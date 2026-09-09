@@ -1,0 +1,1201 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lexicon Quest — Endless</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#12100f;--moss:#2e4a2a;--parch:#e8dcc0;--amber:#e8a33d;--gold:#f0d264;
+    --blood:#a83232;--dim:#7d7361;--spirit:#9fc7e0;
+    --b1:#c0563f;--b2:#e8a33d;--b3:#8fb85a;--b4:#6fb8c8;--b5:#f0d264;
+    --pixel:"Silkscreen","Courier New",monospace;--read:"Lexend",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--ink);color:var(--parch);font-family:var(--read)}
+  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:14px 12px 28px;
+    background:radial-gradient(circle at 50% 0%,#23302a 0%,#12100f 70%)}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+  .shell{width:100%;max-width:660px}
+  .win{border:3px solid var(--parch);outline:3px solid var(--ink);background:#171e1a;box-shadow:0 0 0 3px #3a4a40}
+
+  #hud{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding:10px 12px;margin-bottom:10px}
+  #swordCanvas{width:34px;height:34px;flex:none}
+  .hud-block{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .hud-name{font-family:var(--pixel);font-size:13px;color:var(--gold)}
+  .hud-sub{font-size:11px;color:var(--dim)}
+  #hearts{font-size:17px;letter-spacing:2px;line-height:1;color:var(--blood)}
+  #hearts .empty{color:#3a3128}
+  .hud-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .counter{font-family:var(--pixel);font-size:13px}
+  .counter small{color:var(--dim);font-family:var(--read);font-size:10px;display:block}
+  #streak{letter-spacing:3px;font-size:14px;color:var(--amber);line-height:1}
+  #streak .off{color:#3a3128}
+
+  #bar{height:8px;background:#22201c;border:2px solid #3a4a40;margin-bottom:10px;position:relative}
+  #bar i{display:block;height:100%;background:linear-gradient(90deg,#4a7a3a,#8fb85a);width:0%}
+
+  button{font-family:var(--pixel);font-size:12px;color:var(--ink);background:var(--parch);
+    border:3px solid var(--ink);outline:2px solid var(--parch);padding:8px 12px;cursor:pointer;
+    transition:transform .06s,background .12s}
+  button:hover{background:var(--gold)}
+  button:active{transform:translateY(2px)}
+  button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  button.ghost{background:transparent;color:var(--parch);outline-color:var(--dim);border-color:var(--dim)}
+  button.ghost:hover{background:#2a3630;color:var(--gold)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+
+  #worldWrap{position:relative;line-height:0}
+  #world{width:100%;height:auto;display:block;background:#1b2a24}
+  #hint{font-size:12px;color:var(--dim);text-align:center;margin:8px 0 0;line-height:1.5}
+  #pad{display:none;grid-template-columns:repeat(3,52px);gap:6px;justify-content:center;margin-top:12px}
+  #pad button{padding:14px 0;font-size:14px}
+  #pad .sp{visibility:hidden}
+  @media (hover:none){#pad{display:grid}}
+
+  #overlay{position:fixed;inset:0;background:rgba(9,8,7,.9);display:none;align-items:center;
+    justify-content:center;padding:16px;z-index:20}
+  #overlay.on{display:flex}
+  #panel{width:100%;max-width:560px;max-height:92vh;overflow:auto;padding:20px}
+
+  .stage{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+  .stage canvas{width:72px;height:72px;flex:none}
+  .stage.boss canvas{width:110px;height:110px}
+  .foe{font-family:var(--pixel);font-size:14px;color:var(--blood)}
+  .foe.spirit{color:var(--spirit)}
+  .foehp{font-size:13px;letter-spacing:3px;color:var(--blood);margin-top:5px}
+  .foehp .gone{color:#3a3128}
+
+  .wordline{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px}
+  .word{font-family:var(--pixel);font-size:25px;color:var(--gold);line-height:1.15;word-break:break-word;margin:0}
+  .speak{font-family:var(--pixel);font-size:11px;padding:6px 10px;background:#2f3d34;color:var(--gold);
+    border:2px solid var(--moss);outline:none;flex:none}
+  .speak:hover{background:var(--moss);color:#eafce2}
+  .speak.dead{opacity:.45;cursor:default}
+  .respell{font-family:var(--pixel);font-size:12px;color:var(--spirit)}
+  .def{font-size:16px;line-height:1.55;margin:10px 0 12px}
+  .ex{font-size:14px;line-height:1.6;color:#cbbf9f;border-left:3px solid var(--moss);padding-left:12px;margin:0 0 6px}
+
+  .q{font-size:16px;line-height:1.55;margin:0 0 14px}
+  .q b{color:var(--gold);font-family:var(--pixel);font-size:16px}
+  .blank{color:var(--amber);letter-spacing:1px}
+  .opts{display:grid;gap:8px;margin-bottom:6px}
+  .opt{text-align:left;font-family:var(--read);font-size:15px;padding:11px 14px;background:#222c26;
+    color:var(--parch);border:2px solid #3d4c43;outline:none}
+  .opt:hover{background:#2f3d34;color:var(--gold);border-color:var(--moss)}
+  .opt.right{background:var(--moss);color:#eafce2;border-color:#7ec86a}
+  .opt.wrong{background:#4a1f1f;color:#ffd9d9;border-color:var(--blood)}
+  .scaf{font-family:var(--pixel);font-size:19px;color:var(--amber);letter-spacing:5px;margin:0 0 4px;word-break:break-all}
+  .scaf .hid{color:#5c6b5e}
+  .scaflen{font-family:var(--read);font-size:11px;color:var(--dim);letter-spacing:0;margin:0 0 8px}
+  .hints{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .hints button{font-size:10px;padding:5px 9px}
+  .cue{font-size:14px;line-height:1.55;color:#cbbf9f;border-left:3px solid var(--moss);
+    padding-left:11px;margin:0 0 10px}
+  .typebox{display:flex;gap:8px;margin-bottom:6px}
+  .typebox input{flex:1;min-width:0;font-family:var(--read);font-size:17px;padding:11px 13px;
+    background:#222c26;color:var(--parch);border:2px solid #3d4c43;outline:none}
+  .typebox input:focus{border-color:var(--amber)}
+
+  .timer{height:12px;background:#22201c;border:2px solid #3d4c43;margin-bottom:14px;position:relative}
+  .timer i{display:block;height:100%;background:var(--moss);width:100%}
+  .timer.warn i{background:var(--amber)}
+  .timer.crit i{background:var(--blood)}
+  .timer span{position:absolute;right:5px;top:-1px;font-family:var(--pixel);font-size:9px;color:var(--parch);line-height:12px}
+
+  .verdict{font-size:15px;line-height:1.55;margin:12px 0 0;padding:12px;border:2px solid #3d4c43;background:#20281f}
+  .verdict.good{border-color:#7ec86a}
+  .verdict.bad{border-color:var(--blood)}
+  .verdict strong{font-family:var(--pixel);font-size:13px;display:block;margin-bottom:5px}
+  .verdict.good strong{color:#9ade86}
+  .verdict.bad strong{color:#f08b8b}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .title{font-family:var(--pixel);font-size:19px;color:var(--gold);margin:0 0 10px;line-height:1.3}
+  .body{font-size:15px;line-height:1.6;margin:0 0 8px}
+  .body em{color:var(--amber);font-style:normal}
+  .rate{display:grid;gap:8px;margin-top:6px}
+  .rate button{text-align:left;font-family:var(--read);font-size:15px;padding:12px 14px;background:#222c26;
+    color:var(--parch);border:2px solid #3d4c43;outline:none}
+  .rate button:hover{background:#2f3d34;color:var(--gold);border-color:var(--moss)}
+  .rate b{font-family:var(--pixel);font-size:12px;display:block;color:var(--gold);margin-bottom:3px}
+  .rate small{color:var(--dim);font-size:12px}
+
+  .filters{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+  .filters input{flex:1;min-width:140px;font-family:var(--read);font-size:15px;padding:9px 11px;
+    background:#222c26;color:var(--parch);border:2px solid #3d4c43;outline:none}
+  .filters input:focus{border-color:var(--amber)}
+  .filters select{font-family:var(--read);font-size:14px;padding:9px;background:#222c26;
+    color:var(--parch);border:2px solid #3d4c43}
+  .codex{display:grid;gap:11px;margin-top:6px;max-height:52vh;overflow:auto;padding-right:4px}
+  .codex .item{border-left:3px solid var(--moss);padding-left:11px}
+  .codex .item.s1{border-left-color:var(--b1)}
+  .codex .item.s2{border-left-color:var(--b2)}
+  .codex .item.s3{border-left-color:var(--b3)}
+  .codex .item.s4{border-left-color:var(--b4)}
+  .codex .item.s5{border-left-color:var(--b5)}
+  .codex b{font-family:var(--pixel);color:var(--gold);font-size:14px}
+  .codex p{margin:3px 0 0;font-size:14px;line-height:1.5}
+  .codex .strength{font-size:11px;color:var(--dim);letter-spacing:2px}
+
+  .code{width:100%;font-family:"Courier New",monospace;font-size:11px;padding:10px;background:#222c26;
+    color:var(--spirit);border:2px solid #3d4c43;outline:none;word-break:break-all;resize:vertical;min-height:96px}
+  .code:focus{border-color:var(--amber)}
+
+  .shake{animation:sh .3s}
+  @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  @media (prefers-reduced-motion:reduce){.shake{animation:none}}
+</style>
+
+<div class="shell">
+  <div id="hud" class="win">
+    <canvas id="swordCanvas" width="48" height="48"></canvas>
+    <div class="hud-block">
+      <div class="hud-name" id="swordName">Rusty Blade</div>
+      <div class="hud-sub" id="swordSub">12s per answer</div>
+    </div>
+    <div class="hud-block">
+      <div id="hearts"></div>
+      <div class="hud-sub">health</div>
+    </div>
+    <div class="hud-block">
+      <div id="streak"></div>
+      <div class="hud-sub">to the forge</div>
+    </div>
+    <div class="hud-right">
+      <div class="counter"><span id="mastered">0</span><small>mastered</small></div>
+      <div class="counter"><span id="dueCount" style="color:#e8a33d">0</span><small>shaky</small></div>
+      <button class="ghost" id="codexBtn">Codex</button>
+      <button class="ghost" id="saveBtn">Save</button>
+    </div>
+  </div>
+
+  <div id="bar" class="win" style="box-shadow:none;outline:none"><i></i></div>
+
+  <div id="worldWrap" class="win"><canvas id="world" width="640" height="384"></canvas></div>
+  <p id="hint">Arrow keys or WASD. Gold monsters carry a new word; coloured spirits carry a word you already met.</p>
+
+  <div id="pad">
+    <button class="sp"></button><button data-d="up">▲</button><button class="sp"></button>
+    <button data-d="left">◀</button><button class="sp"></button><button data-d="right">▶</button>
+    <button class="sp"></button><button data-d="down">▼</button><button class="sp"></button>
+  </div>
+</div>
+
+<div id="overlay"><div id="panel" class="win"></div></div>
+
+<script>
+const WORDS=[
+/* character */
+{w:"affable",r:"AF-uh-bul",d:"Easy to talk to and friendly.",s:"friendly",x:["hostile","shy","careless"],t:"The ___ innkeeper chatted with every traveler."},
+{w:"aloof",r:"uh-LOOF",d:"Distant and uninvolved with other people.",s:"distant",x:["warm","eager","noisy"],t:"She stayed ___ at the party, watching from a corner."},
+{w:"altruistic",r:"al-troo-IS-tik",d:"Unselfishly concerned with other people.",s:"unselfish",x:["greedy","cruel","timid"],t:"His ___ decision gave the prize money to the shelter."},
+{w:"audacious",r:"aw-DAY-shus",d:"Boldly daring.",s:"daring",x:["cautious","dull","weak"],t:"The ___ climber went up the cliff without ropes."},
+{w:"benevolent",r:"buh-NEV-uh-lent",d:"Kind and generous toward others.",s:"kindly",x:["cruel","stingy","jealous"],t:"A ___ stranger paid for the family's meal."},
+{w:"brusque",r:"BRUSK",d:"Abrupt and blunt in manner.",s:"curt",x:["gentle","patient","cheerful"],t:"His ___ reply ended the conversation at once."},
+{w:"candid",r:"KAN-did",d:"Honest and direct, even when it is uncomfortable.",s:"frank",x:["secretive","hesitant","rude"],t:"She gave a ___ opinion of his drawing."},
+{w:"churlish",r:"CHUR-lish",d:"Rude and bad-tempered.",s:"surly",x:["polite","joyful","generous"],t:"It was ___ of him to refuse without a word of thanks."},
+{w:"complacent",r:"kum-PLAY-sent",d:"Smugly satisfied and no longer trying to improve.",s:"self-satisfied",x:["anxious","driven","humble"],t:"One easy win made the whole team ___."},
+{w:"conscientious",r:"kon-shee-EN-shus",d:"Careful and guided by a sense of duty.",s:"thorough",x:["careless","lazy","reckless"],t:"A ___ student checks her work twice."},
+{w:"cordial",r:"KOR-jul",d:"Warm and friendly in manner.",s:"genial",x:["icy","hostile","silent"],t:"They exchanged a ___ greeting at the door."},
+{w:"cynical",r:"SIN-ih-kul",d:"Believing that people act only out of selfishness.",s:"distrustful",x:["hopeful","generous","foolish"],t:"Too ___ to trust the offer, she looked for a catch."},
+{w:"despondent",r:"dih-SPON-dent",d:"Deeply discouraged and without hope.",s:"disheartened",x:["elated","calm","confident"],t:"He grew ___ after the third rejection."},
+{w:"diffident",r:"DIF-ih-dent",d:"Shy and lacking confidence in oneself.",s:"timid",x:["bold","angry","careless"],t:"Too ___ to raise his hand, he kept the answer to himself."},
+{w:"docile",r:"DOSS-ul",d:"Easily led or taught; obedient.",s:"obedient",x:["wild","stubborn","fierce"],t:"The ___ pony followed the child anywhere."},
+{w:"dogmatic",r:"dog-MAT-ik",d:"Stating opinions as if they were certain fact.",s:"opinionated",x:["open-minded","unsure","quiet"],t:"His ___ tone left no room for questions."},
+{w:"ebullient",r:"ih-BULL-yent",d:"Bubbling over with enthusiasm.",s:"exuberant",x:["gloomy","weary","grim"],t:"She was ___ after winning the science fair."},
+{w:"eccentric",r:"ik-SEN-trik",d:"Odd or unconventional in a harmless way.",s:"quirky",x:["ordinary","cruel","shy"],t:"The ___ inventor kept a clock in every room."},
+{w:"flamboyant",r:"flam-BOY-unt",d:"Showy and colorful.",s:"showy",x:["plain","modest","dull"],t:"He wore a ___ purple cape to the recital."},
+{w:"frugal",r:"FROO-gul",d:"Careful and sparing with money.",s:"thrifty",x:["wasteful","wealthy","greedy"],t:"So ___ that he mended his socks instead of buying new ones."},
+{w:"garrulous",r:"GAIR-uh-lus",d:"Excessively talkative.",s:"chatty",x:["silent","shy","brief"],t:"Their ___ neighbor talked for an hour about the weather."},
+{w:"gullible",r:"GUL-uh-bul",d:"Easily fooled or tricked.",s:"trusting",x:["suspicious","clever","harsh"],t:"The ___ boy believed the map led to real treasure."},
+{w:"haughty",r:"HAW-tee",d:"Arrogantly superior toward others.",s:"arrogant",x:["humble","kind","timid"],t:"She gave a ___ glance and walked straight past."},
+{w:"impetuous",r:"im-PET-choo-us",d:"Acting suddenly without thinking.",s:"rash",x:["careful","patient","slow"],t:"One ___ leap landed him in the pond."},
+{w:"impudent",r:"IM-pyoo-dent",d:"Disrespectfully bold.",s:"insolent",x:["polite","meek","kind"],t:"The ___ reply earned him a week of chores."},
+{w:"indifferent",r:"in-DIF-rent",d:"Having no interest either way.",s:"uncaring",x:["eager","devoted","curious"],t:"He was ___ to which movie they chose."},
+{w:"indignant",r:"in-DIG-nunt",d:"Angry at something unfair.",s:"outraged",x:["pleased","calm","guilty"],t:"She was ___ when the prize went to a cheater."},
+{w:"ingenious",r:"in-JEEN-yus",d:"Cleverly inventive.",s:"inventive",x:["clumsy","plain","honest"],t:"An ___ pulley lifted the crate by itself."},
+{w:"ingenuous",r:"in-JEN-yoo-us",d:"Innocent and unsuspecting.",s:"naive",x:["crafty","harsh","wise"],t:"Her ___ question made everyone smile."},
+{w:"intrepid",r:"in-TREP-id",d:"Fearless in the face of danger.",s:"fearless",x:["cowardly","weary","calm"],t:"The ___ pilot flew straight into the storm."},
+{w:"meticulous",r:"muh-TIK-yuh-lus",d:"Extremely careful about small details.",s:"painstaking",x:["sloppy","hasty","lazy"],t:"Her ___ notes recorded every measurement twice."},
+{w:"morose",r:"muh-ROHSS",d:"Gloomy and sullen.",s:"sullen",x:["cheerful","lively","kind"],t:"He sat ___ in the back of the bus."},
+{w:"obstinate",r:"OB-stih-nit",d:"Stubbornly refusing to change.",s:"stubborn",x:["flexible","gentle","eager"],t:"The ___ mule would not cross the bridge."},
+{w:"ostentatious",r:"oss-ten-TAY-shus",d:"Showing off wealth or importance.",s:"flashy",x:["modest","plain","quiet"],t:"An ___ gold fountain stood in the lobby."},
+{w:"pensive",r:"PEN-siv",d:"Deeply and somewhat sadly thoughtful.",s:"thoughtful",x:["giddy","hasty","angry"],t:"She grew ___ as the train pulled away."},
+{w:"petulant",r:"PET-yoo-lunt",d:"Childishly sulky and irritable.",s:"sulky",x:["cheerful","patient","brave"],t:"A ___ groan followed every request."},
+{w:"pompous",r:"POM-pus",d:"Self-important and grand.",s:"self-important",x:["humble","simple","shy"],t:"The ___ speech went on for forty minutes."},
+{w:"pragmatic",r:"prag-MAT-ik",d:"Practical rather than idealistic.",s:"practical",x:["dreamy","foolish","rigid"],t:"A ___ plan fixed the leak with tape for now."},
+{w:"resolute",r:"REZ-uh-loot",d:"Firmly determined.",s:"determined",x:["wavering","timid","idle"],t:"She was ___ about finishing the race."},
+{w:"sagacious",r:"suh-GAY-shus",d:"Wise and shrewd in judgment.",s:"wise",x:["foolish","naive","hasty"],t:"The ___ old captain read the sky and turned back."},
+{w:"servile",r:"SUR-vile",d:"Excessively willing to obey.",s:"submissive",x:["defiant","proud","bold"],t:"His ___ bowing embarrassed everyone."},
+{w:"steadfast",r:"STED-fast",d:"Firm and unwavering.",s:"unwavering",x:["fickle","weak","doubtful"],t:"A ___ friend stayed through the whole ordeal."},
+{w:"taciturn",r:"TASS-ih-turn",d:"Saying very little by nature.",s:"tight-lipped",x:["talkative","loud","friendly"],t:"The ___ guard answered only in nods."},
+{w:"tenacious",r:"tuh-NAY-shus",d:"Holding on firmly and refusing to give up.",s:"persistent",x:["fragile","careless","timid"],t:"The ___ puppy would not let go of the rope."},
+{w:"unscrupulous",r:"un-SKROO-pyoo-lus",d:"Having no moral principles.",s:"dishonest",x:["honorable","gentle","timid"],t:"An ___ dealer sold the same horse twice."},
+{w:"zealous",r:"ZEL-us",d:"Enthusiastically devoted to a cause.",s:"fervent",x:["lukewarm","lazy","doubtful"],t:"A ___ volunteer knocked on every door."},
+
+/* actions */
+{w:"abate",r:"uh-BAYT",d:"To become less intense.",s:"subside",x:["intensify","begin","spread"],t:"The storm began to ___ by dawn."},
+{w:"acquiesce",r:"ak-wee-ESS",d:"To accept or agree without protest.",s:"comply",x:["resist","argue","refuse"],t:"She did not like the plan but chose to ___."},
+{w:"admonish",r:"ad-MON-ish",d:"To warn or scold gently.",s:"reprove",x:["praise","ignore","reward"],t:"The coach had to ___ them for showing up late."},
+{w:"alleviate",r:"uh-LEE-vee-ayt",d:"To make something less severe.",s:"ease",x:["worsen","cause","spread"],t:"A cold cloth helped ___ the fever."},
+{w:"annihilate",r:"uh-NY-uh-layt",d:"To destroy completely.",s:"obliterate",x:["create","protect","repair"],t:"One wave could ___ the whole sandcastle."},
+{w:"appease",r:"uh-PEEZ",d:"To calm someone by giving in to them.",s:"pacify",x:["enrage","defy","accuse"],t:"They tried to ___ the crowd with free tickets."},
+{w:"augment",r:"awg-MENT",d:"To increase or add to.",s:"enlarge",x:["reduce","remove","hide"],t:"He took a second job to ___ his savings."},
+{w:"avert",r:"uh-VURT",d:"To turn away, or to prevent from happening.",s:"prevent",x:["cause","invite","ignore"],t:"Quick thinking helped ___ the accident."},
+{w:"bolster",r:"BOHL-ster",d:"To support and strengthen.",s:"reinforce",x:["weaken","remove","doubt"],t:"New evidence helped ___ her argument."},
+{w:"coerce",r:"koh-URSS",d:"To force someone by threat.",s:"compel",x:["persuade","allow","invite"],t:"No one can ___ you into signing it."},
+{w:"commence",r:"kuh-MENSS",d:"To begin.",s:"begin",x:["finish","delay","cancel"],t:"The ceremony will ___ at noon."},
+{w:"condone",r:"kun-DOHN",d:"To overlook or excuse wrongdoing.",s:"excuse",x:["punish","forbid","expose"],t:"The school will not ___ cheating."},
+{w:"confine",r:"kun-FYNE",d:"To keep within limits.",s:"restrict",x:["release","expand","share"],t:"Please ___ your answer to one page."},
+{w:"curtail",r:"kur-TAYL",d:"To cut short or reduce.",s:"shorten",x:["extend","expand","begin"],t:"Rain forced them to ___ the trip."},
+{w:"deter",r:"dih-TUR",d:"To discourage someone from doing something.",s:"discourage",x:["encourage","permit","hurry"],t:"The steep price did not ___ her from buying the book."},
+{w:"disperse",r:"dih-SPURSS",d:"To scatter in different directions.",s:"scatter",x:["gather","hold","freeze"],t:"The wind will ___ the seeds across the field."},
+{w:"divulge",r:"dih-VULJ",d:"To reveal something secret.",s:"disclose",x:["conceal","invent","deny"],t:"He refused to ___ where the map was hidden."},
+{w:"elude",r:"ih-LOOD",d:"To escape or avoid cleverly.",s:"evade",x:["confront","catch","follow"],t:"The fox managed to ___ every hound."},
+{w:"emulate",r:"EM-yoo-layt",d:"To imitate in order to equal or surpass.",s:"imitate",x:["mock","ignore","oppose"],t:"She tried to ___ her sister's steady handwriting."},
+{w:"eradicate",r:"ih-RAD-ih-kayt",d:"To wipe out completely.",s:"eliminate",x:["spread","plant","tolerate"],t:"The program hopes to ___ the disease entirely."},
+{w:"exacerbate",r:"ig-ZAS-ur-bayt",d:"To make a bad situation worse.",s:"worsen",x:["soothe","repair","conceal"],t:"Scratching the bite will only ___ the itch."},
+{w:"expedite",r:"EK-spuh-dyte",d:"To speed up a process.",s:"hasten",x:["delay","block","cancel"],t:"A second clerk helped ___ the line."},
+{w:"fabricate",r:"FAB-rih-kayt",d:"To invent or make up falsely.",s:"invent",x:["verify","discover","admit"],t:"He had to ___ an excuse on the spot."},
+{w:"flourish",r:"FLUR-ish",d:"To grow strongly; to thrive.",s:"thrive",x:["wither","shrink","fail"],t:"Tomatoes ___ in this much sunlight."},
+{w:"forfeit",r:"FOR-fit",d:"To lose something as a penalty.",s:"surrender",x:["win","claim","keep"],t:"Arrive late and you ___ your turn."},
+{w:"foster",r:"FOSS-ter",d:"To encourage the growth of something.",s:"nurture",x:["stifle","destroy","ignore"],t:"Reading aloud helps ___ a love of books."},
+{w:"hinder",r:"HIN-der",d:"To get in the way of.",s:"obstruct",x:["assist","hasten","allow"],t:"Deep snow will ___ the search."},
+{w:"impede",r:"im-PEED",d:"To slow down or obstruct.",s:"block",x:["aid","speed","permit"],t:"Fallen branches ___ the narrow path."},
+{w:"implement",r:"IM-pluh-ment",d:"To put a plan into effect.",s:"enact",x:["abandon","propose","doubt"],t:"The town voted to ___ the new rule."},
+{w:"inhibit",r:"in-HIB-it",d:"To hold back or restrain.",s:"restrain",x:["release","encourage","spread"],t:"Cold weather can ___ the plant's growth."},
+{w:"instigate",r:"IN-stih-gayt",d:"To stir up or provoke into starting.",s:"provoke",x:["settle","prevent","follow"],t:"One rude remark was enough to ___ the argument."},
+{w:"mitigate",r:"MIT-ih-gayt",d:"To make less severe.",s:"lessen",x:["aggravate","cause","extend"],t:"Sandbags helped ___ the flooding."},
+{w:"nullify",r:"NULL-ih-fy",d:"To cancel out or make void.",s:"cancel",x:["confirm","enforce","extend"],t:"One error can ___ the whole result."},
+{w:"placate",r:"PLAY-kayt",d:"To calm someone's anger.",s:"soothe",x:["provoke","accuse","ignore"],t:"The manager tried to ___ the angry customer."},
+{w:"procrastinate",r:"proh-KRAS-tih-nayt",d:"To put off doing something.",s:"delay",x:["hurry","finish","begin"],t:"If you ___ now, the project will crush you later."},
+{w:"rebuke",r:"rih-BYOOK",d:"To criticize sharply.",s:"scold",x:["praise","thank","excuse"],t:"The judge had to ___ the lawyer for interrupting."},
+{w:"refute",r:"rih-FYOOT",d:"To prove something wrong.",s:"disprove",x:["confirm","repeat","accept"],t:"One photograph was enough to ___ his story."},
+{w:"relinquish",r:"rih-LING-kwish",d:"To give up or let go of.",s:"surrender",x:["seize","keep","demand"],t:"She had to ___ the crown after one year."},
+{w:"reprimand",r:"REP-rih-mand",d:"To scold formally.",s:"censure",x:["commend","reward","forgive"],t:"The coach will ___ anyone who skips practice."},
+{w:"squander",r:"SKWON-der",d:"To waste something carelessly.",s:"waste",x:["save","earn","guard"],t:"Do not ___ the last hour of daylight."},
+{w:"subdue",r:"sub-DOO",d:"To bring under control.",s:"conquer",x:["rouse","release","provoke"],t:"It took three of them to ___ the frightened horse."},
+{w:"sustain",r:"suh-STAYN",d:"To keep going or support over time.",s:"maintain",x:["abandon","end","weaken"],t:"One canteen cannot ___ four hikers."},
+{w:"thwart",r:"THWORT",d:"To stop someone from succeeding.",s:"foil",x:["assist","begin","praise"],t:"A locked gate served to ___ their escape."},
+{w:"undermine",r:"un-der-MYNE",d:"To weaken gradually from below.",s:"sabotage",x:["bolster","build","praise"],t:"Constant teasing can ___ a child's confidence."},
+{w:"validate",r:"VAL-ih-dayt",d:"To confirm something as true.",s:"confirm",x:["dispute","ignore","weaken"],t:"A second test helped ___ the finding."},
+
+/* qualities */
+{w:"ambiguous",r:"am-BIG-yoo-us",d:"Having more than one possible meaning.",s:"unclear",x:["certain","loud","honest"],t:"His ___ answer left everyone guessing."},
+{w:"arduous",r:"AR-joo-us",d:"Requiring great effort; very difficult.",s:"grueling",x:["easy","brief","pleasant"],t:"The ___ climb took eleven hours."},
+{w:"authentic",r:"aw-THEN-tik",d:"Genuine and real.",s:"genuine",x:["fake","copied","doubtful"],t:"The museum confirmed the letter was ___."},
+{w:"benign",r:"bih-NYNE",d:"Harmless and gentle.",s:"mild",x:["deadly","cruel","severe"],t:"The old dog's growl was entirely ___."},
+{w:"clandestine",r:"klan-DES-tin",d:"Kept secret because it is not allowed.",s:"secret",x:["public","cheerful","lawful"],t:"They held a ___ meeting after curfew."},
+{w:"conspicuous",r:"kun-SPIK-yoo-us",d:"Easy to notice; standing out.",s:"noticeable",x:["hidden","tiny","silent"],t:"His orange coat made him ___ in the grey crowd."},
+{w:"copious",r:"KOH-pee-us",d:"Plentiful; in large amounts.",s:"abundant",x:["scarce","tiny","single"],t:"She took ___ notes during the lecture."},
+{w:"cumbersome",r:"KUM-ber-sum",d:"Bulky and awkward to handle.",s:"unwieldy",x:["light","tidy","simple"],t:"The ___ old printer took two people to lift."},
+{w:"deficient",r:"dih-FISH-unt",d:"Lacking something necessary.",s:"inadequate",x:["ample","complete","rich"],t:"The soil was ___ in nitrogen."},
+{w:"detrimental",r:"det-rih-MEN-tul",d:"Causing harm or damage.",s:"harmful",x:["helpful","harmless","useful"],t:"Too little sleep is ___ to learning."},
+{w:"diverse",r:"dih-VURSS",d:"Showing a lot of variety.",s:"varied",x:["uniform","identical","plain"],t:"The garden held a ___ set of plants."},
+{w:"eloquent",r:"EL-uh-kwent",d:"Speaking or writing clearly and persuasively.",s:"articulate",x:["silent","clumsy","dishonest"],t:"Her ___ speech convinced the whole council."},
+{w:"exorbitant",r:"ig-ZOR-bih-tunt",d:"Unreasonably high in price.",s:"excessive",x:["cheap","fair","modest"],t:"They charged an ___ fee for delivery."},
+{w:"feasible",r:"FEE-zuh-bul",d:"Possible to do.",s:"achievable",x:["impossible","absurd","costly"],t:"Finishing by Friday is ___ if we start now."},
+{w:"formidable",r:"FOR-mih-duh-bul",d:"Impressively powerful or difficult.",s:"daunting",x:["feeble","easy","gentle"],t:"The champion was a ___ opponent."},
+{w:"futile",r:"FYOO-tile",d:"Pointless; producing no useful result.",s:"useless",x:["effective","worthy","clever"],t:"Arguing with the storm was ___."},
+{w:"gaudy",r:"GAW-dee",d:"Showy in a tasteless way.",s:"garish",x:["tasteful","plain","subtle"],t:"A ___ neon sign lit the whole street."},
+{w:"immaculate",r:"ih-MAK-yoo-lit",d:"Perfectly clean or flawless.",s:"spotless",x:["filthy","messy","ruined"],t:"His workshop was ___ despite the sawdust."},
+{w:"imminent",r:"IM-ih-nunt",d:"About to happen very soon.",s:"impending",x:["distant","past","unlikely"],t:"Dark clouds warned of ___ rain."},
+{w:"impartial",r:"im-PAR-shul",d:"Not favoring either side.",s:"unbiased",x:["prejudiced","unfair","loyal"],t:"An ___ judge decided the contest."},
+{w:"inevitable",r:"in-EV-ih-tuh-bul",d:"Certain to happen; unavoidable.",s:"unavoidable",x:["doubtful","optional","rare"],t:"With no brakes, the crash was ___."},
+{w:"innocuous",r:"ih-NOK-yoo-us",d:"Harmless and unlikely to offend.",s:"inoffensive",x:["dangerous","cruel","potent"],t:"The snake looked frightening but was ___."},
+{w:"intricate",r:"IN-trih-kit",d:"Very detailed and complex.",s:"elaborate",x:["simple","plain","crude"],t:"An ___ pattern covered the whole rug."},
+{w:"lucid",r:"LOO-sid",d:"Clear and easy to understand.",s:"clear",x:["confusing","murky","vague"],t:"She gave a ___ explanation in two sentences."},
+{w:"lucrative",r:"LOO-kruh-tiv",d:"Producing a lot of money.",s:"profitable",x:["worthless","costly","free"],t:"Mowing lawns turned out to be ___."},
+{w:"mundane",r:"mun-DAYN",d:"Ordinary and dull; nothing special.",s:"ordinary",x:["thrilling","rare","elegant"],t:"After the adventure, washing dishes felt painfully ___."},
+{w:"obscure",r:"ub-SKYOOR",d:"Unclear, or known by very few.",s:"little-known",x:["famous","obvious","plain"],t:"He collects ___ facts about lighthouses."},
+{w:"obsolete",r:"OB-suh-leet",d:"No longer used; out of date.",s:"outdated",x:["modern","valuable","broken"],t:"Floppy disks became ___ once flash drives appeared."},
+{w:"opaque",r:"oh-PAYK",d:"Not able to be seen through.",s:"cloudy",x:["clear","thin","bright"],t:"The ___ glass hid the room completely."},
+{w:"paramount",r:"PAIR-uh-mount",d:"More important than anything else.",s:"supreme",x:["minor","equal","optional"],t:"Safety is ___ on this trip."},
+{w:"perpetual",r:"pur-PECH-oo-ul",d:"Never-ending.",s:"ceaseless",x:["brief","occasional","final"],t:"The ___ hum of the fridge filled the kitchen."},
+{w:"plausible",r:"PLAW-zuh-bul",d:"Seeming reasonable or believable.",s:"believable",x:["absurd","proven","false"],t:"That is a ___ explanation, though I still doubt it."},
+{w:"profound",r:"pruh-FOWND",d:"Very deep or intense.",s:"deep",x:["shallow","silly","mild"],t:"The book had a ___ effect on her."},
+{w:"prudent",r:"PROO-dent",d:"Showing careful, sensible judgment.",s:"sensible",x:["reckless","generous","cheerful"],t:"It was ___ to check the weather before the hike."},
+{w:"redundant",r:"rih-DUN-dunt",d:"Unnecessarily repetitive.",s:"repetitive",x:["essential","brief","novel"],t:"The second warning sign was ___."},
+{w:"resilient",r:"rih-ZIL-yunt",d:"Able to recover quickly.",s:"hardy",x:["brittle","weak","rigid"],t:"Children are surprisingly ___ after a fall."},
+{w:"sporadic",r:"spuh-RAD-ik",d:"Happening at irregular intervals.",s:"occasional",x:["constant","steady","hourly"],t:"___ showers interrupted the picnic."},
+{w:"stagnant",r:"STAG-nunt",d:"Not flowing; not developing.",s:"motionless",x:["flowing","thriving","fresh"],t:"The ___ pond smelled of algae."},
+{w:"subtle",r:"SUT-ul",d:"Delicate and not obvious.",s:"faint",x:["obvious","harsh","loud"],t:"There was a ___ change in her tone."},
+{w:"superficial",r:"soo-pur-FISH-ul",d:"On the surface only; shallow.",s:"cursory",x:["deep","thorough","serious"],t:"He gave the report a ___ glance."},
+{w:"superfluous",r:"soo-PUR-floo-us",d:"More than is needed.",s:"unnecessary",x:["essential","scarce","useful"],t:"A third alarm clock is ___."},
+{w:"tangible",r:"TAN-juh-bul",d:"Able to be touched; concrete.",s:"concrete",x:["imaginary","vague","hidden"],t:"We need ___ proof, not a feeling."},
+{w:"turbulent",r:"TUR-byoo-lunt",d:"Violently disturbed or unsteady.",s:"stormy",x:["calm","still","gentle"],t:"The plane crossed a ___ patch of air."},
+{w:"ubiquitous",r:"yoo-BIK-wih-tus",d:"Present everywhere.",s:"widespread",x:["rare","absent","local"],t:"Phones are ___ in the modern classroom."},
+{w:"volatile",r:"VOL-uh-tul",d:"Likely to change suddenly.",s:"unstable",x:["steady","calm","fixed"],t:"The ___ weather ruined every plan."},
+
+/* feelings */
+{w:"apathy",r:"AP-uh-thee",d:"A lack of interest or concern.",s:"indifference",x:["passion","anger","worry"],t:"The team's ___ showed in every dropped pass."},
+{w:"apprehensive",r:"ap-rih-HEN-siv",d:"Anxious about what may happen.",s:"uneasy",x:["confident","eager","calm"],t:"She felt ___ about the first day."},
+{w:"ardent",r:"AR-dunt",d:"Passionate and intensely enthusiastic.",s:"passionate",x:["indifferent","cold","mild"],t:"He is an ___ collector of old maps."},
+{w:"averse",r:"uh-VURSS",d:"Strongly disliking or opposed to.",s:"opposed",x:["eager","fond","willing"],t:"She is ___ to any change in routine."},
+{w:"contempt",r:"kun-TEMPT",d:"A feeling that something is worthless.",s:"scorn",x:["admiration","respect","pity"],t:"He looked at the cheap copy with ___."},
+{w:"dejected",r:"dih-JEK-tid",d:"Sad and discouraged.",s:"downcast",x:["elated","proud","eager"],t:"He walked home ___ after the tryouts."},
+{w:"elated",r:"ih-LAY-tid",d:"Extremely happy.",s:"overjoyed",x:["miserable","bored","calm"],t:"She was ___ to find her lost ring."},
+{w:"exuberant",r:"ig-ZOO-bur-unt",d:"Full of energy and high spirits.",s:"lively",x:["subdued","weary","grim"],t:"An ___ crowd filled the gym."},
+{w:"forlorn",r:"for-LORN",d:"Lonely and unhappy.",s:"desolate",x:["cheerful","crowded","hopeful"],t:"A ___ kitten sat under the porch."},
+{w:"indignation",r:"in-dig-NAY-shun",d:"Anger at something unjust.",s:"outrage",x:["delight","calm","guilt"],t:"Her ___ grew as the story went on."},
+{w:"melancholy",r:"MEL-un-kol-ee",d:"A thoughtful, lingering sadness.",s:"sorrow",x:["joy","fury","panic"],t:"A quiet ___ settled over the empty house."},
+{w:"nostalgia",r:"nos-TAL-juh",d:"A longing for the past.",s:"longing",x:["dread","boredom","hurry"],t:"Old songs filled him with ___."},
+{w:"remorse",r:"rih-MORSS",d:"Deep regret for something wrong you did.",s:"regret",x:["pride","delight","spite"],t:"She felt ___ the moment she said it."},
+{w:"serenity",r:"suh-REN-ih-tee",d:"Calmness and peace.",s:"tranquility",x:["chaos","panic","noise"],t:"There was a strange ___ in the empty library."},
+{w:"skeptical",r:"SKEP-tih-kul",d:"Doubting; not easily convinced.",s:"doubtful",x:["certain","trusting","eager"],t:"He remained ___ of the miracle cure."},
+{w:"trepidation",r:"trep-ih-DAY-shun",d:"Fear or worry about what is coming.",s:"dread",x:["confidence","joy","calm"],t:"She opened the report with ___."},
+{w:"wistful",r:"WIST-ful",d:"Sadly longing for something.",s:"yearning",x:["content","angry","brisk"],t:"He gave a ___ look at his old bicycle."},
+{w:"zeal",r:"ZEEL",d:"Great energy in pursuit of a cause.",s:"fervor",x:["apathy","doubt","sloth"],t:"She campaigned with real ___."},
+
+/* speech */
+{w:"advocate",r:"AD-vuh-kayt",d:"To publicly support something.",s:"champion",x:["oppose","ignore","doubt"],t:"Doctors ___ regular exercise for everyone."},
+{w:"allege",r:"uh-LEJ",d:"To claim something without proof.",s:"assert",x:["prove","deny","confirm"],t:"They ___ that the sign was missing that night."},
+{w:"articulate",r:"ar-TIK-yoo-lit",d:"Able to express oneself clearly.",s:"fluent",x:["mumbling","confused","silent"],t:"She is unusually ___ for her age."},
+{w:"concede",r:"kun-SEED",d:"To admit a point or accept defeat.",s:"admit",x:["deny","win","insist"],t:"He had to ___ that she was right."},
+{w:"concise",r:"kun-SYSE",d:"Brief and to the point.",s:"succinct",x:["rambling","vague","lengthy"],t:"Her ___ summary took only four lines."},
+{w:"contradict",r:"kon-truh-DIKT",d:"To state the opposite of.",s:"dispute",x:["agree","support","repeat"],t:"The photo seemed to ___ his account."},
+{w:"digress",r:"dy-GRESS",d:"To wander away from the main topic.",s:"stray",x:["focus","conclude","repeat"],t:"The speaker began to ___ into stories about his dog."},
+{w:"discourse",r:"DIS-korss",d:"Serious discussion or writing.",s:"discussion",x:["silence","rumor","joke"],t:"The article added little to the ___."},
+{w:"elicit",r:"ih-LISS-it",d:"To draw out a response.",s:"evoke",x:["suppress","ignore","answer"],t:"Her question failed to ___ any reply."},
+{w:"endorse",r:"en-DORSS",d:"To publicly approve or support.",s:"back",x:["reject","doubt","forbid"],t:"Two mayors chose to ___ the plan."},
+{w:"implore",r:"im-PLOR",d:"To beg earnestly.",s:"beseech",x:["demand","refuse","order"],t:"She had to ___ him to reconsider."},
+{w:"imply",r:"im-PLY",d:"To suggest something without saying it outright.",s:"hint",x:["state","prove","shout"],t:"His tone seemed to ___ that we were late."},
+{w:"infer",r:"in-FUR",d:"To draw a conclusion from evidence.",s:"deduce",x:["declare","announce","suggest"],t:"From the wet umbrella we can ___ that it rained."},
+{w:"rhetoric",r:"RET-ur-ik",d:"The art of persuasive speaking or writing.",s:"persuasion",x:["silence","evidence","poetry"],t:"The speech was pure ___ with no facts in it."},
+{w:"solicit",r:"suh-LISS-it",d:"To ask for or seek to obtain.",s:"request",x:["donate","refuse","ignore"],t:"The club will ___ donations from local shops."},
+{w:"verbose",r:"vur-BOHSS",d:"Using far more words than needed.",s:"wordy",x:["concise","silent","blunt"],t:"His ___ answer buried the point completely."},
+{w:"vociferous",r:"voh-SIF-ur-us",d:"Loud and forceful in expressing opinion.",s:"clamorous",x:["quiet","meek","private"],t:"A ___ crowd demanded a recount."},
+
+/* amount and time */
+{w:"brevity",r:"BREV-ih-tee",d:"Shortness of speech or writing.",s:"conciseness",x:["length","delay","silence"],t:"The note's ___ made it easy to read."},
+{w:"diminutive",r:"dih-MIN-yoo-tiv",d:"Very small.",s:"tiny",x:["enormous","average","tall"],t:"A ___ owl perched on the branch."},
+{w:"exhaustive",r:"ig-ZAWS-tiv",d:"Complete and thorough.",s:"comprehensive",x:["partial","hasty","brief"],t:"They made an ___ search of the attic."},
+{w:"finite",r:"FY-nyte",d:"Having limits; not endless.",s:"limited",x:["endless","vast","infinite"],t:"We have a ___ amount of time."},
+{w:"innumerable",r:"ih-NOO-mur-uh-bul",d:"Too many to be counted.",s:"countless",x:["few","single","scarce"],t:"___ stars appeared once the lights went out."},
+{w:"myriad",r:"MEER-ee-ud",d:"A very great number.",s:"multitude",x:["handful","scarcity","pair"],t:"A ___ of insects filled the summer air."},
+{w:"negligible",r:"NEG-lih-juh-bul",d:"So small that it does not matter.",s:"insignificant",x:["enormous","crucial","obvious"],t:"The difference in weight was ___."},
+{w:"nominal",r:"NOM-ih-nul",d:"Very small in amount; in name only.",s:"token",x:["huge","real","costly"],t:"They charge a ___ fee of one dollar."},
+{w:"optimal",r:"OP-tih-mul",d:"The best possible.",s:"ideal",x:["worst","average","poor"],t:"Cool and dry is the ___ way to store them."},
+{w:"paucity",r:"PAW-sih-tee",d:"A scarcity; too little of something.",s:"shortage",x:["abundance","excess","flood"],t:"There was a ___ of evidence."},
+{w:"perennial",r:"puh-REN-ee-ul",d:"Lasting or returning year after year.",s:"recurring",x:["brief","single","sudden"],t:"Traffic is a ___ complaint in this town."},
+{w:"pervasive",r:"pur-VAY-siv",d:"Spreading widely through something.",s:"prevalent",x:["rare","local","faint"],t:"A ___ smell of paint filled the school."},
+{w:"pinnacle",r:"PIN-uh-kul",d:"The highest point.",s:"peak",x:["bottom","valley","start"],t:"Winning the medal was the ___ of her career."},
+{w:"subsequent",r:"SUB-sih-kwent",d:"Coming after in time.",s:"following",x:["previous","current","first"],t:"Every ___ attempt went faster."},
+{w:"transient",r:"TRAN-shunt",d:"Lasting only a short time.",s:"passing",x:["permanent","lasting","eternal"],t:"Fame can be ___."},
+{w:"ephemeral",r:"ih-FEM-ur-ul",d:"Lasting a very short time.",s:"fleeting",x:["endless","solid","ancient"],t:"A rainbow is ___."},
+
+/* ideas and evidence */
+{w:"adversary",r:"AD-vur-sair-ee",d:"An opponent or enemy.",s:"opponent",x:["ally","helper","friend"],t:"He faced a familiar ___ in the final round."},
+{w:"anecdote",r:"AN-ik-doht",d:"A short account of a real incident.",s:"story",x:["statistic","essay","rumor"],t:"She opened with an ___ about her grandmother."},
+{w:"antagonize",r:"an-TAG-uh-nyze",d:"To provoke hostility in someone.",s:"aggravate",x:["soothe","please","assist"],t:"Do not ___ the neighbors over the fence."},
+{w:"arbitrary",r:"AR-bih-trair-ee",d:"Based on whim rather than reason.",s:"random",x:["reasoned","planned","fair"],t:"The seating order seemed completely ___."},
+{w:"catalyst",r:"KAT-uh-list",d:"Something that causes change.",s:"trigger",x:["obstacle","result","delay"],t:"Her letter was the ___ for the whole reform."},
+{w:"coalition",r:"koh-uh-LISH-un",d:"An alliance of groups or people.",s:"alliance",x:["rivalry","split","individual"],t:"Three clubs formed a ___ to save the park."},
+{w:"consensus",r:"kun-SEN-sus",d:"General agreement among a group.",s:"accord",x:["dispute","vote","doubt"],t:"The group reached a ___ after an hour."},
+{w:"deficit",r:"DEF-ih-sit",d:"A shortage or shortfall.",s:"shortfall",x:["surplus","profit","excess"],t:"They finished the year with a small ___."},
+{w:"deplete",r:"dih-PLEET",d:"To use up or drain away.",s:"exhaust",x:["replenish","fill","save"],t:"A long drought can ___ the reservoir."},
+{w:"discrepancy",r:"dis-KREP-un-see",d:"A difference between two things that should match.",s:"inconsistency",x:["agreement","similarity","summary"],t:"She found a ___ between the receipts and the total."},
+{w:"disparity",r:"dis-PAIR-ih-tee",d:"A noticeable inequality.",s:"inequality",x:["equality","balance","match"],t:"There is a wide ___ in class sizes."},
+{w:"dubious",r:"DOO-bee-us",d:"Doubtful or questionable.",s:"questionable",x:["certain","proven","reliable"],t:"The map's age is ___ at best."},
+{w:"empirical",r:"em-PEER-ih-kul",d:"Based on observation or experiment.",s:"observed",x:["theoretical","imagined","guessed"],t:"They wanted ___ evidence, not opinions."},
+{w:"exemplary",r:"ig-ZEM-pluh-ree",d:"Serving as a model of excellence.",s:"outstanding",x:["poor","average","shameful"],t:"Her attendance record is ___."},
+{w:"hypothetical",r:"hy-puh-THET-ih-kul",d:"Supposed for the sake of argument, not actual.",s:"theoretical",x:["actual","proven","certain"],t:"Consider a ___ town with no cars at all."},
+{w:"inherent",r:"in-HEER-unt",d:"Existing as a natural, permanent part of something.",s:"intrinsic",x:["added","foreign","temporary"],t:"There is an ___ risk in any climb."},
+{w:"integrity",r:"in-TEG-rih-tee",d:"Honesty and firm moral principle.",s:"uprightness",x:["corruption","deceit","greed"],t:"He is known throughout the town for his ___."},
+{w:"novelty",r:"NOV-ul-tee",d:"Newness; the quality of being new.",s:"freshness",x:["tradition","routine","age"],t:"The ___ of the game wore off in a week."},
+{w:"paradox",r:"PAIR-uh-doks",d:"A statement that seems contradictory but may be true.",s:"contradiction",x:["certainty","proof","rule"],t:"It is a ___ that the more you give, the more you have."},
+{w:"precedent",r:"PRESS-ih-dunt",d:"An earlier case used as a guide.",s:"example",x:["novelty","exception","forecast"],t:"The ruling set an important ___."},
+{w:"proponent",r:"pruh-POH-nunt",d:"A person who supports something.",s:"supporter",x:["opponent","critic","enemy"],t:"She is a leading ___ of later school start times."},
+{w:"reciprocal",r:"rih-SIP-ruh-kul",d:"Mutual; given in return.",s:"mutual",x:["one-sided","unequal","hostile"],t:"They have a ___ arrangement to feed each other's cats."},
+{w:"rudimentary",r:"roo-dih-MEN-tuh-ree",d:"Basic and not fully developed.",s:"elementary",x:["advanced","complete","refined"],t:"He has only a ___ grasp of French."},
+{w:"scrutinize",r:"SKROO-tih-nyze",d:"To examine very closely.",s:"inspect",x:["glance","ignore","skim"],t:"The judges will ___ every entry."},
+{w:"speculate",r:"SPEK-yoo-layt",d:"To form a theory without firm evidence.",s:"theorize",x:["prove","verify","know"],t:"We can only ___ about what happened."},
+{w:"substantiate",r:"sub-STAN-shee-ayt",d:"To provide evidence to support a claim.",s:"corroborate",x:["disprove","doubt","assume"],t:"He could not ___ a single one of his claims."},
+{w:"tentative",r:"TEN-tuh-tiv",d:"Not final; hesitant.",s:"provisional",x:["final","certain","fixed"],t:"We made a ___ plan for Saturday."},
+{w:"unprecedented",r:"un-PRESS-ih-den-tid",d:"Never having happened before.",s:"unheard-of",x:["routine","common","expected"],t:"The heat that summer was ___."},
+{w:"viable",r:"VY-uh-bul",d:"Capable of working successfully.",s:"workable",x:["hopeless","doomed","absurd"],t:"Only one ___ option remained."},
+{w:"reticent",r:"RET-ih-sent",d:"Reluctant to speak; keeping thoughts private.",s:"reserved",x:["talkative","friendly","loud"],t:"He was ___ about his past and changed the subject."}
+];
+
+/* ---------- tuning ---------- */
+const MASTER=4;
+const INTERVAL={1:2,2:5,3:14,4:60};
+const BOXQ={1:"mc-syn",2:"mc-sent",3:"type-sent",4:"type-word"};
+const SLOTS=6, FORGE_AT=5, BOSS_SCALES=10, BOSS_HEARTS=3;
+const TIERCAP=14, MAXHP=8;
+const forgeUseful=()=>S.tier<TIERCAP||S.maxhp<MAXHP;
+
+const SWORD_NAMES=["Rusty Blade","Iron Sword","Steel Longsword","Silver Rapier","Runed Falchion",
+  "Moonsteel Saber","Emberbrand","Frostedge","Starforged Blade","Lexicon Blade"];
+const SWORD_LOOK=[
+  {blade:"#7a6a55",guard:"#4a3b2a",grip:"#33251a"},{blade:"#9aa2ad",guard:"#5c6470",grip:"#4a3526"},
+  {blade:"#cdd6e0",guard:"#6f7b8c",grip:"#4a3526"},{blade:"#e9eff5",guard:"#b9a24a",grip:"#5a2e2e"},
+  {blade:"#d8c9a8",guard:"#8a6a3a",grip:"#4a2e1e"},{blade:"#cfe0ea",guard:"#7a8fa8",grip:"#3a3550"},
+  {blade:"#f0b070",guard:"#a8542a",grip:"#5a2e1e"},{blade:"#bfe6f0",guard:"#5a90a8",grip:"#2e4450"},
+  {blade:"#ffeec0",guard:"#c8a24a",grip:"#5a3a2a"},{blade:"#ffe9a8",guard:"#e8a33d",grip:"#6b2f2f"}];
+const swordName=t=>t<SWORD_NAMES.length?SWORD_NAMES[t]:"Lexicon Blade +"+(t-SWORD_NAMES.length+1);
+const swordTime=t=>Math.min(40,12+2*t);
+const swordLook=t=>SWORD_LOOK[Math.min(t,SWORD_LOOK.length-1)];
+
+const MAP=[
+  "TTTTTTTTTTTTTTTTTTTT","T..................T","T..TT.....TT.......T","T.................TT",
+  "T.....TT......TT...T","T..................T","TT.....~~~~........T","T......~~~~....TT..T",
+  "T..TT..............T","T..............TT..T","T..................T","TTTTTTTTTTTTTTTTTTTT"];
+const TS=32,COLS=20,ROWS=12;
+const FORGE={c:9,r:5}, SHRINE={c:12,r:6};
+
+const SPRITES={
+  knight:{pal:{w:"#f2efe4",g:"#93a0b0",f:"#e8b98e",e:"#20160f",b:"#3d5f8a",r:"#5a3a22",y:"#4a3526"},
+    px:["....wwww....","...gggggg...","..gggggggg..","..ggffffgg..","..ffeffeff..",
+        "...ffffff...","..bbbbbbbb..",".bbbbbbbbbb.",".bbrrrrrrbb.","..bbbbbbbb..",
+        "..yy....yy..","..yy....yy.."]},
+  slime:{pal:{s:"#5fae55",d:"#356b30",e:"#12100f",h:"#a8e39c"},
+    px:["............","....ssss....","...ssssss...","..sshssssss.","..ssssssss..",
+        ".ssessesss..",".ssssssssss.",".ssssssssss.","sssssssssss.","ssssssssssss",
+        "dddddddddddd","............"]},
+  bat:{pal:{p:"#8a6bb5",d:"#4a3568",e:"#e05a5a"},
+    px:["............","d..........d","dd........dd","ddd.pppp.ddd","dddppppppddd",
+        ".ddpepepdd..","..dppppppd..","...pppppp...","....pppp....",".....pp.....",
+        "............","............"]},
+  ghost:{pal:{w:"#dfe9ea",e:"#20160f"},
+    px:["............","....wwww....","...wwwwww...","..wwwwwwww..","..wweewwee..",
+        "..wwwwwwww..","..wwwwwwww..",".wwwwwwwwww.",".wwwwwwwwww.",".wwwwwwwwww.",
+        ".w.ww.ww.ww.","............"]},
+  golem:{pal:{s:"#8c8577",d:"#5c564b",e:"#e8a33d"},
+    px:["............","..ssssssss..",".ssssssssss.",".sseesseess.",".ssssssssss.",
+        "..ssssssss..","ssssssssssss","ssssddddssss","ssssddddssss","ssss....ssss",
+        "ssss....ssss","............"]},
+  forge:{pal:{o:"#e8a33d",d:"#3a3630",s:"#6b6455"},
+    px:["............","....oo......","...oooo.....","..oooooo....","..dddddddd..",
+        ".dddddddddd.","..dddddddd..","....dddd....","...ssssss...","..ssssssss..",
+        "..ssssssss..","............"]},
+  wyrm:{pal:{r:"#8f2b2b",o:"#e8a33d",e:"#f0d264",t:"#f2efe4"},
+    px:["................","...r........r...","..rr........rr..","..rrr..rr..rrr..",
+        "...rrrrrrrrrr...","..rrrrrrrrrrrr..",".rrrrrrrrrrrrrr.",".rrreerrrreerrr.",
+        ".rrrrrrrrrrrrrr.",".rrroooooooorrr.","..rtttttttttr...","..rrrrrrrrrrrr..",
+        "...rrrrrrrrrr...","..rr.rrrrrr.rr..",".rr...rrrr...rr.","................"]},
+  sword:{pal:{b:"#cdd6e0",g:"#6f7b8c",h:"#4a3526"},
+    px:[".....bb.....",".....bb.....",".....bb.....",".....bb.....",".....bb.....",
+        ".....bb.....","..gggggggg..","..gggggggg..",".....hh.....",".....hh.....",
+        ".....hh.....","....gggg...."]}
+};
+const BOXCOL={1:"#c0563f",2:"#e8a33d",3:"#8fb85a",4:"#f0d264"};
+const spiritPal=b=>({w:BOXCOL[b]||"#9fc7e0",e:"#1b3040"});
+const NEWSPR=["slime","bat","golem"];
+
+function drawSprite(ctx,name,x,y,scale,alpha,pal){
+  const sp=SPRITES[name]; if(!sp) return;
+  const P=pal||sp.pal;
+  ctx.save(); if(alpha!==undefined) ctx.globalAlpha=alpha;
+  for(let r=0;r<sp.px.length;r++){const row=sp.px[r];
+    for(let c=0;c<row.length;c++){const ch=row[c];
+      if(ch==="."||!P[ch]) continue;
+      ctx.fillStyle=P[ch]; ctx.fillRect(x+c*scale,y+r*scale,scale,scale);}}
+  ctx.restore();
+}
+
+/* ---------- state ---------- */
+const N=WORDS.length;
+const S={
+  px:1,pr:1,ox:0,oy:0,moving:false,dir:"down",face:"right",
+  hp:5,maxhp:5,tier:0,streak:0,crowns:0,battles:0,
+  box:new Array(N).fill(0), lastB:new Array(N).fill(0),
+  mons:[], recent:[], mode:"world", enc:null, forge:null, boss:null
+};
+const world=document.getElementById("world"), wctx=world.getContext("2d");
+const overlay=document.getElementById("overlay"), panel=document.getElementById("panel");
+
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const at=(c,r)=>(MAP[r]||"")[c]||"T";
+const masteredCount=()=>S.box.filter(b=>b>=MASTER).length;
+const seenCount=()=>S.box.filter(b=>b>0).length;
+const shakyCount=()=>S.box.filter(b=>b>0&&b<=2).length;
+const starTotal=()=>S.box.reduce((a,b)=>a+b,0);
+function dueList(){
+  const o=[];
+  for(let i=0;i<N;i++){ if(!S.box[i]) continue;
+    if(S.battles-S.lastB[i]>=INTERVAL[S.box[i]]) o.push(i); }
+  return o.sort((a,b)=>S.box[a]-S.box[b]);
+}
+const unseenList=()=>{const o=[];for(let i=0;i<N;i++) if(!S.box[i]) o.push(i); return o;};
+
+function beep(f,d,t){try{
+  const A=window.__ac||(window.__ac=new (window.AudioContext||window.webkitAudioContext)());
+  const o=A.createOscillator(),g=A.createGain();
+  o.type=t||"square";o.frequency.value=f;
+  g.gain.setValueAtTime(.05,A.currentTime);
+  g.gain.exponentialRampToValueAtTime(.0001,A.currentTime+d);
+  o.connect(g);g.connect(A.destination);o.start();o.stop(A.currentTime+d);}catch(e){}}
+
+/* ---------- speech ---------- */
+const VOICE_OK=("speechSynthesis" in window);
+function speak(word,sentence){
+  if(!VOICE_OK) return false;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(word); u.lang="en-US"; u.rate=.75; speechSynthesis.speak(u);
+    if(sentence){const v=new SpeechSynthesisUtterance(sentence); v.lang="en-US"; v.rate=.85; speechSynthesis.speak(v);}
+    return true;
+  }catch(e){return false;}
+}
+const speakBtn=(i,label,sent)=>`<button class="speak${VOICE_OK?"":" dead"}" data-speak="${i}" ${sent?'data-sent="1"':""} ${VOICE_OK?"":"disabled"}>${label||"hear it"}</button>`;
+function wireSpeak(){
+  panel.querySelectorAll("[data-speak]").forEach(b=>b.onclick=()=>{
+    const W=WORDS[+b.dataset.speak];
+    speak(W.w, b.dataset.sent?W.t.replace("___",W.w):null);
+  });
+}
+
+/* ---------- save ---------- */
+const KEY="lexiconquest3:save";
+const b36=n=>{const s=Math.max(0,Math.min(1295,n|0)).toString(36); return s.length<2?"0"+s:s;};
+function toCode(){
+  let pay="";
+  for(let i=0;i<N;i++) pay += String(S.box[i]) + b36(S.box[i]?S.battles-S.lastB[i]:0);
+  const head=JSON.stringify({v:3,n:N,t:S.tier,b:S.battles,s:S.streak,c:S.crowns,x:S.px,y:S.pr,m:S.maxhp});
+  return btoa(unescape(encodeURIComponent(head+"|"+pay))).replace(/=+$/,"");
+}
+function fromCode(code){
+  try{
+    const raw=decodeURIComponent(escape(atob(code.trim().replace(/\s+/g,""))));
+    const cut=raw.indexOf("|"); if(cut<0) return false;
+    const h=JSON.parse(raw.slice(0,cut)), pay=raw.slice(cut+1);
+    if(h.v!==3||h.n!==N||pay.length!==N*3) return false;
+    S.tier=h.t|0; S.battles=h.b|0; S.streak=Math.min(FORGE_AT,h.s|0); S.crowns=h.c|0;
+    S.px=h.x||1; S.pr=h.y||1; S.maxhp=Math.min(MAXHP,Math.max(5,h.m||5)); S.hp=S.maxhp;
+    for(let i=0;i<N;i++){
+      const b=+pay[i*3]; const d=parseInt(pay.substr(i*3+1,2),36)||0;
+      S.box[i]=(b>=0&&b<=MASTER)?b:0;
+      S.lastB[i]=S.box[i]?S.battles-d:0;
+    }
+    S.mons=[]; S.recent=[]; fillMap();
+    return true;
+  }catch(e){ return false; }
+}
+let AUTOSAVE=false;
+async function autosave(){try{ if(!window.storage) return;
+  await window.storage.set(KEY,toCode()); AUTOSAVE=true; }catch(e){AUTOSAVE=false;}}
+async function autoload(){try{ if(!window.storage) return false;
+  const r=await window.storage.get(KEY); AUTOSAVE=true;
+  if(r&&r.value) return fromCode(r.value);
+}catch(e){AUTOSAVE=false;} return false;}
+
+/* ---------- HUD ---------- */
+const sctx=document.getElementById("swordCanvas").getContext("2d");
+function drawHUD(){
+  document.getElementById("swordName").textContent=swordName(S.tier);
+  document.getElementById("swordSub").textContent=swordTime(S.tier)+"s per answer"+(S.crowns?" · "+S.crowns+" crown"+(S.crowns>1?"s":""):"");
+  sctx.clearRect(0,0,48,48);
+  const L=swordLook(S.tier);
+  drawSprite(sctx,"sword",0,0,4,1,{b:L.blade,g:L.guard,h:L.grip});
+  let h=""; for(let i=0;i<S.maxhp;i++) h+= i<S.hp?"♥":'<span class="empty">♥</span>';
+  document.getElementById("hearts").innerHTML=h;
+  let st=""; for(let i=0;i<FORGE_AT;i++) st+= i<S.streak?"◆":'<span class="off">◆</span>';
+  document.getElementById("streak").innerHTML=st;
+  document.getElementById("mastered").textContent=masteredCount()+"/"+N;
+  document.getElementById("dueCount").textContent=shakyCount();
+  document.querySelector("#bar i").style.width=(starTotal()/(N*MASTER)*100).toFixed(1)+"%";
+}
+
+/* ---------- map population ---------- */
+function occupied(){
+  const s=new Set([S.px+","+S.pr, FORGE.c+","+FORGE.r, SHRINE.c+","+SHRINE.r]);
+  S.mons.forEach(m=>s.add(m.c+","+m.r));
+  return s;
+}
+function freeTile(){
+  const taken=occupied(), open=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)
+    if(at(c,r)==="."&&!taken.has(c+","+r)) open.push({c,r});
+  return open.length?open[Math.random()*open.length|0]:null;
+}
+function pickWord(){
+  const onMap=new Set(S.mons.map(m=>m.i));
+  const due=dueList().filter(i=>!onMap.has(i));
+  const unseen=unseenList().filter(i=>!onMap.has(i));
+  let i=null;
+  if(due.length&&(!unseen.length||Math.random()<0.6)) i=due[Math.random()*Math.min(8,due.length)|0];
+  else if(unseen.length) i=unseen[Math.random()*unseen.length|0];
+  else if(due.length) i=due[0];
+  else { // nothing due, nothing unseen: pull the weakest word anyway
+    const all=[...Array(N).keys()].filter(k=>!onMap.has(k)).sort((a,b)=>S.box[a]-S.box[b]);
+    i=all.length?all[Math.random()*Math.min(10,all.length)|0]:null;
+  }
+  return i;
+}
+function spawnOne(){
+  const i=pickWord(); if(i===null) return;
+  const t=freeTile(); if(!t) return;
+  S.mons.push({i,c:t.c,r:t.r,fresh:S.box[i]===0,sp:NEWSPR[i%3]});
+}
+function fillMap(){ while(S.mons.length<SLOTS) { const before=S.mons.length; spawnOne(); if(S.mons.length===before) break; } }
+
+/* ---------- world ---------- */
+const noise=(c,r)=>((c*73856093)^(r*19349663))>>>0;
+function drawWorld(){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    const t=at(c,r),x=c*TS,y=r*TS,n=noise(c,r);
+    if(t==="~"){wctx.fillStyle="#2b4d63";wctx.fillRect(x,y,TS,TS);
+      wctx.fillStyle="#3a6480";wctx.fillRect(x+((n%3)*8),y+8+((n>>3)%2)*10,14,3);}
+    else{wctx.fillStyle="#25392c";wctx.fillRect(x,y,TS,TS);
+      wctx.fillStyle="#2c4433";wctx.fillRect(x+((n%4)*7),y+((n>>2)%4)*7,4,4);
+      wctx.fillRect(x+16+((n>>4)%3)*4,y+18+((n>>6)%3)*4,3,3);}
+    if(t==="T"){wctx.fillStyle="#3d2f21";wctx.fillRect(x+13,y+18,6,12);
+      wctx.fillStyle="#1f3a24";wctx.fillRect(x+4,y+4,24,18);
+      wctx.fillStyle="#2b5231";wctx.fillRect(x+7,y+7,12,8);}
+  }
+  const now=Date.now();
+  // forge
+  const flit=S.streak>=FORGE_AT&&forgeUseful();
+  drawSprite(wctx,"forge",FORGE.c*TS+4,FORGE.r*TS+4,2,flit?1:.28);
+  if(flit){wctx.fillStyle="#e8a33d";wctx.fillRect(FORGE.c*TS+15,FORGE.r*TS-4,3,6);wctx.fillRect(FORGE.c*TS+15,FORGE.r*TS+3,3,3);}
+  // shrine
+  wctx.fillStyle="#3a1414"; wctx.fillRect(SHRINE.c*TS-16,SHRINE.r*TS-14,64,62);
+  drawSprite(wctx,"wyrm",SHRINE.c*TS-16,SHRINE.r*TS-12+Math.sin(now/380)*1.5,4,1);
+  // monsters
+  for(const m of S.mons){
+    const x=m.c*TS+4,y=m.r*TS+4,bob=Math.sin(now/380+m.c)*1.5;
+    if(m.fresh){
+      drawSprite(wctx,m.sp,x,y+bob,2,1);
+      wctx.fillStyle="#f0d264";wctx.fillRect(x+11,y-8,3,6);wctx.fillRect(x+11,y-1,3,3);
+    }else{
+      const b=S.box[m.i]||1;
+      drawSprite(wctx,"ghost",x,y+Math.sin(now/300+m.c*2)*2.5,2,.6+.25*Math.sin(now/500+m.c),spiritPal(b));
+      wctx.fillStyle=BOXCOL[b];
+      wctx.fillRect(x+10,y-8,5,2);wctx.fillRect(x+12,y-6,2,4);
+    }
+  }
+  const x=(S.px+S.ox)*TS+4,y=(S.pr+S.oy)*TS+2;
+  drawSprite(wctx,"knight",x,y,2,1);
+  const L=swordLook(S.tier); wctx.fillStyle=L.blade;
+  if(S.face==="left"){wctx.fillRect(x-5,y+10,4,12);wctx.fillRect(x-8,y+18,10,3);}
+  else{wctx.fillRect(x+25,y+10,4,12);wctx.fillRect(x+22,y+18,10,3);}
+}
+function loop(){
+  if(S.moving){const sp=.14;
+    if(S.dir==="left")S.ox=Math.min(0,S.ox+sp);
+    if(S.dir==="right")S.ox=Math.max(0,S.ox-sp);
+    if(S.dir==="up")S.oy=Math.min(0,S.oy+sp);
+    if(S.dir==="down")S.oy=Math.max(0,S.oy-sp);
+    if(S.ox===0&&S.oy===0)S.moving=false;}
+  drawWorld();
+  if(S.mode==="q") tickTimer();
+  requestAnimationFrame(loop);
+}
+
+/* ---------- movement ---------- */
+function step(dir){
+  if(S.mode!=="world"||S.moving) return;
+  S.dir=dir; if(dir==="left"||dir==="right") S.face=dir;
+  const d={left:[-1,0],right:[1,0],up:[0,-1],down:[0,1]}[dir];
+  const nc=S.px+d[0],nr=S.pr+d[1];
+  if(nc===FORGE.c&&nr===FORGE.r) return bumpForge();
+  if(nc===SHRINE.c&&nr===SHRINE.r) return startBoss();
+  const m=S.mons.find(o=>o.c===nc&&o.r===nr);
+  if(m) return m.fresh?startNew(m):startReview(m);
+  if(at(nc,nr)!==".") return;
+  S.px=nc;S.pr=nr;S.ox=-d[0];S.oy=-d[1];S.moving=true;
+}
+addEventListener("keydown",ev=>{
+  const m={arrowleft:"left",a:"left",arrowright:"right",d:"right",arrowup:"up",w:"up",arrowdown:"down",s:"down"}[ev.key.toLowerCase()];
+  if(m&&S.mode==="world"){ev.preventDefault();step(m);}
+});
+document.querySelectorAll("#pad button[data-d]").forEach(b=>b.addEventListener("click",()=>step(b.dataset.d)));
+
+/* ---------- panel ---------- */
+function openPanel(h){panel.innerHTML=h;overlay.classList.add("on");wireSpeak();}
+function closePanel(){overlay.classList.remove("on");panel.innerHTML="";S.mode="world";}
+function say(t,b){S.mode="msg";
+  openPanel(`<h2 class="title">${t}</h2><p class="body">${b}</p>
+    <div class="row"><button id="ok">Back to the map</button></div>`);
+  document.getElementById("ok").onclick=closePanel;}
+
+/* ---------- questions ---------- */
+function makeQ(idx,kind){
+  const W=WORDS[idx];
+  if(kind==="mc-syn") return {kind:"mc",idx,prompt:`Which word means most nearly the same as <b>${W.w}</b>?`,
+    opts:shuffle([W.s,...W.x]),answer:W.s};
+  if(kind==="mc-sent"){
+    const pool=[...Array(N).keys()].filter(i=>i!==idx&&WORDS[i].s!==W.s);
+    const others=shuffle(pool).slice(0,3).map(i=>WORDS[i].w);
+    return {kind:"mc",idx,prompt:`Choose the word that fits:<br><span class="blank">${W.t.replace("___","______")}</span>`,
+      opts:shuffle([W.w,...others]),answer:W.w};
+  }
+  if(kind==="type-sent") return {kind:"type",kind2:"type-sent",idx,
+    prompt:`Type the missing word:<br><span class="blank">${W.t.replace("___","______")}</span>`,answer:W.w};
+  return {kind:"type",kind2:"type-word",idx,
+    prompt:`Type the word that means:<br><em>${W.d}</em>`,answer:W.w};
+}
+const near=(a,b)=>{
+  a=(a||"").toLowerCase().trim(); b=b.toLowerCase();
+  if(a===b) return "exact";
+  if(b.length<6||!a) return false;
+  const m=[]; for(let i=0;i<=a.length;i++)m[i]=[i];
+  for(let j=0;j<=b.length;j++)m[0][j]=j;
+  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
+    m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return m[a.length][b.length]<=1?"close":false;
+};
+let T={end:0,limit:0,live:false};
+function startTimer(extra){T.limit=(swordTime(S.tier)+(extra||0))*1000;T.end=performance.now()+T.limit;T.live=true;}
+function tickTimer(){
+  if(!T.live) return;
+  const bar=document.getElementById("tbar"); if(!bar) return;
+  const left=Math.max(0,T.end-performance.now()),pct=left/T.limit*100;
+  bar.querySelector("i").style.width=pct+"%";
+  bar.querySelector("span").textContent=Math.ceil(left/1000)+"s";
+  bar.className="timer"+(pct<25?" crit":pct<50?" warn":"");
+  if(left<=0){T.live=false;answer(null,true);}
+}
+function renderQuestion(cfg){
+  S.mode="q";
+  const q=cfg.q,typing=q.kind==="type";
+  openPanel(`${cfg.stageHTML||""}
+    <div id="tbar" class="timer"><i></i><span></span></div>
+    <p class="q">${q.prompt}</p>
+    ${typing?`<div class="scaf" id="scaf"></div>
+      <p class="scaflen" id="scaflen"></p>
+      <div class="cue" id="cue" style="display:none"></div>
+      <div class="hints">
+        <button class="ghost" id="hL">another letter</button>
+        <button class="ghost" id="hM">${q.kind2==="type-sent"?"what it means":"show a sentence"}</button>
+        <span class="hud-sub" style="font-size:10px;align-self:center">each nudge costs a little time</span>
+      </div>
+      <div class="typebox"><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type the word"><button id="go">Strike</button></div>
+      <p class="hud-sub" style="font-size:11px">One slipped letter still lands.</p>`
+     :`<div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join("")}</div>`}
+    <div id="slot"></div>`);
+  startTimer(typing?Math.round(swordTime(S.tier)*0.5):0);
+  if(typing){
+    const W=WORDS[q.idx], word=q.answer;
+    cfg.shown=1; cfg.cueUsed=false;
+    const paintScaf=()=>{
+      const el=document.getElementById("scaf"); if(!el) return;
+      el.innerHTML=word.split("").map((ch,i)=>
+        i<cfg.shown?ch:'<span class="hid">·</span>').join("");
+      document.getElementById("scaflen").textContent=
+        word.length+" letters, starting with \u201c"+word.slice(0,cfg.shown)+"\u201d";
+    };
+    const spend=()=>{ const left=Math.max(0,T.end-performance.now());
+      T.end=performance.now()+left*0.75; };
+    paintScaf();
+    document.getElementById("hL").onclick=()=>{
+      if(cfg.shown>=word.length-1){ document.getElementById("hL").disabled=true; return; }
+      cfg.shown++; spend(); paintScaf(); beep(520,.06);
+      if(cfg.shown>=word.length-1) document.getElementById("hL").disabled=true;
+      document.getElementById("ans").focus();
+    };
+    document.getElementById("hM").onclick=()=>{
+      if(cfg.cueUsed) return;
+      cfg.cueUsed=true; spend(); beep(520,.06);
+      const box=document.getElementById("cue");
+      box.innerHTML = q.kind2==="type-sent" ? W.d : W.t.replace("___","______");
+      box.style.display="block";
+      document.getElementById("hM").disabled=true;
+      document.getElementById("ans").focus();
+    };
+    const inp=document.getElementById("ans");inp.focus();
+    const fire=()=>answer(inp.value,false);
+    document.getElementById("go").onclick=fire;
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")fire();});
+  }else panel.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(q.opts[+b.dataset.o],false));
+  S._cfg=cfg;
+}
+function answer(given,timedOut){
+  if(S.mode!=="q") return;
+  T.live=false;
+  const cfg=S._cfg,q=cfg.q;
+  let ok=false,fuzzy=false;
+  if(!timedOut&&given!=null){
+    if(q.kind==="type"){const n=near(given,q.answer);ok=!!n;fuzzy=(n==="close");}
+    else ok=given===q.answer;
+  }
+  S.mode="verdict";
+  if(q.kind==="mc") panel.querySelectorAll(".opt").forEach(b=>{
+    const v=q.opts[+b.dataset.o];b.disabled=true;
+    if(v===q.answer)b.classList.add("right"); else if(v===given)b.classList.add("wrong");});
+  else{const i=document.getElementById("ans");if(i)i.disabled=true;
+       const g=document.getElementById("go");if(g)g.disabled=true;}
+  const W=WORDS[q.idx],slot=document.getElementById("slot");
+  if(ok){
+    beep(660,.09);setTimeout(()=>beep(880,.12),90);
+    slot.innerHTML=`<div class="verdict good"><strong>${fuzzy?"Close enough — a hit!":"A clean hit!"}</strong>
+      ${fuzzy?`Spelled <b style="color:#f0d264">${q.answer}</b>. `:""}<b style="color:#f0d264">${W.w}</b>
+      <span class="respell">${W.r}</span> ${speakBtn(q.idx,"hear it")} — ${W.d}</div>
+      <div class="row"><button id="next">Press on</button></div>`;
+    wireSpeak(); document.getElementById("next").onclick=()=>cfg.onCorrect();
+  }else{
+    cfg.missed=true;
+    if(cfg.bossHearts!==undefined){cfg.bossHearts--;} else {S.hp--;}
+    drawHUD(); beep(160,.2,"sawtooth");
+    panel.classList.add("shake");setTimeout(()=>panel.classList.remove("shake"),320);
+    const dead = cfg.bossHearts!==undefined ? cfg.bossHearts<=0 : S.hp<=0;
+    slot.innerHTML=`<div class="verdict bad"><strong>${timedOut?"Out of time — the blow lands on you.":"Missed."}</strong>
+      The word is <b style="color:#f0d264">${q.answer}</b> <span class="respell">${W.r}</span>
+      ${speakBtn(q.idx,"hear it",true)}<br>${W.d}<br>
+      <em style="color:#cbbf9f">${W.t.replace("___",W.w)}</em></div>
+      <div class="row"><button id="next">${dead?"…":"Try again"}</button></div>`;
+    wireSpeak();
+    document.getElementById("next").onclick=()=> dead?cfg.onDefeat():cfg.onWrong();
+  }
+  autosave();
+}
+
+/* ---------- new word ---------- */
+function paintFoe(id,sp,scale,pal){
+  const cv=document.getElementById(id); if(!cv) return;
+  const c=cv.getContext("2d"); c.clearRect(0,0,cv.width,cv.height);
+  drawSprite(c,sp,0,0,scale||6,1,pal);
+}
+function startNew(m){
+  const W=WORDS[m.i];
+  S.enc={m,idx:m.i,hp:2,step:0,fresh:true};
+  S.mode="msg";
+  openPanel(`<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe">A ${m.sp} guards a new word</div><div class="foehp">♦♦</div></div></div>
+    <div class="wordline"><h2 class="word">${W.w}</h2><span class="respell">${W.r}</span>
+      ${speakBtn(m.i,"hear it")}${speakBtn(m.i,"hear a sentence",true)}</div>
+    <p class="def">${W.d}</p>
+    <p class="ex">${W.t.replace("___",W.w)}</p>
+    <div class="row"><button id="fight">Draw your sword</button><button class="ghost" id="flee">Walk away</button></div>`);
+  paintFoe("foe",m.sp);
+  document.getElementById("fight").onclick=encQ;
+  document.getElementById("flee").onclick=closePanel;
+}
+function encStage(){
+  const e=S.enc;
+  const hp="♦".repeat(e.hp)+`<span class="gone">${"♦".repeat(2-e.hp)}</span>`;
+  return `<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+    <div class="stage-txt"><div class="foe">${e.m.sp} · ${WORDS[e.idx].w}</div>
+    <div class="foehp">${hp}</div></div></div>`;
+}
+function encQ(){
+  const kind=S.enc.step===0?"mc-syn":(Math.random()<.5?"type-sent":"type-word");
+  renderQuestion({q:makeQ(S.enc.idx,kind),stageHTML:encStage(),
+    onCorrect(){S.enc.hp--; if(S.enc.hp>0){S.enc.step++;encQ();} else rateWord();},
+    onWrong(){encQ();}, onDefeat(){retreat();}});
+  setTimeout(()=>paintFoe("foe",S.enc.m.sp),0);
+}
+function rateWord(){
+  const idx=S.enc.idx,W=WORDS[idx];
+  S.mode="msg";
+  openPanel(`<h2 class="title">${W.w} is yours</h2>
+    <div class="wordline"><span class="respell">${W.r}</span>${speakBtn(idx,"hear it")}</div>
+    <p class="body">${W.d}</p>
+    <p class="body" style="color:#7d7361">Be honest — how well do you know it? This decides how soon
+      its spirit comes back to test you.</p>
+    <div class="rate">
+      <button data-b="1"><b>Still fuzzy</b><small>Comes back almost right away</small></button>
+      <button data-b="2"><b>Getting there</b><small>Comes back after a few fights</small></button>
+      <button data-b="3"><b>I've got it</b><small>Comes back much later</small></button>
+    </div>`);
+  wireSpeak();
+  panel.querySelectorAll(".rate button").forEach(b=>b.onclick=()=>{
+    S.box[idx]=+b.dataset.b; finishFight(idx);
+  });
+}
+
+/* ---------- review ---------- */
+function startReview(m){
+  const W=WORDS[m.i], b=S.box[m.i]||1;
+  S.enc={m,idx:m.i,fresh:false};
+  S.mode="msg";
+  openPanel(`<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe spirit">A spirit of a word you met</div>
+      <div class="foehp" style="color:${BOXCOL[b]}">${"★".repeat(b)}<span class="gone">${"★".repeat(MASTER-b)}</span></div></div></div>
+    <h2 class="title">It will not say the word</h2>
+    <p class="body">One question. Answer it and the word grows stronger and stays away longer.
+      Miss it and the word slips back and returns soon.</p>
+    <div class="row"><button id="go">Face it</button><button class="ghost" id="no">Walk away</button></div>`);
+  paintFoe("foe","ghost",6,spiritPal(b));
+  document.getElementById("go").onclick=revQ;
+  document.getElementById("no").onclick=closePanel;
+}
+function revQ(){
+  const idx=S.enc.idx,b=S.box[idx]||1;
+  renderQuestion({q:makeQ(idx,BOXQ[b]),
+    stageHTML:`<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe spirit">spirit · ${"★".repeat(b)}</div></div></div>`,
+    onCorrect(){
+      if(!this.missed) S.box[idx]=Math.min(MASTER,S.box[idx]+1);
+      else S.box[idx]=Math.max(1,S.box[idx]-(S.box[idx]>=MASTER?1:2));
+      finishFight(idx);
+    },
+    onWrong(){revQ();}, onDefeat(){retreat();}});
+  setTimeout(()=>paintFoe("foe","ghost",6,spiritPal(b)),0);
+}
+
+/* ---------- shared end of fight ---------- */
+function finishFight(idx){
+  S.battles++; S.lastB[idx]=S.battles; S.streak=Math.min(FORGE_AT,S.streak+1);
+  S.recent=[idx,...S.recent.filter(i=>i!==idx)].slice(0,FORGE_AT);
+  S.mons=S.mons.filter(m=>m!==S.enc.m);
+  fillMap(); drawHUD(); autosave();
+  const W=WORDS[idx], b=S.box[idx];
+  const done=masteredCount()===N;
+  S.mode="msg";
+  openPanel(`<h2 class="title">${W.w} — ${"★".repeat(b)}${"☆".repeat(MASTER-b)}</h2>
+    <p class="body">${b>=MASTER?"Mastered. It will only check on you rarely now.":W.d}</p>
+    <p class="body">Mastered: ${masteredCount()} of ${N}. ${dueList().length} words are waiting on the map.</p>
+    ${S.streak>=FORGE_AT?`<p class="body">The forge is lit. Go and earn a better blade.</p>`:""}
+    ${done?`<p class="body"><em>Every word in the book is mastered. The Wyrm has nothing left to hide behind.</em></p>`:""}
+    <div class="row"><button id="ok">Back to the map</button></div>`);
+  document.getElementById("ok").onclick=()=>{S.enc=null;closePanel();};
+}
+function retreat(){
+  S.hp=S.maxhp; drawHUD(); autosave(); S.mode="msg";
+  openPanel(`<h2 class="title">You retreat</h2>
+    <p class="body">Your health returns and nothing is lost. The word is still out there.</p>
+    <div class="row"><button id="ok">Back to the map</button></div>`);
+  document.getElementById("ok").onclick=()=>{S.enc=null;S.forge=null;S.boss=null;closePanel();};
+}
+
+/* ---------- forge ---------- */
+function bumpForge(){
+  if(!forgeUseful()) return say("The forge is spent",
+    "The smith has given you everything he has — the blade is at its limit and your health is full. " +
+    "What is left is the book itself, and the Wyrm.");
+  if(S.streak<FORGE_AT) return say("The forge is dark",
+    `The smith works only after five words. You have ${S.streak} of ${FORGE_AT}.`);
+  const picks=S.recent.slice(0,3);
+  if(picks.length<3) return say("The forge is dark","Take on a few more words first.");
+  const kinds=shuffle(["mc-syn","mc-sent","type-word","type-sent"]).slice(0,3);
+  S.forge={q:picks.map((p,i)=>({idx:p,kind:kinds[i]})),step:0};
+  S.mode="msg";
+  openPanel(`<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe" style="color:#e8a33d">The forge is lit</div></div></div>
+    <h2 class="title">Prove the last five</h2>
+    <p class="body">Three questions from the words you just fought. Answer all three and the smith
+      ${S.tier<TIERCAP?`hammers out the <em>${swordName(S.tier+1)}</em>, worth
+        <em>${swordTime(S.tier+1)} seconds</em> an answer instead of ${swordTime(S.tier)}`
+      :`beats a new heart into your armour — <em>${S.maxhp+1} health</em> instead of ${S.maxhp}`}.</p>
+    <div class="row"><button id="go">Begin the test</button><button class="ghost" id="no">Not yet</button></div>`);
+  paintFoe("foe","forge");
+  document.getElementById("go").onclick=forgeQ;
+  document.getElementById("no").onclick=closePanel;
+}
+function forgeQ(){
+  const f=S.forge,item=f.q[f.step];
+  renderQuestion({q:makeQ(item.idx,item.kind),
+    stageHTML:`<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe" style="color:#e8a33d">Forge test</div>
+      <div class="foehp" style="color:#e8a33d">${f.step+1} of 3</div></div></div>`,
+    onCorrect(){f.step++;f.step<3?forgeQ():forgeDone();},
+    onWrong(){S.box[item.idx]=Math.max(1,S.box[item.idx]-(S.box[item.idx]>=MASTER?1:2));forgeQ();},
+    onDefeat(){retreat();}});
+  setTimeout(()=>paintFoe("foe","forge"),0);
+}
+function forgeDone(){
+  const gotSword = S.tier<TIERCAP;
+  if(gotSword) S.tier++; else if(S.maxhp<MAXHP) S.maxhp++;
+  S.streak=0; S.hp=S.maxhp; drawHUD(); autosave();
+  const L=swordLook(S.tier);
+  S.mode="msg";
+  openPanel(`<div class="stage"><canvas width="72" height="72" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe" style="color:#f0d264">${gotSword?swordName(S.tier):S.maxhp+" health"}</div></div></div>
+    <h2 class="title">${gotSword?"The blade is yours":"Your armour is stronger"}</h2>
+    <p class="body">${gotSword?`You now have <em>${swordTime(S.tier)} seconds</em> to answer`
+      :`You can now take <em>${S.maxhp} hits</em> before retreating`}, and your health is restored.</p>
+    <p class="body">The Wyrm's shrine is open whenever you want to try it.</p>
+    <div class="row"><button id="ok">Back to the map</button><button class="ghost" id="boss">Challenge the Wyrm</button></div>`);
+  const cv=document.getElementById("foe");
+  if(cv) drawSprite(cv.getContext("2d"),"sword",6,0,6,1,{b:L.blade,g:L.guard,h:L.grip});
+  document.getElementById("ok").onclick=()=>{S.forge=null;closePanel();};
+  document.getElementById("boss").onclick=()=>{S.forge=null;startBoss();};
+}
+
+/* ---------- boss ---------- */
+function bossPool(){
+  const weak=[];
+  for(let i=0;i<N;i++) if(S.box[i]>0&&S.box[i]<MASTER) weak.push(i);
+  weak.sort((a,b)=>S.box[a]-S.box[b]);
+  let pool=shuffle(weak.slice(0,Math.max(BOSS_SCALES*2,weak.length))).slice(0,BOSS_SCALES);
+  if(pool.length<BOSS_SCALES){
+    const un=shuffle(unseenList()).slice(0,BOSS_SCALES-pool.length);
+    pool=pool.concat(un);
+  }
+  if(pool.length<BOSS_SCALES){
+    const mast=shuffle([...Array(N).keys()].filter(i=>S.box[i]>=MASTER)).slice(0,BOSS_SCALES-pool.length);
+    pool=pool.concat(mast);
+  }
+  return shuffle(pool);
+}
+function startBoss(){
+  const pool=bossPool();
+  const unknown=pool.filter(i=>!S.box[i]).length;
+  S.boss={queue:pool,broken:0,hearts:BOSS_HEARTS};
+  S.mode="msg";
+  openPanel(`<div class="stage boss"><canvas width="110" height="110" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe">The Lexicon Wyrm</div>
+      <div class="foehp">${BOSS_SCALES} scales · ${BOSS_HEARTS} hearts</div></div></div>
+    <h2 class="title">Ten scales, three hearts</h2>
+    <p class="body">The Wyrm picks the words you know least well. Break all ten scales before it takes
+      three hearts.</p>
+    ${unknown?`<p class="body">Careful — <em>${unknown}</em> of these are words you have never met. If one
+      beats you, the Wyrm will teach it, and it joins your book.</p>`:
+      `<p class="body">Every word here is one you have already met.</p>`}
+    <p class="body" style="color:#7d7361">Mastered so far: ${masteredCount()} of ${N}. The more you master,
+      the fewer weak words the Wyrm has to choose from.</p>
+    <div class="row"><button id="go">Face the Wyrm</button><button class="ghost" id="no">Not yet</button></div>`);
+  const cv=document.getElementById("foe"); if(cv) drawSprite(cv.getContext("2d"),"wyrm",0,0,6.8,1);
+  document.getElementById("go").onclick=bossQ;
+  document.getElementById("no").onclick=closePanel;
+}
+function bossQ(){
+  const B=S.boss, idx=B.queue[0], b=S.box[idx];
+  const kind = b ? BOXQ[b] : "mc-syn";   // never-met words get the gentlest format
+  renderQuestion({
+    q:makeQ(idx,kind), bossHearts:B.hearts,
+    stageHTML:`<div class="stage boss"><canvas width="110" height="110" id="foe"></canvas>
+      <div class="stage-txt"><div class="foe">Lexicon Wyrm</div>
+      <div class="foehp">${BOSS_SCALES-B.broken} scale${BOSS_SCALES-B.broken===1?"":"s"} ·
+        ${"♥".repeat(B.hearts)}<span class="gone">${"♥".repeat(BOSS_HEARTS-B.hearts)}</span></div></div></div>`,
+    onCorrect(){
+      B.hearts=this.bossHearts; B.broken++; B.queue.shift();
+      if(S.box[idx]) S.box[idx]=Math.min(MASTER,S.box[idx]+1);
+      S.battles++; S.lastB[idx]=S.battles;
+      B.broken>=BOSS_SCALES?bossWin():bossQ();
+    },
+    onWrong(){
+      B.hearts=this.bossHearts;
+      if(!S.box[idx]){ S.box[idx]=1; S.battles++; S.lastB[idx]=S.battles; }
+      else S.box[idx]=Math.max(1,S.box[idx]-(S.box[idx]>=MASTER?1:2));
+      B.queue.push(B.queue.shift());
+      drawHUD(); bossQ();
+    },
+    onDefeat(){
+      B.hearts=0;
+      if(!S.box[idx]){ S.box[idx]=1; S.battles++; S.lastB[idx]=S.battles; }
+      bossLose();
+    }});
+  setTimeout(()=>{const cv=document.getElementById("foe"); if(cv) drawSprite(cv.getContext("2d"),"wyrm",0,0,6.8,1);},0);
+}
+function bossWin(){
+  S.crowns++; if(S.tier<TIERCAP) S.tier++; S.hp=S.maxhp; fillMap(); drawHUD(); autosave();
+  const done=masteredCount()===N;
+  S.mode="msg";
+  openPanel(`<h2 class="title">${done?"The Wyrm falls for good":"A crown is taken"}</h2>
+    <p class="body">Ten scales broken. You take a crown${S.tier<TIERCAP?`, and the smith upgrades you to the
+      <em>${swordName(S.tier)}</em>`:""}.</p>
+    ${done?`<p class="body">Every one of the ${N} words is mastered. There is nothing left in the book
+      the Wyrm can use against you. That is the whole quest.</p>`
+    :`<p class="body">It will rebuild its scales from whatever you still know least well.
+      ${masteredCount()} of ${N} mastered. Crowns: ${S.crowns}.</p>`}
+    <div class="row"><button id="ok">Back to the map</button></div>`);
+  document.getElementById("ok").onclick=()=>{S.boss=null;closePanel();};
+}
+function bossLose(){
+  const B=S.boss; S.hp=S.maxhp; fillMap(); drawHUD(); autosave(); S.mode="msg";
+  openPanel(`<h2 class="title">The Wyrm drives you back</h2>
+    <p class="body">You broke ${B.broken} of ${BOSS_SCALES} scales. Every word it beat you with has been
+      added to your book at one star, so the spirits will bring them straight back to you.</p>
+    <p class="body">Clear the spirits on the map, then try again. The Wyrm gets weaker every time you master
+      a word, because it has fewer weak ones left to pick from.</p>
+    <div class="row"><button id="ok">Back to the map</button><button class="ghost" id="again">Straight back in</button></div>`);
+  document.getElementById("ok").onclick=()=>{S.boss=null;closePanel();};
+  document.getElementById("again").onclick=startBoss;
+}
+
+/* ---------- codex ---------- */
+document.getElementById("codexBtn").onclick=()=>{
+  if(S.mode==="q"||S.mode==="verdict") return;
+  S.mode="msg";
+  openPanel(`<h2 class="title">Codex — ${masteredCount()} mastered of ${N}</h2>
+    <div class="filters">
+      <input id="cxq" placeholder="search a word" autocomplete="off">
+      <select id="cxf">
+        <option value="seen">Words I've met (${seenCount()})</option>
+        <option value="weak">Weakest first</option>
+        <option value="due">Due now (${dueList().length})</option>
+        <option value="mast">Mastered (${masteredCount()})</option>
+        <option value="all">Everything (${N})</option>
+      </select>
+    </div>
+    <div class="codex" id="cxList"></div>
+    <div class="row"><button id="ok">Close</button></div>`);
+  const render=()=>{
+    const q=(document.getElementById("cxq").value||"").toLowerCase().trim();
+    const f=document.getElementById("cxf").value;
+    let ids=[...Array(N).keys()];
+    if(f==="seen") ids=ids.filter(i=>S.box[i]>0);
+    else if(f==="weak") ids=ids.filter(i=>S.box[i]>0).sort((a,b)=>S.box[a]-S.box[b]);
+    else if(f==="due") ids=dueList();
+    else if(f==="mast") ids=ids.filter(i=>S.box[i]>=MASTER);
+    if(q) ids=ids.filter(i=>WORDS[i].w.includes(q)||WORDS[i].d.toLowerCase().includes(q));
+    document.getElementById("cxList").innerHTML = ids.length? ids.slice(0,120).map(i=>{
+      const W=WORDS[i],b=S.box[i];
+      if(!b) return `<div class="item"><b style="color:#7d7361">${W.w}</b>
+        <p class="strength">not met yet</p></div>`;
+      return `<div class="item s${b}">
+        <div class="wordline"><b>${W.w}</b><span class="respell">${W.r}</span>${speakBtn(i,"hear it")}</div>
+        <p class="strength">${"★".repeat(b)}${"☆".repeat(MASTER-b)}</p>
+        <p>${W.d}</p><p style="color:#9c917a">${W.t.replace("___",W.w)}</p></div>`;
+    }).join("") : `<p class="body" style="color:#7d7361">Nothing matches that.</p>`;
+    wireSpeak();
+  };
+  document.getElementById("cxq").addEventListener("input",render);
+  document.getElementById("cxf").addEventListener("change",render);
+  document.getElementById("ok").onclick=closePanel;
+  render();
+};
+
+/* ---------- save panel ---------- */
+document.getElementById("saveBtn").onclick=()=>{
+  if(S.mode==="q"||S.mode==="verdict") return;
+  S.mode="msg";
+  const code=toCode();
+  openPanel(`<h2 class="title">Saving your quest</h2>
+    <p class="body">${AUTOSAVE?"This quest saves itself after every question and picks up where you left off next time you open it here."
+      :"Automatic saving isn't available in this window, so use the code below."}</p>
+    <p class="body" style="color:#7d7361">The code holds all ${N} words and how strong each one is.
+      Copy it into a note or email it to yourself, and you can paste it back on any computer to carry on.</p>
+    <textarea class="code" id="outCode" readonly>${code}</textarea>
+    <div class="row"><button id="copy">Copy the code</button></div>
+    <p class="body" style="margin-top:20px">Have a code from before? Paste it here.</p>
+    <textarea class="code" id="inCode" placeholder="paste a save code"></textarea>
+    <div class="row"><button id="load">Load this code</button><button class="ghost" id="ok">Close</button></div>
+    <div id="msg"></div>`);
+  const out=document.getElementById("outCode");
+  document.getElementById("copy").onclick=async()=>{
+    try{await navigator.clipboard.writeText(code);}catch(e){out.select();try{document.execCommand("copy");}catch(_){}}
+    document.getElementById("msg").innerHTML=`<div class="verdict good"><strong>Copied</strong>Paste it somewhere safe.</div>`;
+  };
+  document.getElementById("load").onclick=()=>{
+    const v=document.getElementById("inCode").value; if(!v.trim()) return;
+    if(fromCode(v)){ drawHUD();
+      document.getElementById("msg").innerHTML=`<div class="verdict good"><strong>Quest loaded</strong>${masteredCount()} of ${N} mastered, ${seenCount()} words met.</div>`;
+    }else document.getElementById("msg").innerHTML=`<div class="verdict bad"><strong>That code didn't read</strong>Check the whole code was pasted with nothing cut off.</div>`;
+  };
+  document.getElementById("ok").onclick=closePanel;
+};
+
+/* ---------- title ---------- */
+function title(){
+  S.mode="msg";
+  const resumed=seenCount()>0;
+  openPanel(`<h2 class="title">Lexicon Quest</h2>
+    <p class="body">There are <em>${N}</em> hard words in this book. Monsters carry the ones you have never met;
+      coloured spirits carry the ones you have. Beat a monster and the word is yours.</p>
+    <p class="body">Every word has four stars. It gains one each time you beat its spirit and loses two when
+      you miss. Four stars means mastered, and the whole quest is mastering all ${N}.</p>
+    <p class="body">Every five fights the forge lights up and tests you on those five. Pass and your sword
+      improves, which buys you more seconds to think.</p>
+    <p class="body">The Wyrm's shrine is always open. It picks the ten words you know least well, so early on
+      it will beat you — and it teaches you every word it beats you with.</p>
+    <p class="body">When you have to type a word you get its first letter and its length, and two nudges you
+      can tap if you are stuck — one more letter, or the other half of the clue. Nudges only cost time,
+      never a heart.</p>
+    <p class="body" style="color:#7d7361;font-size:13px">Arrow keys or WASD. Every word has a <em>hear it</em>
+      button. The quest saves itself, and <em>Save</em> gives you a code to carry it to another computer.</p>
+    <div class="row"><button id="go">${resumed?"Continue":"Begin"}</button></div>`);
+  document.getElementById("go").onclick=closePanel;
+}
+
+/* ---------- boot ---------- */
+(async function(){
+  await autoload();
+  fillMap(); drawHUD(); title(); loop();
+})();
+</script>
