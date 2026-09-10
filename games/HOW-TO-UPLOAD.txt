@@ -1,0 +1,32 @@
+Fraction Lab — upload to seanluomdphd.com
+==========================================
+
+This folder is the finished website, not the source code.
+Do not upload the big Grok zip. Upload THESE files.
+
+1. Log into your web host (cPanel, File Manager, FTP, or Dreamhost/GoDaddy panel).
+
+2. Open the public folder for the site. It is usually called
+   public_html   or   www   or   httpdocs
+
+3. Create a folder named:  games
+
+4. Upload EVERYTHING in this folder into games/ so the host has:
+
+   games/fraction_lab.html
+   games/favicon.svg
+   games/assets/        (keep this folder; it holds the JavaScript and CSS)
+
+5. Visit:
+
+   https://www.seanluomdphd.com/games/fraction_lab.html
+
+6. Optional: on your homepage, add a link:
+
+   <a href="games/fraction_lab.html">Fraction Lab</a>
+
+If the page is blank after upload, the assets folder did not go up with
+the HTML file. Both have to sit next to each other.
+
+Stars and progress save in the visitor's browser (localStorage). No
+server, database, or login is required.
