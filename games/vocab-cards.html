@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Cards: Grade 5 to SAT Vocabulary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#2F3E46; --desk2:#26343B; --card:#FFFEFA; --ink:#1D2D44; --muted:#5B6776;
+  --rule:#C9DDEC; --margin:#D1495B; --pencil:#E9B949;
+  --l1:#3F8F5B; --l2:#2F6FB0; --l3:#7A4FA8; --l4:#B8333F;
+  --ok:#3F8F5B; --bad:#B8333F;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--card);font-family:var(--sans);min-height:100vh}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--pencil);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1;margin:0;letter-spacing:-.01em}
+.sub{margin:.5rem 0 0;color:#C8D3DA;font-size:1rem;max-width:52ch}
+nav.tabs{display:flex;gap:6px}
+nav.tabs button{background:transparent;color:#DDE5EA;border:2px solid #56707C;border-radius:8px 8px 0 0;padding:10px 18px;font-weight:600;cursor:pointer}
+nav.tabs button[aria-pressed="true"]{background:var(--card);color:var(--ink);border-color:var(--card)}
+.toolbar{background:var(--desk2);border-radius:10px;padding:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:18px}
+.toolbar input[type=search]{flex:1 1 220px;padding:10px 12px;border-radius:6px;border:0;background:var(--card);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:2px solid transparent;border-radius:999px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:.85rem;color:#fff;opacity:.45}
+.chip[aria-pressed="true"]{opacity:1;border-color:#fff}
+.chip.l1{background:var(--l1)}.chip.l2{background:var(--l2)}.chip.l3{background:var(--l3)}.chip.l4{background:var(--l4)}
+.toolbar select,.toolbar .plain{padding:8px 10px;border-radius:6px;border:0;background:var(--card);color:var(--ink);cursor:pointer}
+.count{color:#C8D3DA;font-size:.9rem;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:26px 20px}
+/* Index card */
+.card{position:relative;background:var(--card);color:var(--ink);border-radius:3px;padding:22px 18px 16px 30px;
+  box-shadow:0 2px 0 #d9d4c4,0 10px 18px -8px rgba(0,0,0,.45);
+  background-image:linear-gradient(to right,transparent 22px,var(--margin) 22px,var(--margin) 23.5px,transparent 23.5px),
+  repeating-linear-gradient(to bottom,transparent 0,transparent 25px,var(--rule) 25px,var(--rule) 26px);
+  background-position:0 0,0 58px;background-repeat:no-repeat,repeat-y;background-size:100% 100%,100% calc(100% - 58px)}
+.card::before{content:attr(data-tab);position:absolute;top:-17px;right:16px;padding:3px 12px 4px;border-radius:6px 6px 0 0;
+  font-size:.72rem;font-weight:700;color:#fff;background:var(--tabc)}
+.card.l1{--tabc:var(--l1)}.card.l2{--tabc:var(--l2)}.card.l3{--tabc:var(--l3)}.card.l4{--tabc:var(--l4)}
+.card .head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.word{font-family:var(--serif);font-weight:700;font-size:1.75rem;line-height:1.1;margin:0;word-break:break-word}
+.pos{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:1rem}
+.iconbtn{margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.iconbtn:hover{background:var(--pencil);border-color:var(--pencil)}
+.iconbtn svg{width:18px;height:18px}
+.star{border:0;width:30px;height:30px;margin-left:0;font-size:1.25rem;color:#B9B2A0}
+.star[aria-pressed="true"]{color:var(--pencil)}
+.star:hover{background:transparent;color:var(--pencil)}
+.def{font-family:var(--serif);font-size:1.08rem;line-height:1.55;margin:0 0 10px}
+.quote{font-family:var(--serif);font-style:italic;font-size:1.02rem;line-height:1.55;margin:0}
+.quote mark,.feedback mark,.face mark{background:linear-gradient(transparent 55%,#F6DD8F 55%);color:inherit;font-weight:600}
+.cite{font-size:.8rem;color:var(--muted);margin:4px 0 0}
+.empty{background:var(--card);color:var(--ink);padding:28px;border-radius:4px;font-family:var(--serif);font-size:1.1rem}
+/* Test */
+.testpanel{background:var(--card);color:var(--ink);border-radius:4px;padding:26px;max-width:760px;margin:0 auto;
+  box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
+.testpanel h2{font-family:var(--serif);font-size:1.9rem;margin:0 0 6px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.mode{text-align:left;border:2px solid #D8D2C0;background:#fff;border-radius:8px;padding:14px;cursor:pointer;color:var(--ink)}
+.mode strong{display:block;font-family:var(--serif);font-size:1.2rem;margin-bottom:3px}
+.mode span{font-size:.88rem;color:var(--muted)}
+.mode[aria-pressed="true"]{border-color:var(--ink);background:#FDF6DE}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:12px 0}
+.row label{font-weight:600;font-size:.92rem}
+.row select{padding:8px;border-radius:6px;border:2px solid #D8D2C0;background:#fff}
+.lvlpick{display:flex;flex-wrap:wrap;gap:6px}
+.primary{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:12px 22px;font-weight:700;cursor:pointer}
+.primary:hover{background:#2C4466}
+.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink);border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer}
+.progress{height:8px;background:#E8E2D0;border-radius:4px;overflow:hidden;margin:4px 0 18px}
+.progress div{height:100%;background:var(--pencil);transition:width .25s}
+.qmeta{display:flex;justify-content:space-between;font-size:.9rem;color:var(--muted)}
+.prompt{font-family:var(--serif);font-size:1.45rem;line-height:1.45;margin:10px 0 18px}
+.prompt .big{font-size:2.4rem;font-weight:700;display:inline-flex;align-items:center;gap:12px}
+.blank{display:inline-block;min-width:5.5em;border-bottom:2px solid var(--ink)}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;border:2px solid #D8D2C0;background:#fff;border-radius:8px;padding:12px 14px;cursor:pointer;font-family:var(--serif);font-size:1.08rem;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--ok);background:#E5F2E8}
+.opt.wrong{border-color:var(--bad);background:#F8E3E5}
+.feedback{margin-top:16px;padding:12px 14px;border-radius:8px;background:#F4F0E3;font-family:var(--serif);line-height:1.5}
+.feedback b{font-family:var(--sans)}
+.spell{display:flex;gap:10px;flex-wrap:wrap}
+.spell input{flex:1 1 220px;font-size:1.3rem;padding:10px 12px;border:2px solid #D8D2C0;border-radius:8px;font-family:var(--serif)}
+.flip{perspective:1200px;margin:8px 0 16px}
+.flip-inner{position:relative;min-height:260px;transition:transform .45s;transform-style:preserve-3d;cursor:pointer}
+.flip.on .flip-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border:2px solid #D8D2C0;border-radius:6px;padding:22px;display:flex;flex-direction:column;justify-content:center;background:#fff}
+.face.back{transform:rotateY(180deg)}
+.face .word{font-size:2.6rem;text-align:center}
+.score{font-family:var(--serif);font-size:3.2rem;font-weight:700;margin:6px 0}
+.missed{list-style:none;padding:0;margin:14px 0;display:grid;gap:8px}
+.missed li{border-left:4px solid var(--bad);padding:6px 10px;background:#FBF6EA;font-family:var(--serif)}
+.note{font-size:.85rem;color:var(--muted)}
+[hidden]{display:none!important}
+/* One-at-a-time view */
+.solo{max-width:640px;margin:28px auto 0}
+.solo .flip{margin:0}
+.solo .flip-inner{display:grid;min-height:0}
+.solo .face{position:relative;grid-area:1/1;border:0;border-radius:3px;padding:34px 28px 26px 44px;justify-content:flex-start;
+  background-color:var(--card);
+  background-image:linear-gradient(to right,transparent 30px,var(--margin) 30px,var(--margin) 31.5px,transparent 31.5px),
+  repeating-linear-gradient(to bottom,transparent 0,transparent 29px,var(--rule) 29px,var(--rule) 30px);
+  background-position:0 0,0 70px;background-repeat:no-repeat,repeat-y;background-size:100% 100%,100% calc(100% - 70px)}
+.solo-front{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+.solo-front .word{font-size:clamp(2.6rem,8vw,4.2rem)}
+.solo-front .pos{font-size:1.2rem}
+.solo-front .iconbtn{margin:10px auto 0;width:48px;height:48px}
+.solo-front .iconbtn svg{width:22px;height:22px}
+.solo .back .def{font-size:1.3rem}
+.solo .back .quote{font-size:1.15rem}
+.solo-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+.solo-nav .navbtn{background:var(--card);color:var(--ink);border:0;border-radius:8px;padding:11px 20px;font-weight:700;cursor:pointer}
+.solo-nav .navbtn:disabled{opacity:.4;cursor:default}
+.solo-nav .count{margin:0;min-width:7em;text-align:center}
+.solo-nav .star{color:#8FA3AE;width:40px;height:40px;font-size:1.5rem}
+.solo-nav .star[aria-pressed="true"]{color:var(--pencil)}
+.keys{text-align:center;color:#9FB0BA;font-size:.85rem;margin-top:10px}
+footer{margin-top:40px;color:#9FB0BA;font-size:.85rem;max-width:70ch}
+@media (max-width:560px){.wrap{padding:18px 12px 40px}.testpanel{padding:18px}.prompt .big{font-size:1.9rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Word Cards</h1>
+      <p class="sub">Vocabulary from grade 5 (ISEE Lower Level) through the SAT, with pronunciation, meanings, and sentences from classic writers.</p>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <button id="tabBrowse" aria-pressed="true">Study cards</button>
+      <button id="tabTest" aria-pressed="false">Test yourself</button>
+    </nav>
+  </header>
+
+  <section id="browse">
+    <div class="toolbar">
+      <select id="view" aria-label="View">
+        <option value="grid">All cards</option>
+        <option value="one">One at a time</option>
+      </select>
+      <input type="search" id="q" placeholder="Search words or meanings" aria-label="Search">
+      <div class="chips" id="lvlChips"></div>
+      <select id="sort" aria-label="Sort">
+        <option value="az">A to Z</option>
+        <option value="level">By level</option>
+        <option value="daily">Randomize (new order each day)</option>
+        <option value="random">Shuffle (new order every time)</option>
+      </select>
+      <button class="plain" id="starOnly" aria-pressed="false">★ Starred only</button>
+      <button class="plain" id="quoteOnly" aria-pressed="false">Classic quotes only</button>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="grid" id="grid"></div>
+    <div id="single" hidden></div>
+  </section>
+
+  <section id="test" hidden>
+    <div class="testpanel" id="testpanel"></div>
+  </section>
+
+  <footer>
+    Quoted sentences come from public-domain classics and historical documents. Cards without a named source use an original example sentence.
+    Pronunciation uses your browser's built-in voice. Stars and scores are saved in this browser only.
+  </footer>
+</div>
+
+<script>
+/* word | part of speech | level (1-4) | meaning | sentence | source (blank = original example) */
+const RAW = `abundant|adj.|1|Existing in large amounts; plentiful.|After the spring rains, wildflowers were abundant on the hillside.|
+accurate|adj.|1|Correct in every detail; exact.|Her map was so accurate that we never took a wrong turn.|
+adapt|v.|1|To change in order to fit new conditions.|Polar bears have adapted to life on the frozen sea.|
+admire|v.|1|To look at or think of with respect and approval.|Everyone admired the way she stayed calm during the storm.|
+ancient|adj.|1|Very old; belonging to the distant past.|Ghastly grim and ancient Raven wandering from the Nightly shore|Edgar Allan Poe, "The Raven"
+anxious|adj.|1|Worried or nervous about something uncertain.|Leo felt anxious while he waited for his test results.|
+astonish|v.|1|To surprise greatly; to amaze.|Always do right. This will gratify some people and astonish the rest.|Mark Twain (1901)
+attain|v.|1|To reach or achieve, usually with effort.|In order to make a man or a boy covet a thing, it is only necessary to make the thing difficult to attain.|Mark Twain, The Adventures of Tom Sawyer
+bewilder|v.|1|To confuse completely.|The maze of hallways bewildered the new students.|
+blunder|n.|1|A careless or foolish mistake.|Leaving the gate open was a blunder that let the goats escape.|
+boast|v.|1|To talk with too much pride about yourself.|He boasted that he could beat anyone at chess, then lost his first game.|
+brief|adj.|1|Short in time or length.|The principal gave a brief speech so we could get to recess.|
+brittle|adj.|1|Hard but easily broken or snapped.|Old leaves become dry and brittle in the fall.|
+cautious|adj.|1|Careful to avoid danger or mistakes.|The cautious hiker tested each rock before stepping on it.|
+cherish|v.|1|To hold dear; to care for lovingly.|She cherished the letters her grandmother had written her.|
+clarify|v.|1|To make something clearer or easier to understand.|The teacher drew a diagram to clarify the directions.|
+coax|v.|1|To gently persuade someone to do something.|We coaxed the shy kitten out from under the bed with a toy.|
+collide|v.|1|To crash into something.|The two soccer players collided while chasing the ball.|
+compassion|n.|1|Sympathy and concern for others who are suffering.|Out of compassion, the class raised money for the flood victims.|
+conceal|v.|1|To hide or keep secret.|The squirrel concealed its acorns under the leaves.|
+conclude|v.|1|To bring to an end; also, to decide after thinking.|After studying the clues, the detective concluded that the butler was innocent.|
+confident|adj.|1|Sure of yourself or of something.|After weeks of practice, Maya felt confident about the recital.|
+consequence|n.|1|A result or effect of an action.|One consequence of staying up late was a very sleepy morning.|
+content|adj.|1|Satisfied and at peace.|The cat lay content in a patch of sunlight.|
+courage|n.|1|The strength to face danger or fear.|Courage is resistance to fear, mastery of fear—not absence of fear.|Mark Twain, Pudd'nhead Wilson
+cower|v.|1|To crouch or shrink back in fear.|The puppy cowered under the table during the thunderstorm.|
+crucial|adj.|1|Extremely important; decisive.|Water is crucial for every living thing.|
+curious|adj.|1|Eager to know or learn something.|The curious toddler opened every drawer in the kitchen.|
+dazzle|v.|1|To amaze with brightness or skill.|The fireworks dazzled the crowd.|
+debris|n.|1|Scattered pieces of something broken or destroyed.|After the hurricane, debris covered the beach.|
+decay|n.|1|The process of rotting or falling apart.|The old barn showed signs of decay.|
+deceive|v.|1|To make someone believe something that is not true.|The magician deceived the audience with a clever trick.|
+depart|v.|1|To leave, especially to start a journey.|The train departs at exactly nine o'clock.|
+descend|v.|1|To move down.|The divers descended slowly into the dark water.|
+despair|n./v.|1|Complete loss of hope; to lose all hope.|Look on my Works, ye Mighty, and despair!|Percy Bysshe Shelley, "Ozymandias"
+determined|adj.|1|Firmly decided; not willing to give up.|The determined climber reached the top despite the wind.|
+devour|v.|1|To eat hungrily; to take in eagerly.|My brother devoured three slices of pizza in five minutes.|
+drowsy|adj.|1|Sleepy; half asleep.|A drowsy, dreamy influence seems to hang over the land, and to pervade the very atmosphere.|Washington Irving, "The Legend of Sleepy Hollow"
+dreary|adj.|1|Dull, gloomy, and depressing.|Once upon a midnight dreary, while I pondered, weak and weary|Edgar Allan Poe, "The Raven"
+eager|adj.|1|Wanting very much to do or have something.|The eager students raised their hands before the question was finished.|
+elated|adj.|1|Very happy and excited.|Sam was elated when his science project won first prize.|
+emerge|v.|1|To come out into view.|A butterfly emerged from the cocoon.|
+enormous|adj.|1|Very large; huge.|An enormous whale surfaced beside the boat.|
+exaggerate|v.|1|To make something seem bigger or more important than it really is.|He exaggerated when he said the fish was as big as a car.|
+examine|v.|1|To look at closely and carefully.|The doctor examined the X-ray for any breaks.|
+excavate|v.|1|To dig out, especially to uncover buried things.|Scientists excavated the dinosaur bones one by one.|
+exhausted|adj.|1|Extremely tired; also, completely used up.|After the marathon, the runners were exhausted.|
+fatigue|n.|1|Great tiredness.|Fatigue set in after hours of hiking uphill.|
+feeble|adj.|1|Weak; lacking strength.|The feeble baby bird could not yet fly.|
+fierce|adj.|1|Violent, intense, or aggressive.|A fierce wind knocked over the fence.|
+fragile|adj.|1|Easily broken or damaged.|Pack the glass ornaments carefully because they are fragile.|
+frantic|adj.|1|Wild with worry, fear, or hurry.|The frantic parents searched the park for their lost child.|
+frigid|adj.|1|Very cold.|The frigid air made our breath look like smoke.|
+furious|adj.|1|Extremely angry.|The coach was furious when the team skipped practice.|
+generous|adj.|1|Willing to give and share.|Our generous neighbor gave us tomatoes from her garden.|
+glimpse|n.|1|A quick or partial look.|We caught a glimpse of a deer before it ran into the woods.|
+gloomy|adj.|1|Dark or sad; without hope.|The gloomy weather matched his mood.|
+grateful|adj.|1|Feeling or showing thanks.|I am grateful for friends who help me study.|
+grieve|v.|1|To feel deep sadness, especially after a loss.|The family grieved for their old dog.|
+hesitate|v.|1|To pause before acting because of uncertainty.|She hesitated at the edge of the diving board.|
+hover|v.|1|To stay in the air over one place.|Hover through the fog and filthy air.|William Shakespeare, Macbeth
+hue|n.|1|A color or shade of a color.|Nature's first green is gold, Her hardest hue to hold.|Robert Frost, "Nothing Gold Can Stay"
+humble|adj.|1|Not proud; modest.|Even after winning, the champion stayed humble.|
+imitate|v.|1|To copy someone or something.|The parrot imitated the sound of the doorbell.|
+immense|adj.|1|Extremely large.|The immense cave could hold a whole cathedral.|
+impatient|adj.|1|Unable to wait calmly.|The impatient driver honked again and again.|
+inquire|v.|1|To ask for information.|Dad called to inquire about the store's hours.|
+insist|v.|1|To demand firmly; to refuse to give in.|Mom insisted that we wear helmets.|
+jealousy|n.|1|Unhappy feelings about what someone else has.|O, beware, my lord, of jealousy; It is the green-eyed monster|William Shakespeare, Othello
+journey|n.|1|A trip from one place to another, often long.|The pioneers' journey west took many months.|
+keen|adj.|1|Sharp; also eager or intense.|A sharp tongue is the only edged tool that grows keener with constant use.|Washington Irving, "Rip Van Winkle"
+lure|v.|1|To tempt or attract, often with a reward.|The smell of cookies lured us into the kitchen.|
+magnificent|adj.|1|Very impressive or beautiful.|The castle had a magnificent view of the mountains.|
+meager|adj.|1|Very small in amount; not enough.|The stray dog survived on meager scraps.|
+mimic|v.|1|To imitate, often to make fun of or amuse.|My little sister mimics everything I say.|
+moist|adj.|1|Slightly wet.|Keep the soil moist so the seeds will sprout.|
+moral|n.|1|The lesson a story teaches.|Everything's got a moral, if only you can find it.|Lewis Carroll, Alice's Adventures in Wonderland
+mournful|adj.|1|Full of sadness or grief.|The wolf let out a long, mournful howl.|
+navigate|v.|1|To find the way; to steer.|Sailors once navigated by the stars.|
+nimble|adj.|1|Quick and light in movement.|The nimble goat leaped from rock to rock.|
+obvious|adj.|1|Easy to see or understand.|It was obvious that the dog had eaten the cake.|
+observe|v.|1|To watch carefully; to notice.|You see, but you do not observe.|Arthur Conan Doyle, "A Scandal in Bohemia"
+odor|n.|1|A smell, often unpleasant.|A strange odor came from the refrigerator.|
+opponent|n.|1|A person you compete or fight against.|She shook hands with her opponent after the match.|
+peculiar|adj.|1|Strange or unusual.|There was a peculiar noise coming from the attic.|
+perch|v.|1|To sit or rest on something high or narrow.|Hope is the thing with feathers That perches in the soul|Emily Dickinson
+persuade|v.|1|To convince someone to believe or do something.|Jada persuaded her parents to let her join the team.|
+plead|v.|1|To beg earnestly.|The boy pleaded for one more bedtime story.|
+predict|v.|1|To say what will happen in the future.|Scientists predict that the storm will reach the coast tonight.|
+prevention|n.|1|The act of stopping something before it happens.|An ounce of prevention is worth a pound of cure.|Benjamin Franklin (1735)
+protest|v./n.|1|To object strongly; an objection.|The lady doth protest too much, methinks.|William Shakespeare, Hamlet
+quarrel|n.|1|An angry argument.|The twins had a quarrel over the last cookie.|
+rarely|adv.|1|Not often; seldom.|The truth is rarely pure and never simple.|Oscar Wilde, The Importance of Being Earnest
+reluctant|adj.|1|Unwilling; hesitant.|The reluctant swimmer dipped only one toe in the pool.|
+resist|v.|1|To fight against; to refuse to give in to.|I can resist everything except temptation.|Oscar Wilde, Lady Windermere's Fan
+rustle|v./n.|1|A soft, crackling sound, like leaves or fabric moving.|And the silken, sad, uncertain rustling of each purple curtain|Edgar Allan Poe, "The Raven"
+scarce|adj.|1|Hard to find; not enough.|Kindred spirits are not so scarce as I used to think.|L. M. Montgomery, Anne of Green Gables
+scold|v.|1|To speak angrily to someone who did something wrong.|The librarian scolded us for talking too loudly.|
+scowl|v.|1|To frown in an angry way.|The grumpy man scowled at the noisy children.|
+shiver|v.|1|To shake slightly from cold or fear.|We shivered at the bus stop in the icy wind.|
+sluggish|adj.|1|Slow-moving; lacking energy.|The heat made everyone feel sluggish.|
+solitary|adj.|1|Alone; existing by itself.|Secret, and self-contained, and solitary as an oyster.|Charles Dickens, A Christmas Carol
+soothe|v.|1|To calm or comfort.|The lullaby soothed the crying baby.|
+sparse|adj.|1|Thinly scattered; not crowded.|Grass was sparse in the dry desert.|
+startle|v.|1|To surprise and frighten suddenly.|The loud bang startled the birds from the tree.|
+stingy|adj.|1|Unwilling to spend or share.|The stingy king kept all the gold for himself.|
+sturdy|adj.|1|Strong and solidly built.|We built a sturdy treehouse that could hold four kids.|
+summit|n.|1|The highest point, especially of a mountain.|There is an ecstasy that marks the summit of life, and beyond which life cannot rise.|Jack London, The Call of the Wild
+survive|v.|1|To continue to live, especially through danger.|Camels can survive for days without water.|
+swift|adj.|1|Very fast.|The race is not to the swift, nor the battle to the strong.|Ecclesiastes 9:11 (King James Bible)
+temptation|n.|1|A strong urge to do something, often something you shouldn't.|The only way to get rid of a temptation is to yield to it.|Oscar Wilde, The Picture of Dorian Gray
+thrifty|adj.|1|Careful with money; not wasteful.|Our thrifty aunt reuses every paper bag.|
+timid|adj.|1|Shy and easily frightened.|The timid rabbit froze when it saw us.|
+toil|n./v.|1|Hard, tiring work; to work hard.|Double, double toil and trouble; Fire burn and cauldron bubble.|William Shakespeare, Macbeth
+tremble|v.|1|To shake, often from fear or cold.|Her voice trembled as she began her speech.|
+triumph|n.|1|A great victory or success.|If you can meet with Triumph and Disaster And treat those two impostors just the same|Rudyard Kipling, "If—"
+vacant|adj.|1|Empty; also, showing no thought.|For oft, when on my couch I lie In vacant or in pensive mood|William Wordsworth, "I Wandered Lonely as a Cloud"
+valiant|adj.|1|Brave and bold.|Cowards die many times before their deaths; The valiant never taste of death but once.|William Shakespeare, Julius Caesar
+vanish|v.|1|To disappear suddenly.|The magician's rabbit vanished into thin air.|
+vast|adj.|1|Extremely large in area or amount.|Two vast and trunkless legs of stone Stand in the desert.|Percy Bysshe Shelley, "Ozymandias"
+vivid|adj.|1|Bright and strong; clear and detailed.|She painted the sunset in vivid oranges and pinks.|
+wary|adj.|1|Watchful and careful about possible danger.|The deer was wary of the strange noise.|
+weary|adj.|1|Very tired.|The weary travelers finally reached the inn.|
+wholesome|adj.|1|Good for your health or well-being.|He has refused his Assent to Laws, the most wholesome and necessary for the public good.|Declaration of Independence (1776)
+wince|v.|1|To make a quick face from pain or embarrassment.|In the fell clutch of circumstance I have not winced nor cried aloud.|William Ernest Henley, "Invictus"
+wrath|n.|1|Intense anger.|A soft answer turneth away wrath: but grievous words stir up anger.|Proverbs 15:1 (King James Bible)
+yield|v.|1|To give way or give up; also, to produce.|To strive, to seek, to find, and not to yield.|Alfred, Lord Tennyson, "Ulysses"
+ample|adj.|1|More than enough.|There was ample room in the van for everyone's bags.|
+blend|v.|1|To mix together smoothly.|Blend the bananas and milk to make a smoothie.|
+brisk|adj.|1|Quick and energetic; pleasantly cold.|We took a brisk walk in the autumn air.|
+clumsy|adj.|1|Awkward and careless in movement.|The clumsy waiter dropped a stack of plates.|
+dwell|v.|1|To live in a place; to keep thinking about something.|Don't dwell on one bad grade.|
+fret|v.|1|To worry.|Grandpa fretted when we were late coming home.|
+gaze|v.|1|To look steadily for a long time.|We gazed at the stars from the rooftop.|
+haste|n.|1|Excessive speed or hurry.|In her haste, she forgot her lunch.|
+linger|v.|1|To stay longer than expected.|The smell of popcorn lingered in the theater.|
+loyal|adj.|1|Faithful to a person or cause.|The loyal dog waited by the door every day.|
+murky|adj.|1|Dark and hard to see through.|We couldn't see the bottom of the murky pond.|
+radiant|adj.|1|Shining brightly; glowing with happiness.|The bride looked radiant.|
+recede|v.|1|To move back or away.|The floodwaters slowly receded.|
+sift|v.|1|To separate or examine carefully.|Detectives sifted through the evidence.|
+stern|adj.|1|Strict and serious.|The stern judge did not smile once.|
+thrive|v.|1|To grow strongly; to do well.|Tomatoes thrive in hot, sunny weather.|
+tranquil|adj.|1|Calm and peaceful.|The lake was tranquil at dawn.|
+trudge|v.|1|To walk slowly and heavily.|We trudged through the deep snow.|
+abolish|v.|2|To officially end or get rid of.|Many states voted to abolish slavery long before the Civil War.|
+abrupt|adj.|2|Sudden and unexpected; also, rudely short.|The bus came to an abrupt stop.|
+absurd|adj.|2|Wildly unreasonable or ridiculous.|The idea of a fish riding a bicycle is absurd.|
+accumulation|n.|2|A gradual gathering or build-up.|Life, although it may only be an accumulation of anguish, is dear to me, and I will defend it.|Mary Shelley, Frankenstein
+acquire|v.|2|To get or gain.|She acquired a taste for spicy food in Mexico.|
+adversary|n.|2|An enemy or opponent.|The knight faced his old adversary at dawn.|
+advocate|v./n.|2|To publicly support; a supporter.|He advocated for a longer lunch period.|
+affluent|adj.|2|Wealthy.|The affluent family owned three houses.|
+agile|adj.|2|Able to move quickly and easily.|The agile gymnast flipped across the mat.|
+alter|v.|2|To change.|Love is not love Which alters when it alteration finds|William Shakespeare, Sonnet 116
+ambition|n.|2|A strong desire to succeed or achieve something.|Ambition should be made of sterner stuff.|William Shakespeare, Julius Caesar
+amiable|adj.|2|Friendly and pleasant.|The amiable host made everyone feel welcome.|
+anguish|n.|2|Severe mental or physical pain.|Life, although it may only be an accumulation of anguish, is dear to me.|Mary Shelley, Frankenstein
+apprehensive|adj.|2|Anxious that something bad will happen.|I was apprehensive about my first day at a new school.|
+arrogant|adj.|2|Having an exaggerated sense of one's own importance.|The arrogant player refused to pass the ball.|
+assert|v.|2|To state firmly and confidently.|The witness asserted that she saw the thief.|
+benevolent|adj.|2|Kind and wanting to do good.|I was benevolent and good; misery made me a fiend.|Mary Shelley, Frankenstein
+bleak|adj.|2|Cold, empty, and without hope.|The future looked bleak after the factory closed.|
+bliss|n.|2|Perfect happiness.|They flash upon that inward eye Which is the bliss of solitude|William Wordsworth, "I Wandered Lonely as a Cloud"
+brevity|n.|2|Shortness; using few words.|Brevity is the soul of wit.|William Shakespeare, Hamlet
+candid|adj.|2|Honest and direct.|Thank you for your candid opinion of my essay.|
+chortle|v.|2|To laugh in a gleeful, chuckling way.|O frabjous day! Callooh! Callay! He chortled in his joy.|Lewis Carroll, "Jabberwocky"
+colossal|adj.|2|Extremely large.|Round the decay Of that colossal Wreck, boundless and bare The lone and level sands stretch far away.|Percy Bysshe Shelley, "Ozymandias"
+commend|v.|2|To praise formally.|The mayor commended the firefighters for their bravery.|
+compel|v.|2|To force someone to do something.|The rain compelled us to cancel the picnic.|
+comply|v.|2|To obey a rule or request.|All visitors must comply with the museum's rules.|
+concise|adj.|2|Brief but complete.|Write a concise summary of the chapter in three sentences.|
+condemn|v.|2|To strongly disapprove of; to sentence to punishment.|World leaders condemned the attack.|
+contradict|v.|2|To say the opposite of; to deny.|Do I contradict myself? Very well then I contradict myself.|Walt Whitman, "Song of Myself"
+covet|v.|2|To strongly desire something that belongs to someone else.|In order to make a man or a boy covet a thing, it is only necessary to make the thing difficult to attain.|Mark Twain, The Adventures of Tom Sawyer
+decree|v./n.|2|To order officially; an official order.|In Xanadu did Kubla Khan A stately pleasure-dome decree|Samuel Taylor Coleridge, "Kubla Khan"
+deliberately|adv.|2|On purpose; carefully and without hurry.|I went to the woods because I wished to live deliberately.|Henry David Thoreau, Walden
+deceptive|adj.|2|Giving a false impression; misleading.|There is nothing more deceptive than an obvious fact.|Arthur Conan Doyle, "The Boscombe Valley Mystery"
+dense|adj.|2|Closely packed; thick.|The dense fog hid the bridge completely.|
+desolate|adj.|2|Empty, lonely, and bleak.|Desolate yet all undaunted, on this desert land enchanted|Edgar Allan Poe, "The Raven"
+desperation|n.|2|A state of hopelessness that can lead to reckless action.|The mass of men lead lives of quiet desperation.|Henry David Thoreau, Walden
+devious|adj.|2|Sneaky and dishonest.|The villain came up with a devious plan.|
+digest|v.|2|To break down food; to think over and understand.|Some books are to be tasted, others to be swallowed, and some few to be chewed and digested.|Francis Bacon, "Of Studies"
+diligent|adj.|2|Careful and hardworking.|A diligent student reviews her notes every night.|
+dismal|adj.|2|Gloomy and depressing.|The team had a dismal season with only one win.|
+disposed|adj.|2|Inclined or willing.|All experience hath shewn, that mankind are more disposed to suffer, while evils are sufferable|Declaration of Independence (1776)
+dominion|n.|2|Control or power over something.|And Darkness and Decay and the Red Death held illimitable dominion over all.|Edgar Allan Poe, "The Masque of the Red Death"
+ecstasy|n.|2|Overwhelming joy.|There is an ecstasy that marks the summit of life, and beyond which life cannot rise.|Jack London, The Call of the Wild
+eliminate|v.|2|To remove or get rid of.|When you have eliminated the impossible, whatever remains, however improbable, must be the truth.|Arthur Conan Doyle, The Sign of the Four
+eloquent|adj.|2|Speaking or writing clearly and persuasively.|Her eloquent speech moved the audience to tears.|
+endure|v.|2|To put up with something painful; to last.|The explorers endured months of bitter cold.|
+enthusiasm|n.|2|Intense enjoyment, interest, or eagerness.|Nothing great was ever achieved without enthusiasm.|Ralph Waldo Emerson, "Circles"
+entire|adj.|2|Whole; complete.|No man is an island, entire of itself.|John Donne, Meditation XVII
+err|v.|2|To make a mistake.|To err is human, to forgive divine.|Alexander Pope, An Essay on Criticism
+esteem|v./n.|2|To respect and admire; respect.|What we obtain too cheap, we esteem too lightly.|Thomas Paine, The American Crisis
+evade|v.|2|To escape or avoid, often by trickery.|The fox evaded the hunters by crossing the stream.|
+exasperate|v.|2|To irritate intensely.|The constant beeping exasperated everyone in the room.|
+expenditure|n.|2|The spending of money; an amount spent.|Annual income twenty pounds, annual expenditure nineteen nineteen and six, result happiness.|Charles Dickens, David Copperfield
+fiend|n.|2|An evil spirit or a very wicked person.|I was benevolent and good; misery made me a fiend.|Mary Shelley, Frankenstein
+fickle|adj.|2|Changing often, especially in loyalty or affection.|Fans can be fickle when a team starts losing.|
+flourish|v.|2|To grow well; to thrive.|The garden flourished after we added compost.|
+frailty|n.|2|Weakness in body or character.|Frailty, thy name is woman!|William Shakespeare, Hamlet
+frugal|adj.|2|Careful and economical with money or food.|By living frugally, they saved enough for a trip.|
+futile|adj.|2|Useless; having no chance of success.|It was futile to argue with the referee.|
+gratify|v.|2|To please or satisfy.|Always do right. This will gratify some people and astonish the rest.|Mark Twain (1901)
+gravely|adv.|2|In a serious, solemn way.|Begin at the beginning, the King said, very gravely, and go on till you come to the end: then stop.|Lewis Carroll, Alice's Adventures in Wonderland
+haughty|adj.|2|Arrogantly proud; looking down on others.|Pride goeth before destruction, and an haughty spirit before a fall.|Proverbs 16:18 (King James Bible)
+hostile|adj.|2|Unfriendly; showing opposition.|The hostile crowd booed the visiting team.|
+idle|adj.|2|Not working or active; lazy.|The machines sat idle during the holiday.|
+immortal|adj.|2|Living forever; never forgotten.|What immortal hand or eye, Could frame thy fearful symmetry?|William Blake, "The Tyger"
+impostor|n.|2|A person who pretends to be someone else to deceive.|If you can meet with Triumph and Disaster And treat those two impostors just the same|Rudyard Kipling, "If—"
+improbable|adj.|2|Not likely to happen or be true.|When you have eliminated the impossible, whatever remains, however improbable, must be the truth.|Arthur Conan Doyle, The Sign of the Four
+indifferent|adj.|2|Not caring; showing no interest.|He was indifferent to the score and just enjoyed playing.|
+infinite|adj.|2|Without limits or end.|Reserving judgments is a matter of infinite hope.|F. Scott Fitzgerald, The Great Gatsby
+integrity|n.|2|The quality of being honest and having strong moral principles.|A person of integrity tells the truth even when no one is watching.|
+intolerable|adj.|2|Too bad or painful to be endured.|The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.|Jane Austen, Northanger Abbey
+intrepid|adj.|2|Fearless; adventurous.|The intrepid explorer crossed the Arctic on foot.|
+jubilant|adj.|2|Filled with joy, especially after a victory.|Jubilant fans poured onto the field.|
+kindred|adj./n.|2|Similar in nature; family or like-minded people.|Kindred spirits are not so scarce as I used to think.|L. M. Montgomery, Anne of Green Gables
+lament|v./n.|2|To express deep sorrow; an expression of grief.|The village lamented the loss of its oldest tree.|
+lore|n.|2|Traditional knowledge or stories about a subject.|Over many a quaint and curious volume of forgotten lore|Edgar Allan Poe, "The Raven"
+malice|n.|2|The desire to harm others.|With malice toward none, with charity for all|Abraham Lincoln, Second Inaugural Address
+meddle|v.|2|To interfere in something that is not your concern.|Please don't meddle in your sister's argument.|
+mercy|n.|2|Kindness or forgiveness shown to someone you could punish.|The quality of mercy is not strain'd; It droppeth as the gentle rain from heaven|William Shakespeare, The Merchant of Venice
+merely|adv.|2|Only; nothing more than.|All the world's a stage, And all the men and women merely players|William Shakespeare, As You Like It
+mortal|adj./n.|2|Subject to death; a human being.|Lord, what fools these mortals be!|William Shakespeare, A Midsummer Night's Dream
+mortify|v.|2|To cause someone to feel deeply embarrassed or humiliated.|I could easily forgive his pride, if he had not mortified mine.|Jane Austen, Pride and Prejudice
+multitude|n.|2|A very large number.|I am large, I contain multitudes.|Walt Whitman, "Song of Myself"
+naive|adj.|2|Lacking experience; too trusting.|The naive tourist believed the bridge was for sale.|
+negligent|adj.|2|Failing to take proper care.|The negligent babysitter let the toddler wander off.|
+novice|n.|2|A beginner.|As a novice skier, I stayed on the easy slopes.|
+obscure|adj./v.|2|Not well known or hard to understand; to hide.|Clouds obscured the moon.|
+obstinate|adj.|2|Stubborn; refusing to change.|The obstinate mule would not budge.|
+ominous|adj.|2|Suggesting that something bad will happen.|Ominous dark clouds gathered over the town.|
+pensive|adj.|2|Deeply or seriously thoughtful.|For oft, when on my couch I lie In vacant or in pensive mood|William Wordsworth, "I Wandered Lonely as a Cloud"
+perish|v.|2|To die or be destroyed.|Government of the people, by the people, for the people, shall not perish from the earth.|Abraham Lincoln, Gettysburg Address
+persevere|v.|2|To keep trying despite difficulty.|She persevered through ten failed experiments before one worked.|
+plausible|adj.|2|Seeming reasonable or believable.|His excuse was plausible, so the teacher accepted it.|
+ponder|v.|2|To think about carefully.|Once upon a midnight dreary, while I pondered, weak and weary|Edgar Allan Poe, "The Raven"
+prejudice|n.|2|An unfair opinion formed without knowledge or reason.|Prejudices, it is well known, are most difficult to eradicate from the heart whose soil has never been loosened or fertilised by education.|Charlotte Brontë, Jane Eyre
+prudence|n.|2|Good judgment and caution.|Prudence, indeed, will dictate that Governments long established should not be changed for light and transient causes.|Declaration of Independence (1776)
+quaint|adj.|2|Attractively old-fashioned or unusual.|Over many a quaint and curious volume of forgotten lore|Edgar Allan Poe, "The Raven"
+refuge|n.|2|A place or state of safety.|Patriotism is the last refuge of a scoundrel.|Samuel Johnson, quoted in Boswell's Life of Johnson
+reign|v./n.|2|To rule as king or queen; a period of rule.|Better to reign in Hell, than serve in Heav'n.|John Milton, Paradise Lost
+resentful|adj.|2|Feeling bitter about unfair treatment.|My temper would perhaps be called resentful.|Jane Austen, Pride and Prejudice
+revenge|n.|2|Harm done in return for a wrong.|When he ventured upon insult, I vowed revenge.|Edgar Allan Poe, "The Cask of Amontillado"
+rigid|adj.|2|Stiff; not flexible; strict.|The school had rigid rules about uniforms.|
+scheme|n.|2|A plan, often a secret or clever one.|The best laid schemes o' mice an' men Gang aft agley|Robert Burns, "To a Mouse"
+scornful|adj.|2|Showing contempt or disrespect.|When I use a word, Humpty Dumpty said, in rather a scornful tone, it means just what I choose it to mean.|Lewis Carroll, Through the Looking-Glass
+scoundrel|n.|2|A dishonest or wicked person.|Patriotism is the last refuge of a scoundrel.|Samuel Johnson, quoted in Boswell's Life of Johnson
+serene|adj.|2|Calm and peaceful.|Her serene smile calmed the nervous patients.|
+shun|v.|2|To avoid deliberately.|However mean your life is, meet it and live it; do not shun it and call it hard names.|Henry David Thoreau, Walden
+signify|v.|2|To mean or indicate.|It is a tale told by an idiot, full of sound and fury, signifying nothing.|William Shakespeare, Macbeth
+sinewy|adj.|2|Lean and muscular.|The smith, a mighty man is he, With large and sinewy hands|Henry Wadsworth Longfellow, "The Village Blacksmith"
+sluggard|n.|2|A lazy person.|Go to the ant, thou sluggard; consider her ways, and be wise.|Proverbs 6:6 (King James Bible)
+solitude|n.|2|The state of being alone, often peacefully.|They flash upon that inward eye Which is the bliss of solitude|William Wordsworth, "I Wandered Lonely as a Cloud"
+stately|adj.|2|Grand and dignified.|In Xanadu did Kubla Khan A stately pleasure-dome decree|Samuel Taylor Coleridge, "Kubla Khan"
+strive|v.|2|To try very hard.|To strive, to seek, to find, and not to yield.|Alfred, Lord Tennyson, "Ulysses"
+sublime|adj.|2|Of such excellence or beauty that it inspires awe.|Lives of great men all remind us We can make our lives sublime|Henry Wadsworth Longfellow, "A Psalm of Life"
+superfluous|adj.|2|More than is needed; unnecessary.|Superfluous wealth can buy superfluities only.|Henry David Thoreau, Walden
+symmetry|n.|2|Balanced, matching proportions on both sides.|What immortal hand or eye, Could frame thy fearful symmetry?|William Blake, "The Tyger"
+tedious|adj.|2|Long and boring.|Copying the dictionary by hand would be tedious.|
+temperate|adj.|2|Mild; not extreme; showing self-control.|Shall I compare thee to a summer's day? Thou art more lovely and more temperate|William Shakespeare, Sonnet 18
+thankless|adj.|2|Not showing gratitude; not appreciated.|How sharper than a serpent's tooth it is To have a thankless child!|William Shakespeare, King Lear
+theorize|v.|2|To form an explanation or theory.|It is a capital mistake to theorize before one has data.|Arthur Conan Doyle, "A Scandal in Bohemia"
+tranquility|n.|2|Peace and calm.|Establish Justice, insure domestic Tranquility, provide for the common defence|Constitution of the United States, Preamble
+transient|adj.|2|Lasting only a short time.|Governments long established should not be changed for light and transient causes.|Declaration of Independence (1776)
+tyranny|n.|2|Cruel and unfair use of power.|Tyranny, like hell, is not easily conquered.|Thomas Paine, The American Crisis
+undaunted|adj.|2|Not discouraged or afraid.|Desolate yet all undaunted, on this desert land enchanted|Edgar Allan Poe, "The Raven"
+unconquerable|adj.|2|Impossible to defeat.|I thank whatever gods may be For my unconquerable soul.|William Ernest Henley, "Invictus"
+vanity|n.|2|Too much pride in one's looks or achievements.|Pride relates more to our opinion of ourselves, vanity to what we would have others think of us.|Jane Austen, Pride and Prejudice
+vex|v.|2|To annoy or trouble.|It was not the old man who vexed me, but his Evil Eye.|Edgar Allan Poe, "The Tell-Tale Heart"
+vibrate|v.|2|To move back and forth rapidly.|Trust thyself: every heart vibrates to that iron string.|Ralph Waldo Emerson, "Self-Reliance"
+visage|n.|2|A person's face or expression.|Near them, on the sand, Half sunk a shattered visage lies|Percy Bysshe Shelley, "Ozymandias"
+vow|v./n.|2|To promise solemnly; a solemn promise.|When he ventured upon insult, I vowed revenge.|Edgar Allan Poe, "The Cask of Amontillado"
+ceaseless|adj.|2|Never stopping.|So we beat on, boats against the current, borne back ceaselessly into the past.|F. Scott Fitzgerald, The Great Gatsby
+morality|n.|2|Principles of right and wrong behavior.|Conventionality is not morality.|Charlotte Brontë, Jane Eyre
+belittle|v.|2|To make someone or something seem unimportant.|Don't belittle your brother's drawing just because he is young.|
+compromise|n./v.|2|An agreement where each side gives up something.|After an hour of arguing, we reached a compromise on the movie.|
+conform|v.|2|To follow rules or go along with what others do.|He refused to conform to the latest fashion trends.|
+crucial|adj.|2|Extremely important.|Practice is crucial to learning an instrument.|
+deplore|v.|2|To strongly disapprove of.|We deplore cruelty to animals.|
+diminish|v.|2|To make or become smaller.|The pain diminished after I took the medicine.|
+dispute|n./v.|2|An argument; to argue about.|The neighbors had a dispute about the fence line.|
+elaborate|adj./v.|2|Detailed and complicated; to explain in more detail.|Could you elaborate on your answer?|
+feasible|adj.|2|Possible and practical to do.|Building a treehouse in one afternoon isn't feasible.|
+gullible|adj.|2|Easily tricked.|The gullible boy believed his friend could fly.|
+hinder|v.|2|To get in the way of; to slow down.|Heavy snow hindered the rescue.|
+impartial|adj.|2|Fair; not favoring one side.|A referee must stay impartial.|
+inevitable|adj.|2|Certain to happen.|With dark clouds overhead, rain seemed inevitable.|
+jeopardy|n.|2|Danger of loss or harm.|The drought put the whole harvest in jeopardy.|
+legible|adj.|2|Clear enough to be read.|Please make your handwriting legible.|
+mediocre|adj.|2|Only average; not very good.|The food was mediocre, but the view was stunning.|
+nostalgia|n.|2|A sentimental longing for the past.|Old cartoons filled Dad with nostalgia.|
+petty|adj.|2|Of little importance; small-minded.|They ended their friendship over a petty argument.|
+reprimand|v./n.|2|To scold formally.|The coach reprimanded players who arrived late.|
+resolute|adj.|2|Firmly determined.|She was resolute in her decision to finish the race.|
+somber|adj.|2|Dark, serious, or sad.|The mood at the memorial was somber.|
+spontaneous|adj.|2|Done on sudden impulse without planning.|The crowd broke into spontaneous applause.|
+subtle|adj.|2|Delicate; hard to notice.|There was a subtle hint of lemon in the cake.|
+vague|adj.|2|Unclear or not specific.|His directions were so vague that we got lost.|
+verify|v.|2|To check that something is true.|Always verify facts before you share them.|
+vigilant|adj.|2|Watchful for danger.|The vigilant guard noticed the open window.|
+censure|n./v.|3|Strong formal criticism; to criticize harshly.|Give every man thy ear, but few thy voice; Take each man's censure, but reserve thy judgment.|William Shakespeare, Hamlet
+consecrate|v.|3|To make or declare sacred.|We can not dedicate—we can not consecrate—we can not hallow—this ground.|Abraham Lincoln, Gettysburg Address
+hallow|v.|3|To honor as holy.|We can not consecrate—we can not hallow—this ground.|Abraham Lincoln, Gettysburg Address
+proposition|n.|3|A statement or idea offered for consideration.|A new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.|Abraham Lincoln, Gettysburg Address
+interred|v.|3|Buried, especially with ceremony.|The evil that men do lives after them; The good is oft interred with their bones.|William Shakespeare, Julius Caesar
+consistency|n.|3|The quality of always behaving or being the same way.|A foolish consistency is the hobgoblin of little minds.|Ralph Waldo Emerson, "Self-Reliance"
+nonconformist|n.|3|A person who does not follow accepted customs or beliefs.|Whoso would be a man must be a nonconformist.|Ralph Waldo Emerson, "Self-Reliance"
+fritter|v.|3|To waste little by little.|Our life is frittered away by detail. Simplify, simplify.|Henry David Thoreau, Walden
+satire|n.|3|Humor or exaggeration used to mock foolishness or wrongdoing.|Satire is a sort of glass, wherein beholders do generally discover everybody's face but their own.|Jonathan Swift, The Battle of the Books
+profound|adj.|3|Very deep or intense; showing great insight.|Every human creature is constituted to be that profound secret and mystery to every other.|Charles Dickens, A Tale of Two Cities
+constitute|v.|3|To make up or form; to be.|Every human creature is constituted to be that profound secret and mystery to every other.|Charles Dickens, A Tale of Two Cities
+forbearance|n.|3|Patient self-control; restraint.|Charity, mercy, forbearance, and benevolence, were, all, my business.|Charles Dickens, A Christmas Carol
+benevolence|n.|3|Kindness and goodwill toward others.|Charity, mercy, forbearance, and benevolence, were, all, my business.|Charles Dickens, A Christmas Carol
+covetous|adj.|3|Greedily wanting what others have.|A squeezing, wrenching, grasping, scraping, clutching, covetous, old sinner!|Charles Dickens, A Christmas Carol
+retribution|n.|3|Punishment given in return for a wrong.|A wrong is unredressed when retribution overtakes its redresser.|Edgar Allan Poe, "The Cask of Amontillado"
+impunity|n.|3|Freedom from punishment.|I must not only punish, but punish with impunity.|Edgar Allan Poe, "The Cask of Amontillado"
+invariably|adv.|3|Always; without exception.|A long train of abuses and usurpations, pursuing invariably the same Object|Declaration of Independence (1776)
+despotism|n.|3|Rule by a single person with absolute power.|It evinces a design to reduce them under absolute Despotism.|Declaration of Independence (1776)
+oppressive|adj.|3|Harsh and unjust; heavy and uncomfortable.|When the clouds hung oppressively low in the heavens|Edgar Allan Poe, "The Fall of the House of Usher"
+pervade|v.|3|To spread through every part of.|A sense of insufferable gloom pervaded my spirit.|Edgar Allan Poe, "The Fall of the House of Usher"
+insufferable|adj.|3|Too unpleasant to bear.|A sense of insufferable gloom pervaded my spirit.|Edgar Allan Poe, "The Fall of the House of Usher"
+eradicate|v.|3|To destroy completely; to wipe out.|Prejudices, it is well known, are most difficult to eradicate from the heart.|Charlotte Brontë, Jane Eyre
+ensnare|v.|3|To catch in a trap.|I am no bird; and no net ensnares me: I am a free human being with an independent will.|Charlotte Brontë, Jane Eyre
+synonymous|adj.|3|Having the same or nearly the same meaning.|Vanity and pride are different things, though the words are often used synonymously.|Jane Austen, Pride and Prejudice
+aberration|n.|3|A departure from what is normal or expected.|One bad grade was an aberration in her otherwise perfect record.|
+abstain|v.|3|To choose not to do something.|Three senators abstained from the vote.|
+adept|adj.|3|Very skilled.|He is adept at solving puzzles quickly.|
+admonish|v.|3|To warn or scold gently but firmly.|The librarian admonished us to return books on time.|
+aesthetic|adj./n.|3|Relating to beauty or artistic taste.|The café's aesthetic was cozy and old-fashioned.|
+affable|adj.|3|Friendly and easy to talk to.|The affable tour guide answered every question.|
+alleviate|v.|3|To make pain or a problem less severe.|Ice can alleviate the swelling.|
+ambiguous|adj.|3|Having more than one possible meaning.|The ending of the film was ambiguous.|
+ambivalent|adj.|3|Having mixed feelings.|I'm ambivalent about moving: excited but also sad.|
+amenable|adj.|3|Open to suggestion; willing to cooperate.|The principal was amenable to our idea for a garden.|
+animosity|n.|3|Strong hostility or dislike.|There was animosity between the rival teams.|
+apathy|n.|3|Lack of interest or concern.|Voter apathy led to a very low turnout.|
+arbitrary|adj.|3|Based on random choice rather than reason.|The rule seemed arbitrary, so no one followed it.|
+ardent|adj.|3|Passionate and enthusiastic.|She is an ardent supporter of animal rights.|
+articulate|adj./v.|3|Able to express ideas clearly; to express clearly.|He articulated his concerns calmly.|
+ascertain|v.|3|To find out for certain.|Investigators tried to ascertain the cause of the fire.|
+audacious|adj.|3|Boldly daring, sometimes recklessly.|The audacious climber tried the cliff without ropes.|
+austere|adj.|3|Severe or strict; plain and without decoration.|The monks lived in austere little rooms.|
+aversion|n.|3|A strong dislike.|My cat has an aversion to water.|
+banal|adj.|3|Boring from overuse; unoriginal.|The movie's plot was banal and predictable.|
+belligerent|adj.|3|Hostile and eager to fight.|The belligerent customer shouted at the cashier.|
+benign|adj.|3|Gentle and kind; not harmful.|The doctor said the lump was benign.|
+berate|v.|3|To scold angrily and at length.|The captain berated the crew for their carelessness.|
+bolster|v.|3|To support or strengthen.|The good review bolstered her confidence.|
+boisterous|adj.|3|Noisy, energetic, and rowdy.|The boisterous party kept the neighbors awake.|
+brazen|adj.|3|Bold and shameless.|The thief made a brazen escape in broad daylight.|
+cajole|v.|3|To persuade by flattery or coaxing.|She cajoled her brother into doing her chores.|
+callous|adj.|3|Showing no concern for others' feelings.|His callous joke upset the whole table.|
+candor|n.|3|Openness and honesty.|I appreciate your candor about the problem.|
+capricious|adj.|3|Changing mood or behavior suddenly and unpredictably.|The capricious weather switched from sun to hail.|
+catalyst|n.|3|Something that causes or speeds up change.|The invention of the printing press was a catalyst for learning.|
+caustic|adj.|3|Able to burn chemically; bitterly sarcastic.|Her caustic comments hurt his feelings.|
+chronic|adj.|3|Lasting a long time or constantly recurring.|He suffers from chronic back pain.|
+circumvent|v.|3|To find a way around an obstacle or rule.|They circumvented the traffic jam by taking side streets.|
+coerce|v.|3|To force someone by using threats.|No one should be coerced into signing a contract.|
+cogent|adj.|3|Clear, logical, and convincing.|She made a cogent argument for later school start times.|
+coherent|adj.|3|Logical and consistent; easy to follow.|After the fall, he wasn't coherent for a few minutes.|
+complacent|adj.|3|Too satisfied with yourself to notice danger or problems.|The team grew complacent after winning five straight games.|
+conciliatory|adj.|3|Meant to make peace or calm anger.|He made a conciliatory phone call after the argument.|
+concur|v.|3|To agree.|The doctors concurred that surgery was needed.|
+condone|v.|3|To accept or allow behavior that is wrong.|The school does not condone bullying.|
+conspicuous|adj.|3|Easy to notice; standing out.|His bright orange hat was conspicuous in the crowd.|
+contempt|n.|3|A feeling that someone is worthless or beneath consideration.|She looked at the cheater with contempt.|
+convoluted|adj.|3|Extremely complicated and hard to follow.|The instructions were so convoluted that no one could assemble the desk.|
+copious|adj.|3|Abundant; in large amounts.|She took copious notes during the lecture.|
+corroborate|v.|3|To confirm or support with evidence.|Security footage corroborated the witness's story.|
+credible|adj.|3|Believable; trustworthy.|The reporter relied only on credible sources.|
+cryptic|adj.|3|Mysterious and hard to understand.|He left a cryptic note on the fridge.|
+culpable|adj.|3|Deserving blame.|The court found the company culpable for the spill.|
+cynical|adj.|3|Believing people act only out of selfishness.|After years in politics, he became cynical.|
+dearth|n.|3|A shortage or lack.|There was a dearth of fresh water after the storm.|
+debilitate|v.|3|To make very weak.|The long illness debilitated her.|
+decorum|n.|3|Proper, polite behavior.|The students showed perfect decorum at the ceremony.|
+defer|v.|3|To postpone; to give way to someone else's judgment.|I'll defer to your expertise on this question.|
+deft|adj.|3|Quick and skillful.|With a deft move, the goalie blocked the shot.|
+denounce|v.|3|To publicly declare something wrong or evil.|The mayor denounced the vandalism.|
+deplete|v.|3|To use up.|The long winter depleted our supply of firewood.|
+deride|v.|3|To mock or ridicule.|Critics derided the film as silly.|
+detrimental|adj.|3|Causing harm.|Too much screen time can be detrimental to sleep.|
+deviate|v.|3|To depart from an expected course.|The pilot deviated from the flight path to avoid the storm.|
+didactic|adj.|3|Meant to teach, often in a preachy way.|The fable was charming but a little didactic.|
+diffident|adj.|3|Shy and lacking self-confidence.|The diffident student rarely spoke in class.|
+digress|v.|3|To wander from the main topic.|The speaker digressed into stories about his dog.|
+discern|v.|3|To notice or recognize, often with difficulty.|In the dark, I could barely discern the path.|
+disdain|n./v.|3|Scorn; to look down on.|The cat regarded the cheap food with disdain.|
+disparage|v.|3|To speak about in a belittling way.|It is unkind to disparage other people's hobbies.|
+disparity|n.|3|A great difference.|There is a large disparity between the two salaries.|
+dissent|n./v.|3|Disagreement with an official or popular view.|Two justices wrote a dissent.|
+divulge|v.|3|To reveal a secret.|The magician refused to divulge how the trick worked.|
+dogmatic|adj.|3|Insisting that one's beliefs are absolutely true.|His dogmatic attitude made discussion impossible.|
+dubious|adj.|3|Doubtful; questionable.|The website's claims seemed dubious.|
+eclectic|adj.|3|Drawing from many different sources or styles.|Her music taste is eclectic, from jazz to K-pop.|
+efficacy|n.|3|The ability to produce the intended result.|Scientists tested the efficacy of the new vaccine.|
+elusive|adj.|3|Hard to find, catch, or understand.|The snow leopard is famously elusive.|
+embellish|v.|3|To decorate; to add untrue details to a story.|Grandpa always embellishes his fishing stories.|
+emulate|v.|3|To imitate someone you admire.|Young players try to emulate their heroes.|
+endorse|v.|3|To publicly support or approve.|The newspaper endorsed the candidate.|
+enigma|n.|3|A mystery; a puzzling person or thing.|The ancient stone circle remains an enigma.|
+ephemeral|adj.|3|Lasting a very short time.|The beauty of cherry blossoms is ephemeral.|
+erratic|adj.|3|Unpredictable; irregular.|The car swerved in an erratic way.|
+erroneous|adj.|3|Wrong; incorrect.|The article contained erroneous information.|
+euphemism|n.|3|A mild word used in place of a harsh one.|"Passed away" is a euphemism for "died."|
+exacerbate|v.|3|To make a bad situation worse.|Scratching will only exacerbate the itch.|
+exemplary|adj.|3|Serving as an excellent example.|She received an award for exemplary service.|
+exonerate|v.|3|To officially clear from blame.|New DNA evidence exonerated the prisoner.|
+expedite|v.|3|To speed up a process.|Paying extra will expedite shipping.|
+explicit|adj.|3|Stated clearly and in detail.|The teacher gave explicit instructions.|
+extol|v.|3|To praise enthusiastically.|The critic extolled the young pianist's talent.|
+facilitate|v.|3|To make easier.|Maps facilitate travel in unfamiliar cities.|
+fallacy|n.|3|A mistaken belief or faulty reasoning.|It is a fallacy that lightning never strikes twice.|
+fastidious|adj.|3|Very attentive to detail and cleanliness; hard to please.|The fastidious chef wiped every plate twice.|
+fervent|adj.|3|Intensely passionate.|He was a fervent fan of the local team.|
+flagrant|adj.|3|Obvious and shocking.|The foul was a flagrant violation of the rules.|
+fortitude|n.|3|Courage in pain or difficulty.|She faced her illness with great fortitude.|
+frivolous|adj.|3|Not serious; silly or unimportant.|The judge dismissed the frivolous lawsuit.|
+galvanize|v.|3|To shock or excite into action.|The speech galvanized the students to volunteer.|
+garrulous|adj.|3|Extremely talkative.|The garrulous passenger talked for the entire flight.|
+gregarious|adj.|3|Sociable; enjoying company.|Dolphins are gregarious animals that live in pods.|
+hackneyed|adj.|3|Overused and unoriginal.|"It was a dark and stormy night" is a hackneyed opening.|
+haphazard|adj.|3|Lacking order or planning.|Books were stacked in a haphazard way.|
+heed|v.|3|To pay attention to.|Heed the warning signs on the trail.|
+hypocrisy|n.|3|Claiming beliefs or standards you don't actually follow.|Lecturing others about littering while littering is hypocrisy.|
+idiosyncrasy|n.|3|A peculiar habit or trait.|One of his idiosyncrasies is eating pizza with a fork.|
+impetuous|adj.|3|Acting quickly without thinking.|His impetuous decision to quit surprised everyone.|
+implicit|adj.|3|Suggested but not directly stated.|There was an implicit threat in his tone.|
+incessant|adj.|3|Never stopping.|The incessant barking kept us awake.|
+incite|v.|3|To stir up or provoke.|The speaker was accused of inciting a riot.|
+indolent|adj.|3|Lazy; avoiding effort.|The indolent cat slept all afternoon.|
+indulge|v.|3|To allow yourself or someone to enjoy something.|On birthdays we indulge in extra dessert.|
+inept|adj.|3|Clumsy and lacking skill.|The inept burglar locked himself out of the getaway car.|
+inhibit|v.|3|To hold back or prevent.|Cold temperatures inhibit plant growth.|
+innate|adj.|3|Existing from birth; natural.|She has an innate talent for music.|
+innocuous|adj.|3|Harmless; not offensive.|It was an innocuous question, but he got upset.|
+insatiable|adj.|3|Impossible to satisfy.|He has an insatiable appetite for mystery novels.|
+instigate|v.|3|To start or provoke an action or event.|Who instigated the food fight?|
+inundate|v.|3|To flood; to overwhelm.|The office was inundated with complaints.|
+irate|adj.|3|Very angry.|Irate passengers crowded the ticket counter.|
+jeopardize|v.|3|To put in danger.|Cheating could jeopardize your future.|
+judicious|adj.|3|Showing good judgment.|A judicious use of salt improves any dish.|
+laborious|adj.|3|Requiring a lot of hard work.|Copying the manuscript by hand was laborious.|
+languid|adj.|3|Slow, relaxed, and lacking energy.|We spent a languid afternoon by the pool.|
+lethargic|adj.|3|Sluggish and drowsy.|The flu left him lethargic for a week.|
+lucid|adj.|3|Clear and easy to understand; mentally clear.|Her explanation of the theory was lucid.|
+magnanimous|adj.|3|Generous and forgiving, especially toward a rival.|The magnanimous winner praised her opponent.|
+malleable|adj.|3|Easily shaped or influenced.|Gold is a malleable metal.|
+meticulous|adj.|3|Extremely careful and precise.|The meticulous scientist recorded every measurement.|
+mitigate|v.|3|To make less severe.|Planting trees can mitigate flooding.|
+mundane|adj.|3|Ordinary and dull.|Doing laundry is a mundane chore.|
+negligible|adj.|3|So small it is not worth considering.|The difference in price was negligible.|
+nonchalant|adj.|3|Calm and casual, seemingly unconcerned.|He gave a nonchalant shrug after scoring the winning goal.|
+notorious|adj.|3|Famous for something bad.|The pirate was notorious for his cruelty.|
+novel|adj.|3|New and original.|She came up with a novel solution to the problem.|
+oblivious|adj.|3|Not aware of what is happening.|Absorbed in his book, he was oblivious to the noise.|
+obsolete|adj.|3|No longer used; out of date.|Typewriters are mostly obsolete.|
+opulent|adj.|3|Rich and luxurious.|The palace had opulent golden ballrooms.|
+ostentatious|adj.|3|Showy; meant to impress.|His ostentatious car had gold-plated wheels.|
+paradox|n.|3|A statement that seems to contradict itself but may be true.|It is a paradox that the more you learn, the less you feel you know.|
+partisan|adj./n.|3|Strongly supporting one side or party.|The debate became bitterly partisan.|
+pervasive|adj.|3|Spreading widely throughout.|The smell of smoke was pervasive.|
+placate|v.|3|To calm someone's anger.|The manager offered a refund to placate the customer.|
+pragmatic|adj.|3|Practical; focused on what works.|She took a pragmatic approach to fixing the budget.|
+precocious|adj.|3|Showing unusual ability at an early age.|The precocious six-year-old could play Mozart.|
+prevalent|adj.|3|Widespread; common.|Colds are prevalent in winter.|
+pristine|adj.|3|Perfectly clean and untouched.|The beach was pristine before the tourists arrived.|
+prolific|adj.|3|Producing a great deal.|Agatha Christie was a prolific author.|
+provocative|adj.|3|Causing strong reaction, often on purpose.|The article made a provocative claim.|
+reconcile|v.|3|To restore friendship; to make things consistent.|The two friends reconciled after a long silence.|
+redundant|adj.|3|Unnecessary because it repeats something.|"Free gift" is redundant because gifts are free.|
+refute|v.|3|To prove wrong.|The scientist refuted the myth with evidence.|
+relinquish|v.|3|To give up or let go.|The king refused to relinquish his crown.|
+remorse|n.|3|Deep regret for doing wrong.|He felt remorse for breaking his promise.|
+renounce|v.|3|To formally give up.|She renounced her claim to the throne.|
+resilient|adj.|3|Able to recover quickly from difficulty.|Children are often remarkably resilient.|
+reticent|adj.|3|Reserved; not revealing thoughts easily.|He was reticent about his past.|
+reverent|adj.|3|Showing deep respect.|The visitors were reverent inside the cathedral.|
+rudimentary|adj.|3|Basic; undeveloped.|I have only a rudimentary knowledge of French.|
+scrutinize|v.|3|To examine very closely.|The editor scrutinized every sentence.|
+skeptical|adj.|3|Doubtful; not easily convinced.|Scientists were skeptical of the bold claim.|
+sporadic|adj.|3|Happening occasionally and irregularly.|There were sporadic showers throughout the day.|
+squander|v.|3|To waste, especially money or opportunity.|He squandered his allowance on candy.|
+stagnant|adj.|3|Not moving or flowing; not developing.|Mosquitoes breed in stagnant water.|
+steadfast|adj.|3|Firm and unwavering.|She was a steadfast friend through hard times.|
+stoic|adj.|3|Enduring pain without showing feelings.|He remained stoic during the painful treatment.|
+substantiate|v.|3|To provide evidence to support.|Can you substantiate that claim?|
+succinct|adj.|3|Brief and clearly expressed.|Her succinct answer covered everything.|
+superficial|adj.|3|On the surface only; shallow.|The cut was only superficial.|
+surreptitious|adj.|3|Done secretly.|He took a surreptitious glance at his phone during class.|
+tenacious|adj.|3|Holding firmly; persistent.|The tenacious reporter wouldn't drop the story.|
+tentative|adj.|3|Not certain or fixed; hesitant.|We made tentative plans for Saturday.|
+trivial|adj.|3|Of little importance.|Don't waste time on trivial details.|
+turbulent|adj.|3|Full of disorder or violent movement.|The plane shook in turbulent air.|
+unprecedented|adj.|3|Never done or known before.|The storm caused unprecedented flooding.|
+vehement|adj.|3|Showing strong feeling; forceful.|She made a vehement protest against the decision.|
+venerate|v.|3|To regard with great respect.|The villagers venerated their elders.|
+verbose|adj.|3|Using more words than needed.|The verbose report could have been one page.|
+vindicate|v.|3|To clear of blame; to prove right.|The test results vindicated her theory.|
+volatile|adj.|3|Likely to change suddenly or explosively.|The stock market was volatile that week.|
+whimsical|adj.|3|Playfully unusual or fanciful.|The book had whimsical illustrations of dancing teapots.|
+zealous|adj.|3|Full of intense enthusiasm.|The zealous volunteers worked through the night.|
+dissimulation|n.|4|Hiding one's true feelings or intentions.|With what caution—with what foresight—with what dissimulation I went to work!|Edgar Allan Poe, "The Tell-Tale Heart"
+husbandry|n.|4|Careful management of resources; farming.|For loan oft loses both itself and friend, And borrowing dulls the edge of husbandry.|William Shakespeare, Hamlet
+unalienable|adj.|4|Impossible to take away or give up.|They are endowed by their Creator with certain unalienable Rights.|Declaration of Independence (1776)
+endow|v.|4|To provide with a quality, ability, or funds.|They are endowed by their Creator with certain unalienable Rights.|Declaration of Independence (1776)
+usurpation|n.|4|The wrongful seizing of power.|A long train of abuses and usurpations, pursuing invariably the same Object|Declaration of Independence (1776)
+evince|v.|4|To reveal or show clearly.|It evinces a design to reduce them under absolute Despotism.|Declaration of Independence (1776)
+conventionality|n.|4|Following accepted customs, sometimes without thought.|Conventionality is not morality.|Charlotte Brontë, Jane Eyre
+illimitable|adj.|4|Without limits; boundless.|And Darkness and Decay and the Red Death held illimitable dominion over all.|Edgar Allan Poe, "The Masque of the Red Death"
+abate|v.|4|To lessen in intensity.|The storm finally abated around midnight.|
+abstruse|adj.|4|Difficult to understand; obscure.|The professor's abstruse lecture lost most of the class.|
+acquiesce|v.|4|To accept or agree reluctantly, without protest.|After much debate, the board acquiesced to the plan.|
+acrimony|n.|4|Bitterness or ill feeling.|The divorce was full of acrimony.|
+adulation|n.|4|Excessive admiration or praise.|The pop star basked in the adulation of her fans.|
+alacrity|n.|4|Cheerful eagerness.|She accepted the invitation with alacrity.|
+anachronism|n.|4|Something out of place in time.|A wristwatch in a movie about ancient Rome is an anachronism.|
+anomaly|n.|4|Something that deviates from what is normal.|The warm January day was an anomaly.|
+antithesis|n.|4|The direct opposite.|Laziness is the antithesis of success.|
+apocryphal|adj.|4|Of doubtful truth, though widely repeated.|The story about the founder's lucky penny is probably apocryphal.|
+approbation|n.|4|Official approval or praise.|The plan received the committee's approbation.|
+assuage|v.|4|To ease or soothe.|Nothing could assuage her grief.|
+attenuate|v.|4|To weaken or reduce in force.|The thick walls attenuated the noise from the street.|
+avarice|n.|4|Extreme greed for wealth.|The miser's avarice left him friendless.|
+bombastic|adj.|4|High-sounding but with little meaning; pompous.|The candidate's bombastic speech promised everything.|
+burgeon|v.|4|To grow or expand rapidly.|The town's population burgeoned after the factory opened.|
+cacophony|n.|4|A harsh, jarring mix of sounds.|A cacophony of car horns filled the street.|
+castigate|v.|4|To criticize or punish severely.|The editorial castigated the city for its slow response.|
+chicanery|n.|4|Trickery used to deceive.|The election was marred by legal chicanery.|
+circumspect|adj.|4|Cautious and careful about consequences.|Be circumspect about what you post online.|
+clandestine|adj.|4|Kept secret, often because it is illicit.|The spies held a clandestine meeting.|
+commensurate|adj.|4|In proportion to; corresponding in size or degree.|Her salary was commensurate with her experience.|
+conflagration|n.|4|A large, destructive fire.|The conflagration destroyed half the city.|
+conundrum|n.|4|A confusing and difficult problem.|Where to seat both grandmothers was a real conundrum.|
+contrite|adj.|4|Feeling deep regret for wrongdoing.|The contrite boy apologized for breaking the window.|
+craven|adj.|4|Contemptibly cowardly.|The craven soldier deserted his post.|
+credulous|adj.|4|Too ready to believe things.|Credulous readers fell for the fake news story.|
+deference|n.|4|Polite respect and submission to another's wishes.|In deference to her grandfather, she removed her hat.|
+demagogue|n.|4|A leader who gains power by appealing to emotions and prejudice.|The demagogue stirred up the crowd with lies.|
+deprecate|v.|4|To express disapproval of; to belittle.|He deprecated his own achievements with a joke.|
+diatribe|n.|4|A bitter, angry attack in words.|The column was a diatribe against modern art.|
+dichotomy|n.|4|A division into two opposed parts.|The novel explores the dichotomy between city and country life.|
+disparate|adj.|4|Fundamentally different; not comparable.|The committee brought together disparate groups.|
+dissonance|n.|4|Lack of harmony; conflict.|There was dissonance between his words and his actions.|
+ebullient|adj.|4|Cheerful and full of energy.|The ebullient host greeted every guest with a hug.|
+efface|v.|4|To erase; to make oneself inconspicuous.|Time had effaced the words on the gravestone.|
+egregious|adj.|4|Outstandingly bad; shocking.|The error was so egregious that the paper printed an apology.|
+elucidate|v.|4|To make clear; to explain.|The diagram elucidates how the engine works.|
+enervate|v.|4|To drain of energy; to weaken.|The heat enervated the hikers.|
+engender|v.|4|To cause or give rise to.|Her kindness engendered loyalty among her staff.|
+equanimity|n.|4|Mental calmness, especially under stress.|He accepted the loss with equanimity.|
+equivocate|v.|4|To use vague language to avoid committing oneself.|When asked directly, the senator equivocated.|
+erudite|adj.|4|Having or showing great knowledge.|The erudite professor could quote Latin poetry from memory.|
+esoteric|adj.|4|Understood by only a small group.|The book was full of esoteric references.|
+exculpate|v.|4|To show or declare that someone is not guilty.|The letter exculpated the accused clerk.|
+exigent|adj.|4|Urgent; demanding immediate action.|The exigent circumstances required a quick decision.|
+extraneous|adj.|4|Irrelevant; not essential.|Cut the extraneous details from your essay.|
+fatuous|adj.|4|Silly and pointless.|He made a fatuous remark that nobody laughed at.|
+felicitous|adj.|4|Well chosen or suited; pleasing.|It was a felicitous choice of words.|
+fortuitous|adj.|4|Happening by chance, often luckily.|Our meeting at the airport was fortuitous.|
+gainsay|v.|4|To deny or contradict.|No one could gainsay her expertise.|
+garner|v.|4|To gather or collect.|The film garnered excellent reviews.|
+grandiloquent|adj.|4|Pompous or extravagant in language.|His grandiloquent toast went on for twenty minutes.|
+harbinger|n.|4|A sign of something to come.|The robin is a harbinger of spring.|
+hegemony|n.|4|Dominance of one group or nation over others.|The empire's hegemony lasted three centuries.|
+iconoclast|n.|4|A person who attacks cherished beliefs or institutions.|The young architect was an iconoclast who rejected tradition.|
+idyllic|adj.|4|Extremely happy, peaceful, or picturesque.|They spent an idyllic summer by the lake.|
+immutable|adj.|4|Unchanging over time.|The laws of physics are immutable.|
+impecunious|adj.|4|Having little or no money.|The impecunious student lived on rice and beans.|
+imperious|adj.|4|Arrogant and domineering.|The imperious duchess expected everyone to obey her.|
+impervious|adj.|4|Not able to be penetrated or affected.|The coat is impervious to rain.|
+implacable|adj.|4|Unable to be calmed or satisfied.|The implacable enemy refused every peace offer.|
+incongruous|adj.|4|Out of place; not in harmony.|A tuxedo looked incongruous at the beach party.|
+incontrovertible|adj.|4|Impossible to deny or dispute.|The video provided incontrovertible proof.|
+indefatigable|adj.|4|Tireless.|The indefatigable nurse worked a double shift.|
+ineffable|adj.|4|Too great to be expressed in words.|The view from the summit filled her with ineffable joy.|
+inexorable|adj.|4|Impossible to stop or prevent.|The inexorable march of time spares no one.|
+ingenuous|adj.|4|Innocent and unsuspecting.|Her ingenuous questions revealed how new she was.|
+inimical|adj.|4|Harmful or hostile.|Pollution is inimical to marine life.|
+insipid|adj.|4|Lacking flavor or interest.|The soup was insipid and needed salt.|
+intransigent|adj.|4|Refusing to change one's views.|The intransigent negotiators would not compromise.|
+inveterate|adj.|4|Having a long-established habit.|He is an inveterate liar.|
+irascible|adj.|4|Easily angered.|The irascible old man yelled at the pigeons.|
+laconic|adj.|4|Using very few words.|The cowboy's laconic reply was simply "Yep."|
+largesse|n.|4|Generosity in giving.|The museum depends on the largesse of donors.|
+laudable|adj.|4|Deserving praise.|Her efforts to help the homeless are laudable.|
+lugubrious|adj.|4|Looking or sounding sad and dismal.|The lugubrious music made the film even sadder.|
+maudlin|adj.|4|Self-pityingly or tearfully sentimental.|The song was sweet but a little maudlin.|
+mendacious|adj.|4|Lying; untruthful.|The mendacious ad promised impossible results.|
+mercurial|adj.|4|Subject to sudden changes of mood.|Her mercurial temper kept everyone on edge.|
+misanthrope|n.|4|A person who dislikes humankind.|The old misanthrope avoided all social events.|
+mollify|v.|4|To calm the anger of.|A sincere apology mollified the angry neighbor.|
+munificent|adj.|4|Extremely generous.|A munificent gift funded the new library.|
+nascent|adj.|4|Just beginning to develop.|The nascent company had only three employees.|
+nefarious|adj.|4|Wicked or criminal.|The villain's nefarious plot was foiled.|
+obdurate|adj.|4|Stubbornly refusing to change.|Despite our pleas, he remained obdurate.|
+obfuscate|v.|4|To make unclear or confusing on purpose.|The company tried to obfuscate the facts.|
+obsequious|adj.|4|Too eager to please or obey.|The obsequious waiter laughed at every joke.|
+obstreperous|adj.|4|Noisy and difficult to control.|The obstreperous toddler threw his cereal.|
+onerous|adj.|4|Burdensome; involving heavy effort.|Filling out the forms was an onerous task.|
+opprobrium|n.|4|Harsh public criticism; disgrace.|The decision drew widespread opprobrium.|
+ostracize|v.|4|To exclude from a group.|The club ostracized members who broke its rules.|
+palliate|v.|4|To ease symptoms without curing; to make seem less serious.|The medicine palliated the pain.|
+panacea|n.|4|A cure for all problems.|Technology is not a panacea for every social issue.|
+paragon|n.|4|A perfect example of a quality.|She was a paragon of patience.|
+parsimonious|adj.|4|Extremely unwilling to spend money.|The parsimonious landlord refused to fix the heat.|
+paucity|n.|4|A scarcity; small amount.|The paucity of evidence made the case weak.|
+pedantic|adj.|4|Overly concerned with minor details or rules.|His pedantic corrections annoyed his friends.|
+penchant|n.|4|A strong liking or tendency.|She has a penchant for spicy food.|
+penurious|adj.|4|Extremely poor; also, stingy.|The penurious artist sold paintings for bread.|
+perfidious|adj.|4|Deceitful and untrustworthy.|The perfidious ally switched sides mid-battle.|
+perfunctory|adj.|4|Done with minimal effort or care.|He gave the room a perfunctory cleaning.|
+pernicious|adj.|4|Harmful in a gradual or subtle way.|Rumors can have a pernicious effect on a team.|
+perspicacious|adj.|4|Having keen insight.|The perspicacious detective spotted the clue immediately.|
+phlegmatic|adj.|4|Calm and unemotional.|The phlegmatic pilot landed the damaged plane smoothly.|
+pithy|adj.|4|Brief but full of meaning.|Franklin was known for pithy sayings.|
+platitude|n.|4|A dull, overused remark presented as meaningful.|The speech was full of platitudes about hard work.|
+plethora|n.|4|An excessive amount.|The menu offered a plethora of choices.|
+polemic|n.|4|A strong written or spoken attack on an idea.|Her essay was a polemic against standardized testing.|
+precipitate|adj./v.|4|Done suddenly and rashly; to cause to happen suddenly.|The insult precipitated a fight.|
+predilection|n.|4|A preference or special liking.|He has a predilection for old films.|
+prescient|adj.|4|Having knowledge of events before they happen.|Her prescient warning saved the company.|
+prevaricate|v.|4|To speak evasively; to avoid the truth.|Stop prevaricating and answer the question.|
+probity|n.|4|Honesty and decency.|The judge was known for her probity.|
+profligate|adj.|4|Recklessly wasteful.|The profligate heir spent his fortune in a year.|
+propensity|n.|4|A natural tendency.|Toddlers have a propensity to put things in their mouths.|
+propitious|adj.|4|Favorable; likely to lead to success.|Clear skies made it a propitious day for the launch.|
+prosaic|adj.|4|Ordinary; lacking imagination.|The explanation turned out to be prosaic: a raccoon.|
+proscribe|v.|4|To forbid.|The rules proscribe phones during exams.|
+quiescent|adj.|4|Inactive or at rest.|The volcano has been quiescent for centuries.|
+quixotic|adj.|4|Idealistic but impractical.|His quixotic plan was to end hunger by himself.|
+rancor|n.|4|Deep, long-lasting bitterness.|They settled the dispute without rancor.|
+recalcitrant|adj.|4|Stubbornly uncooperative.|The recalcitrant mule refused to cross the bridge.|
+recondite|adj.|4|Little known; obscure.|The scholar studied recondite ancient languages.|
+refractory|adj.|4|Stubborn; resistant to treatment or control.|The refractory horse threw off every rider.|
+repudiate|v.|4|To reject or deny.|The senator repudiated the false statement.|
+rescind|v.|4|To cancel officially.|The school rescinded the new dress code.|
+sagacious|adj.|4|Wise and shrewd.|The sagacious elder settled the dispute.|
+salient|adj.|4|Most noticeable or important.|The salient point of her argument was cost.|
+sanguine|adj.|4|Optimistic, especially in a hard situation.|The coach was sanguine about the team's chances.|
+sardonic|adj.|4|Mocking in a grimly humorous way.|He gave a sardonic smile at the bad news.|
+soporific|adj.|4|Causing sleep.|The lecture was so soporific that half the class dozed.|
+spurious|adj.|4|False; not genuine.|The study's spurious conclusions were retracted.|
+strident|adj.|4|Loud and harsh; forceful in a grating way.|Her strident voice carried across the field.|
+sycophant|n.|4|A person who flatters powerful people to gain advantage.|The king surrounded himself with sycophants.|
+taciturn|adj.|4|Reserved; saying little.|The taciturn farmer nodded but didn't speak.|
+tempestuous|adj.|4|Stormy; full of strong emotion.|The couple had a tempestuous relationship.|
+torpid|adj.|4|Sluggish and inactive.|The snake was torpid in the cold.|
+tractable|adj.|4|Easy to control or influence.|The new puppy was surprisingly tractable.|
+transgression|n.|4|A violation of a rule or law.|He apologized for his transgression.|
+truculent|adj.|4|Eager to fight or argue.|The truculent fan picked a fight with the referee.|
+ubiquitous|adj.|4|Found everywhere.|Smartphones have become ubiquitous.|
+unctuous|adj.|4|Excessively flattering in an insincere way.|The unctuous salesman praised every car on the lot.|
+vacillate|v.|4|To waver between opinions.|She vacillated between the two colleges for weeks.|
+venal|adj.|4|Open to bribery; corrupt.|The venal official accepted gifts from contractors.|
+veracity|n.|4|Truthfulness; accuracy.|Reporters questioned the veracity of his claims.|
+vicarious|adj.|4|Experienced through another person.|Grandma took vicarious pleasure in our travels.|
+vilify|v.|4|To speak about in a very insulting way.|The tabloids vilified the actor.|
+vitriolic|adj.|4|Filled with bitter criticism.|The review was vitriolic.|
+vociferous|adj.|4|Loud and forceful in expressing opinions.|Vociferous fans chanted for the whole game.|
+wanton|adj.|4|Deliberate and unprovoked; reckless.|The wanton destruction of the park angered residents.|
+zealot|n.|4|A person who is fanatical about a cause.|The zealot refused to hear any other viewpoint.|
+ameliorate|v.|4|To make something bad better.|The new policy ameliorated working conditions.|
+anathema|n.|4|Something intensely disliked.|Waste is anathema to my grandmother.|
+bellicose|adj.|4|Eager to fight; warlike.|The dictator's bellicose speeches alarmed the neighbors.|
+capitulate|v.|4|To surrender; to stop resisting.|After a long siege, the city capitulated.|
+cognizant|adj.|4|Aware; having knowledge.|Be cognizant of the risks before you invest.|
+complicit|adj.|4|Involved with others in wrongdoing.|By staying silent, he became complicit.|
+cursory|adj.|4|Hasty and not thorough.|A cursory glance missed the error.|
+denigrate|v.|4|To criticize unfairly; to belittle.|Don't denigrate other people's efforts.|
+desultory|adj.|4|Lacking a plan or purpose; random.|They made desultory conversation while waiting.|
+edify|v.|4|To instruct and improve morally or intellectually.|The documentary was meant to edify as well as entertain.|
+enmity|n.|4|Deep hostility.|Centuries of enmity divided the two clans.|
+exacting|adj.|4|Demanding great effort or precision.|The surgeon's exacting standards saved lives.|
+fecund|adj.|4|Highly fertile or productive.|The fecund valley produced abundant crops.|
+hubris|n.|4|Excessive pride that leads to downfall.|The king's hubris led him to ignore every warning.|
+impetus|n.|4|A force that causes action.|The flood was the impetus for new safety laws.|
+insular|adj.|4|Narrow-minded; isolated from outside influences.|The insular village distrusted outsiders.|
+juxtapose|v.|4|To place side by side for contrast.|The photo juxtaposes a skyscraper with a tiny shack.|
+lionize|v.|4|To treat as a celebrity.|The press lionized the young astronaut.|
+myriad|adj./n.|4|Countless; a great number.|The reef is home to a myriad of fish.|
+nuance|n.|4|A subtle difference in meaning or feeling.|The translator captured every nuance of the poem.|
+obviate|v.|4|To remove a need or difficulty.|The new bridge obviates the long ferry ride.|
+pejorative|adj.|4|Expressing contempt or disapproval.|"Nerd" was once purely pejorative.|
+proliferate|v.|4|To increase rapidly in number.|Coffee shops proliferated downtown.|
+reprove|v.|4|To scold or correct gently.|The teacher reproved him for interrupting.|
+stymie|v.|4|To block or hinder.|Bad weather stymied the rescue effort.|
+tacit|adj.|4|Understood without being stated.|They had a tacit agreement not to discuss politics.|
+tenuous|adj.|4|Very weak or slight.|The link between the two events is tenuous.|
+undermine|v.|4|To weaken gradually or secretly.|Constant criticism can undermine confidence.|
+vindictive|adj.|4|Wanting revenge.|The vindictive villain plotted for years.|
+`;
+
+const LEVELS = {
+  1:{name:"Grades 5–6",tab:"Grades 5–6 · ISEE Lower"},
+  2:{name:"Grades 7–8",tab:"Grades 7–8 · ISEE Middle"},
+  3:{name:"Grades 9–10",tab:"Grades 9–10 · ISEE Upper"},
+  4:{name:"SAT",tab:"SAT"}
+};
+
+const WORDS = (() => {
+  const seen = new Set(), out = [];
+  RAW.split("\n").forEach(line => {
+    line = line.trim(); if (!line) return;
+    const p = line.split("|");
+    if (p.length < 5) return;
+    const w = p[0].trim(), key = w.toLowerCase();
+    if (seen.has(key)) return; seen.add(key);
+    out.push({w, pos:p[1].trim(), lvl:+p[2], def:p[3].trim(), ex:p[4].trim(), src:(p[5]||"").trim()});
+  });
+  return out;
+})();
+
+/* ---------- storage (safe) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let stars = new Set(store.get("wc_stars", []));
+const saveStars = () => store.set("wc_stars", [...stars]);
+
+/* ---------- speech ---------- */
+let voice = null;
+function pickVoice(){
+  if (!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /en[-_]US/i.test(v.lang) && /natural|google|samantha/i.test(v.name))
+       || vs.find(v => /en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if ("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function say(text, rate=0.85){
+  if (!("speechSynthesis" in window)){ alert("Your browser does not support speech. Try Chrome, Safari, or Edge."); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if (voice) u.voice = voice;
+  u.lang = voice ? voice.lang : "en-US"; u.rate = rate;
+  speechSynthesis.speak(u);
+}
+const SPEAK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+
+/* ---------- helpers ---------- */
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const stem = w => { const l = w.toLowerCase(); return l.length <= 5 ? l.slice(0, Math.max(3, l.length-1)) : l.slice(0, l.length-2); };
+function findWord(sentence, w){
+  const re = new RegExp("\\b(" + stem(w).replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "[a-z]*)", "i");
+  return sentence.match(re);
+}
+function highlight(sentence, w){
+  const m = findWord(sentence, w);
+  if (!m) return esc(sentence);
+  const i = m.index;
+  return esc(sentence.slice(0,i)) + "<mark>" + esc(m[1]) + "</mark>" + esc(sentence.slice(i + m[1].length));
+}
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const $ = id => document.getElementById(id);
+const todayKey = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+const todayLabel = () => new Date().toLocaleDateString(undefined, {weekday:"long", month:"long", day:"numeric"});
+function seededShuffle(arr, seedStr){
+  let h = 1779033703 ^ seedStr.length;
+  for (const c of seedStr){ h = Math.imul(h ^ c.charCodeAt(0), 3432918353); h = h << 13 | h >>> 19; }
+  let s = h >>> 0;
+  const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = (t + Math.imul(t ^ t >>> 7, 61 | t)) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length-1; i > 0; i--){ const j = Math.floor(rnd()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+/* Same order all day for everyone; changes at midnight */
+const dailyOrder = () => new Map(seededShuffle(WORDS.map(x => x.w), "wordcards-" + todayKey()).map((w,i) => [w,i]));
+
+/* ---------- tabs ---------- */
+function showTab(which){
+  $("tabBrowse").setAttribute("aria-pressed", which==="browse");
+  $("tabTest").setAttribute("aria-pressed", which==="test");
+  $("browse").hidden = which!=="browse";
+  $("test").hidden = which!=="test";
+  if (which==="test" && !quiz) renderSetup();
+}
+$("tabBrowse").onclick = () => showTab("browse");
+$("tabTest").onclick = () => showTab("test");
+
+/* ---------- browse ---------- */
+const browseLv = new Set([1,2,3,4]);
+let shuffled = null;
+$("lvlChips").innerHTML = Object.entries(LEVELS).map(([k,v]) =>
+  `<button class="chip l${k}" data-l="${k}" aria-pressed="true">${v.name}</button>`).join("");
+$("lvlChips").onclick = e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  const l = +b.dataset.l;
+  browseLv.has(l) ? browseLv.delete(l) : browseLv.add(l);
+  b.setAttribute("aria-pressed", browseLv.has(l));
+  renderGrid();
+};
+$("sort").value = store.get("wc_sort", "az");
+["q","sort"].forEach(id => $(id).addEventListener("input", () => { shuffled = null; soloWord = null; store.set("wc_sort", $("sort").value); renderGrid(); }));
+$("view").value = store.get("wc_view", "grid");
+$("view").addEventListener("input", () => { store.set("wc_view", $("view").value); renderGrid(); });
+["starOnly","quoteOnly"].forEach(id => $(id).onclick = e => {
+  const b = e.currentTarget; b.setAttribute("aria-pressed", b.getAttribute("aria-pressed")!=="true"); renderGrid();
+});
+
+function cardHTML(x){
+  return `<article class="card l${x.lvl}" data-tab="${LEVELS[x.lvl].tab}">
+    <div class="head">
+      <h3 class="word">${esc(x.w)}</h3><span class="pos">${esc(x.pos)}</span>
+      <button class="iconbtn speak" data-w="${esc(x.w)}" aria-label="Pronounce ${esc(x.w)}" title="Pronounce">${SPEAK_SVG}</button>
+      <button class="iconbtn star" data-w="${esc(x.w)}" aria-pressed="${stars.has(x.w)}" aria-label="Star ${esc(x.w)}" title="Star for review">★</button>
+    </div>
+    <p class="def">${esc(x.def)}</p>
+    <p class="quote">${x.src ? "“" : ""}${highlight(x.ex, x.w)}${x.src ? "”" : ""}</p>
+    <p class="cite">${x.src ? "— " + esc(x.src) : "Example sentence"}</p>
+  </article>`;
+}
+function renderGrid(){
+  const q = $("q").value.trim().toLowerCase();
+  const so = $("starOnly").getAttribute("aria-pressed")==="true";
+  const qo = $("quoteOnly").getAttribute("aria-pressed")==="true";
+  let list = WORDS.filter(x => browseLv.has(x.lvl)
+    && (!q || x.w.toLowerCase().includes(q) || x.def.toLowerCase().includes(q))
+    && (!so || stars.has(x.w)) && (!qo || x.src));
+  const s = $("sort").value;
+  if (s==="az") list.sort((a,b)=>a.w.localeCompare(b.w));
+  else if (s==="level") list.sort((a,b)=>a.lvl-b.lvl || a.w.localeCompare(b.w));
+  else if (s==="daily"){ const pos = dailyOrder(); list.sort((a,b)=>pos.get(a.w)-pos.get(b.w)); }
+  else { if (!shuffled) shuffled = shuffle(WORDS).map(x=>x.w); const pos = new Map(shuffled.map((w,i)=>[w,i])); list.sort((a,b)=>pos.get(a.w)-pos.get(b.w)); }
+  $("count").textContent = `Showing ${list.length} of ${WORDS.length} words` + (s==="daily" ? ` in today's order (${todayLabel()})` : "");
+  const one = $("view").value === "one";
+  $("grid").hidden = one; $("single").hidden = !one;
+  if (one){
+    soloList = list;
+    if (!soloWord && s==="daily"){ const saved = store.get("wc_daily_pos", null); if (saved && saved.d === todayKey()) soloWord = saved.w; }
+    const k = soloWord ? list.findIndex(x => x.w === soloWord) : 0;
+    soloIdx = k < 0 ? 0 : k;
+    $("grid").innerHTML = "";
+    return renderSolo();
+  }
+  $("grid").innerHTML = list.length ? list.map(cardHTML).join("")
+    : `<div class="empty">No cards match. Clear the search, turn on more levels, or switch off “Starred only.”</div>`;
+}
+$("grid").onclick = e => {
+  const sp = e.target.closest(".speak"); if (sp) return say(sp.dataset.w);
+  const st = e.target.closest(".star");
+  if (st){ const w = st.dataset.w; stars.has(w) ? stars.delete(w) : stars.add(w); saveStars(); st.setAttribute("aria-pressed", stars.has(w)); }
+};
+
+/* ---------- one at a time ---------- */
+let soloList = [], soloIdx = 0, soloWord = null;
+function renderSolo(focusId){
+  const el = $("single");
+  if (!soloList.length){
+    el.innerHTML = `<div class="empty" style="margin-top:20px">No cards match. Clear the search, turn on more levels, or switch off “Starred only.”</div>`;
+    return;
+  }
+  const x = soloList[soloIdx]; soloWord = x.w;
+  if ($("sort").value === "daily") store.set("wc_daily_pos", {d: todayKey(), w: x.w});
+  const tab = LEVELS[x.lvl].tab, w = esc(x.w);
+  el.innerHTML = `<div class="solo">
+    <div class="flip" id="soloFlip"><div class="flip-inner" id="soloInner" tabindex="0" role="button" aria-label="Flip card for ${w}">
+      <div class="face card l${x.lvl}" data-tab="${tab}">
+        <div class="solo-front">
+          <h3 class="word">${w}</h3><span class="pos">${esc(x.pos)}</span>
+          <button class="iconbtn speak" data-w="${w}" aria-label="Pronounce ${w}" title="Pronounce">${SPEAK_SVG}</button>
+          <p class="note">Tap the card to see the meaning</p>
+        </div>
+      </div>
+      <div class="face back card l${x.lvl}" data-tab="${tab}">
+        <div class="head"><h3 class="word">${w}</h3><span class="pos">${esc(x.pos)}</span>
+          <button class="iconbtn speak" data-w="${w}" aria-label="Pronounce ${w}" title="Pronounce">${SPEAK_SVG}</button></div>
+        <p class="def">${esc(x.def)}</p>
+        <p class="quote">${x.src ? "“" : ""}${highlight(x.ex, x.w)}${x.src ? "”" : ""}</p>
+        <p class="cite">${x.src ? "— " + esc(x.src) : "Example sentence"}</p>
+      </div>
+    </div></div>
+    <div class="solo-nav">
+      <button class="navbtn" id="soloPrev" ${soloIdx === 0 ? "disabled" : ""}>Previous</button>
+      <p class="count">${soloIdx + 1} of ${soloList.length}</p>
+      <button class="iconbtn star" id="soloStar" data-w="${w}" aria-pressed="${stars.has(x.w)}" aria-label="Star ${w}" title="Star for review">★</button>
+      <button class="navbtn" id="soloNext" ${soloIdx === soloList.length - 1 ? "disabled" : ""}>Next</button>
+    </div>
+    <p class="keys">Keyboard: ← and → to move, space to flip, P to pronounce</p>
+  </div>`;
+  if (focusId && $(focusId) && !$(focusId).disabled) $(focusId).focus();
+}
+function soloMove(d, focusId){
+  const n = soloIdx + d;
+  if (n < 0 || n >= soloList.length) return;
+  soloIdx = n; renderSolo(focusId);
+}
+const soloFlip = () => { const f = $("soloFlip"); if (f) f.classList.toggle("on"); };
+$("single").onclick = e => {
+  const sp = e.target.closest(".speak"); if (sp) return say(sp.dataset.w);
+  if (e.target.closest("#soloPrev")) return soloMove(-1, "soloPrev");
+  if (e.target.closest("#soloNext")) return soloMove(1, "soloNext");
+  const st = e.target.closest("#soloStar");
+  if (st){ const w = st.dataset.w; stars.has(w) ? stars.delete(w) : stars.add(w); saveStars(); st.setAttribute("aria-pressed", stars.has(w)); return; }
+  if (e.target.closest("#soloInner")) soloFlip();
+};
+document.addEventListener("keydown", e => {
+  if ($("browse").hidden || $("single").hidden || !soloList.length) return;
+  if (e.target.closest("input, select, textarea")) return;
+  if (e.key === "ArrowRight"){ e.preventDefault(); soloMove(1); }
+  else if (e.key === "ArrowLeft"){ e.preventDefault(); soloMove(-1); }
+  else if ((e.key === " " || e.key === "Enter") && !e.target.closest("button")){ e.preventDefault(); soloFlip(); }
+  else if (e.key.toLowerCase() === "p") say(soloList[soloIdx].w);
+});
+
+/* ---------- test ---------- */
+const MODES = {
+  meaning:{t:"Pick the meaning", d:"See a word, choose its definition."},
+  word:{t:"Pick the word", d:"Read a definition, choose the word."},
+  blank:{t:"Fill in the blank", d:"Complete the sentence with the right word."},
+  spell:{t:"Spelling bee", d:"Hear a word and type it."},
+  flash:{t:"Flashcards", d:"Flip each card and grade yourself."}
+};
+let setup = store.get("wc_setup", {mode:"meaning", lv:[1,2,3,4], n:10, pool:"all"});
+let quiz = null;
+
+function renderSetup(){
+  quiz = null;
+  const best = store.get("wc_best", {});
+  $("testpanel").innerHTML = `
+    <h2>Test yourself</h2>
+    <p class="note">Choose a quiz type, the levels to draw from, and how many questions.</p>
+    <div class="modes" id="modes">${Object.entries(MODES).map(([k,m]) =>
+      `<button class="mode" data-m="${k}" aria-pressed="${setup.mode===k}"><strong>${m.t}</strong><span>${m.d}</span></button>`).join("")}</div>
+    <div class="row"><label>Levels</label><div class="lvlpick" id="tlv">${Object.entries(LEVELS).map(([k,v]) =>
+      `<button class="chip l${k}" data-l="${k}" aria-pressed="${setup.lv.includes(+k)}">${v.name}</button>`).join("")}</div></div>
+    <div class="row">
+      <label for="tn">Questions</label>
+      <select id="tn">${[10,20,30,50,100].map(n=>`<option ${n===setup.n?"selected":""}>${n}</option>`).join("")}</select>
+      <label for="tpool">Words</label>
+      <select id="tpool">
+        <option value="all" ${setup.pool==="all"?"selected":""}>All words</option>
+        <option value="daily" ${setup.pool==="daily"?"selected":""}>Today's mix (${todayLabel()})</option>
+        <option value="star" ${setup.pool==="star"?"selected":""}>Starred words (${stars.size})</option>
+      </select>
+    </div>
+    <p class="note">Today's mix quizzes you on the first cards in today's Randomize order for the levels you pick, so it matches what you studied. It changes at midnight.</p>
+    <p class="note" id="tmsg"></p>
+    <div class="row"><button class="primary" id="go">Start quiz</button>
+      ${Object.keys(best).length ? `<span class="note">Best scores: ${Object.entries(best).map(([k,v])=>`${MODES[k]?MODES[k].t:k} ${v}%`).join(", ")}</span>` : ""}</div>`;
+  $("modes").onclick = e => { const b = e.target.closest(".mode"); if (!b) return;
+    setup.mode = b.dataset.m; document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-pressed", x===b)); };
+  $("tlv").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; const l = +b.dataset.l;
+    setup.lv = setup.lv.includes(l) ? setup.lv.filter(x=>x!==l) : [...setup.lv, l]; b.setAttribute("aria-pressed", setup.lv.includes(l)); };
+  $("go").onclick = startQuiz;
+}
+
+function startQuiz(){
+  setup.n = +$("tn").value; setup.pool = $("tpool").value; store.set("wc_setup", setup);
+  let pool = WORDS.filter(x => setup.lv.includes(x.lvl));
+  if (setup.pool==="star") pool = pool.filter(x => stars.has(x.w));
+  if (setup.mode==="blank") pool = pool.filter(x => findWord(x.ex, x.w));
+  if (pool.length < 4){ $("tmsg").textContent = "Not enough words for this quiz. Turn on more levels, or star more words first."; return; }
+  let base;
+  if (setup.pool==="daily"){ const pos = dailyOrder(); base = pool.slice().sort((a,b)=>pos.get(a.w)-pos.get(b.w)); }
+  else base = shuffle(pool);
+  const items = shuffle(base.slice(0, Math.min(setup.n, pool.length)));
+  quiz = {mode:setup.mode, items, i:0, right:0, missed:[], answered:false, lvPool:WORDS.filter(x=>setup.lv.includes(x.lvl))};
+  renderQ();
+}
+
+function distractors(x, k=3){
+  const same = shuffle(quiz.lvPool.filter(y => y.w!==x.w && y.pos.split(/[ /]/)[0]===x.pos.split(/[ /]/)[0]));
+  const any = shuffle(quiz.lvPool.filter(y => y.w!==x.w));
+  const out = [];
+  for (const y of [...same, ...any]){ if (out.length>=k) break; if (!out.includes(y)) out.push(y); }
+  return out;
+}
+
+function renderQ(){
+  const q = quiz, x = q.items[q.i];
+  q.answered = false;
+  const head = `<div class="qmeta"><span>${MODES[q.mode].t}</span><span>Question ${q.i+1} of ${q.items.length} · Score ${q.right}</span></div>
+    <div class="progress"><div style="width:${q.i/q.items.length*100}%"></div></div>`;
+  let body = "";
+  if (q.mode==="meaning"){
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt"><span class="big">${esc(x.w)} <button class="iconbtn" id="sp" aria-label="Pronounce">${SPEAK_SVG}</button></span><br><span class="pos">${esc(x.pos)}</span></div>
+      <div class="opts">${opts.map(o=>`<button class="opt" data-w="${esc(o.w)}">${esc(o.def)}</button>`).join("")}</div>`;
+  } else if (q.mode==="word"){
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt">${esc(x.def)} <span class="pos">(${esc(x.pos)})</span></div>
+      <div class="opts">${opts.map(o=>`<button class="opt" data-w="${esc(o.w)}">${esc(o.w)}</button>`).join("")}</div>`;
+  } else if (q.mode==="blank"){
+    const m = findWord(x.ex, x.w);
+    const s = esc(x.ex.slice(0,m.index)) + '<span class="blank"></span>' + esc(x.ex.slice(m.index+m[1].length));
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt">${x.src?"“":""}${s}${x.src?"”":""}${x.src?`<div class="cite">— ${esc(x.src)}</div>`:""}</div>
+      <p class="note">The answer may appear in a different form in the sentence (for example, “pondered” for “ponder”).</p>
+      <div class="opts">${opts.map(o=>`<button class="opt" data-w="${esc(o.w)}">${esc(o.w)}</button>`).join("")}</div>`;
+  } else if (q.mode==="spell"){
+    body = `<div class="prompt"><button class="primary" id="sp">${SPEAK_SVG.replace('aria-hidden','style="width:18px;height:18px;vertical-align:-3px" aria-hidden')} Hear the word</button>
+      <button class="ghost" id="spslow">Say it slowly</button><div class="def" style="margin-top:14px">Hint: ${esc(x.def)}</div></div>
+      <div class="spell"><input id="sin" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the word"><button class="primary" id="scheck">Check</button></div>`;
+  } else {
+    body = `<div class="flip" id="flip"><div class="flip-inner" tabindex="0" role="button" aria-label="Flip card">
+        <div class="face"><div class="word">${esc(x.w)}</div><p class="note" style="text-align:center">Say what it means, then tap to flip.</p></div>
+        <div class="face back"><p class="def"><b>${esc(x.w)}</b> <span class="pos">${esc(x.pos)}</span></p><p class="def">${esc(x.def)}</p>
+          <p class="quote">${highlight(x.ex,x.w)}</p><p class="cite">${x.src?"— "+esc(x.src):"Example sentence"}</p></div>
+      </div></div>
+      <div class="row"><button class="iconbtn" id="sp" aria-label="Pronounce">${SPEAK_SVG}</button>
+        <button class="ghost" id="fbad" hidden>Still learning</button><button class="primary" id="fgood" hidden>I knew it</button></div>`;
+  }
+  $("testpanel").innerHTML = head + body + `<div id="fb"></div><div class="row"><button class="ghost" id="quit">End quiz</button></div>`;
+  $("quit").onclick = finish;
+  const sp = $("sp"); if (sp) sp.onclick = () => say(x.w);
+  if (q.mode==="spell"){
+    setTimeout(()=>say(x.w), 250);
+    $("spslow").onclick = () => say(x.w, 0.55);
+    const check = () => { if (q.answered) return next();
+      const ok = $("sin").value.trim().toLowerCase() === x.w.toLowerCase();
+      grade(ok, x, ok ? "" : `You typed “${esc($("sin").value.trim())}”.`); $("scheck").textContent = "Next"; };
+    $("scheck").onclick = check;
+    $("sin").onkeydown = e => { if (e.key==="Enter") check(); };
+    $("sin").focus();
+  } else if (q.mode==="flash"){
+    const inner = document.querySelector(".flip-inner");
+    const flip = () => { $("flip").classList.toggle("on"); $("fbad").hidden = $("fgood").hidden = false; };
+    inner.onclick = flip; inner.onkeydown = e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); flip(); } };
+    $("fgood").onclick = () => { q.right++; next(); };
+    $("fbad").onclick = () => { q.missed.push(x); next(); };
+  } else {
+    document.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      if (q.answered) return;
+      const ok = b.dataset.w === x.w;
+      document.querySelectorAll(".opt").forEach(o => { o.disabled = true; if (o.dataset.w===x.w) o.classList.add("right"); });
+      if (!ok) b.classList.add("wrong");
+      grade(ok, x, "");
+    });
+  }
+}
+
+function grade(ok, x, extra){
+  const q = quiz; q.answered = true;
+  if (ok) q.right++; else q.missed.push(x);
+  $("fb").innerHTML = `<div class="feedback"><b style="color:${ok?"var(--ok)":"var(--bad)"}">${ok?"Correct.":"Not quite."}</b> ${extra}
+    <b>${esc(x.w)}</b> (${esc(x.pos)}): ${esc(x.def)}<br><i>${highlight(x.ex,x.w)}</i>${x.src?` — ${esc(x.src)}`:""}
+    <div class="row" style="margin-bottom:0"><button class="primary" id="nx">${q.i+1<q.items.length?"Next question":"See results"}</button></div></div>`;
+  $("nx").onclick = next; $("nx").focus();
+}
+function next(){ quiz.i++; quiz.i < quiz.items.length ? renderQ() : finish(); }
+
+function finish(){
+  const q = quiz, done = q.mode==="flash" ? q.right + q.missed.length : (q.answered ? q.i+1 : q.i);
+  const n = Math.max(done, 0), pct = n ? Math.round(q.right/n*100) : 0;
+  if (n >= 5){ const best = store.get("wc_best", {}); if (!best[q.mode] || pct > best[q.mode]){ best[q.mode] = pct; store.set("wc_best", best); } }
+  $("testpanel").innerHTML = `<h2>Results</h2><div class="score">${q.right} / ${n}</div>
+    <p class="note">${n ? pct + "% correct" : "No questions answered."}</p>
+    ${q.missed.length ? `<h3 style="font-family:var(--serif)">Words to review</h3>
+      <ul class="missed">${q.missed.map(x=>`<li><b>${esc(x.w)}</b>: ${esc(x.def)}</li>`).join("")}</ul>
+      <button class="ghost" id="starMissed">Star these words</button>` : n ? `<p>Every answer was right.</p>` : ""}
+    <div class="row"><button class="primary" id="again">New quiz</button>
+      ${q.missed.length ? `<button class="ghost" id="retry">Retry missed words</button>` : ""}</div>`;
+  $("again").onclick = renderSetup;
+  const sm = $("starMissed"); if (sm) sm.onclick = () => { q.missed.forEach(x=>stars.add(x.w)); saveStars(); sm.textContent = "Starred"; sm.disabled = true; renderGrid(); };
+  const rt = $("retry"); if (rt) rt.onclick = () => {
+    const items = shuffle(q.missed); quiz = {...q, items, i:0, right:0, missed:[], answered:false}; renderQ(); };
+}
+
+renderGrid();
+</script>
+</body>
+</html>
