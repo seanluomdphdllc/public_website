@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汉字卡片 · Chinese Word Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Public+Sans:wght@400;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#2E3B47; --desk2:#25313B; --card:#FFFDF7; --ink:#1D2D44; --muted:#5B6776;
+  --rule:#D8E3EC; --margin:#C8443B; --gold:#E0A33E;
+  --c:#2F6FB0; --w:#3F8F5B; --f:#7A4FA8;
+  --ok:#3F8F5B; --bad:#B8333F;
+  --serif:"Newsreader",Georgia,serif;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --zh:"Noto Serif SC","Songti SC","SimSun","Microsoft YaHei",serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--desk);color:var(--card);font-family:var(--sans);min-height:100vh}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+h1{font-family:var(--zh);font-weight:700;font-size:clamp(2rem,4.5vw,3rem);line-height:1.05;margin:0}
+h1 small{display:block;font-family:var(--serif);font-size:.5em;font-weight:400;color:#C8D3DA;margin-top:6px}
+.sub{margin:.5rem 0 0;color:#C8D3DA;font-size:.95rem;max-width:56ch}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs button{background:transparent;color:#DDE5EA;border:2px solid #56707C;border-radius:8px 8px 0 0;padding:9px 14px;font-weight:600;cursor:pointer}
+nav.tabs button[aria-pressed="true"]{background:var(--card);color:var(--ink);border-color:var(--card)}
+.toolbar{background:var(--desk2);border-radius:10px;padding:13px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.toolbar input[type=search]{flex:1 1 200px;padding:9px 12px;border-radius:6px;border:0;background:var(--card);color:var(--ink)}
+.toolbar select,.toolbar .plain{padding:8px 10px;border-radius:6px;border:0;background:var(--card);color:var(--ink);cursor:pointer}
+.plain[aria-pressed="true"]{background:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:2px solid transparent;border-radius:999px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:.85rem;color:#fff;opacity:.45;background:#4E6373}
+.chip[aria-pressed="true"]{opacity:1;border-color:#fff}
+.chip.lv1{background:#2F8F5B}.chip.lv2{background:#3E975C}.chip.lv3{background:#2F8BB0}.chip.lv4{background:#2F6FB0}
+.chip.lv5{background:#5A5FB0}.chip.lv6{background:#7A4FA8}.chip.lv7{background:#94439A}.chip.lv8{background:#B03F7E}
+.chip.lv9{background:#B8455A}.chip.lv10{background:#A0522D}
+.chip.lvl{padding:7px 11px;min-width:42px;text-align:center}
+.tiny{background:transparent;border:2px solid #6E8593;color:#DDE5EA;border-radius:999px;padding:6px 10px;font-size:.8rem;font-weight:600;cursor:pointer}
+.count{color:#C8D3DA;font-size:.9rem;margin:0 0 14px}
+.deckNote{color:#C8D3DA;font-size:.92rem;margin:0 0 12px;max-width:74ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 20px}
+.card{position:relative;background:var(--card);color:var(--ink);border-radius:3px;padding:20px 18px 14px 30px;
+  box-shadow:0 2px 0 #ddd8c8,0 10px 18px -8px rgba(0,0,0,.45);
+  background-image:linear-gradient(to right,transparent 22px,var(--margin) 22px,var(--margin) 23.5px,transparent 23.5px),
+  repeating-linear-gradient(to bottom,transparent 0,transparent 25px,var(--rule) 25px,var(--rule) 26px);
+  background-position:0 0,0 58px;background-repeat:no-repeat,repeat-y;background-size:100% 100%,100% calc(100% - 58px)}
+.card::before{content:attr(data-tab);position:absolute;top:-17px;right:16px;padding:3px 12px 4px;border-radius:6px 6px 0 0;font-size:.72rem;font-weight:700;color:#fff;background:var(--tabc)}
+.card.dc{--tabc:var(--c)}.card.dw{--tabc:var(--w)}.card.df{--tabc:var(--f)}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.zh{font-family:var(--zh);font-weight:700;line-height:1.15;margin:0;word-break:break-word}
+.card .zh{font-size:2rem}
+.card.dc .zh{font-size:3rem}
+.py{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:1.05rem}
+.py.hide{visibility:hidden}
+.iconbtn{flex:none;width:36px;height:36px;border-radius:50%;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.iconbtn:hover{background:var(--gold);border-color:var(--gold)}
+.iconbtn svg{width:17px;height:17px}
+.head .iconbtn.speak{margin-left:auto}
+.star{border:0;width:30px;height:30px;font-size:1.25rem;color:#B9B2A0}
+.star[aria-pressed="true"]{color:var(--gold)}
+.star:hover{background:transparent;color:var(--gold)}
+.en{font-family:var(--serif);font-size:1.06rem;line-height:1.5;margin:6px 0 8px}
+.ex{margin:0;line-height:1.6}
+.ex .exzh{font-family:var(--zh);font-size:1.1rem}
+.ex .exen{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:.95rem;display:block}
+.ex mark{background:linear-gradient(transparent 55%,#F6DD8F 55%);color:inherit}
+.rel{font-size:.9rem;color:var(--muted);margin:8px 0 0;font-family:var(--serif)}
+.rel b{font-family:var(--zh);font-weight:600;color:var(--ink)}
+.empty{background:var(--card);color:var(--ink);padding:26px;border-radius:4px;font-family:var(--serif);font-size:1.05rem}
+/* one at a time */
+.solo{max-width:640px;margin:26px auto 0}
+.flip{perspective:1200px}
+.flip-inner{display:grid;transition:transform .45s;transform-style:preserve-3d;cursor:pointer}
+.flip.on .flip-inner{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;border-radius:3px;padding:30px 26px 24px 40px;background-color:var(--card);color:var(--ink);
+  box-shadow:0 2px 0 #ddd8c8,0 10px 20px -8px rgba(0,0,0,.5);position:relative;
+  background-image:linear-gradient(to right,transparent 30px,var(--margin) 30px,var(--margin) 31.5px,transparent 31.5px),
+  repeating-linear-gradient(to bottom,transparent 0,transparent 29px,var(--rule) 29px,var(--rule) 30px);
+  background-position:0 0,0 70px;background-repeat:no-repeat,repeat-y;background-size:100% 100%,100% calc(100% - 70px)}
+.face.back{transform:rotateY(180deg)}
+.face::before{content:attr(data-tab);position:absolute;top:-17px;right:20px;padding:3px 12px 4px;border-radius:6px 6px 0 0;font-size:.72rem;font-weight:700;color:#fff;background:var(--tabc)}
+.solo-front{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.solo-front .zh{font-size:clamp(3.4rem,13vw,6rem)}
+.solo .dfface .solo-front .zh{font-size:clamp(2.2rem,8vw,3.6rem)}
+.solo-front .py{font-size:1.5rem}
+.note{font-size:.88rem;color:var(--muted);margin:2px 0 0}
+.solo-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+.solo-nav .navbtn{background:var(--card);color:var(--ink);border:0;border-radius:8px;padding:11px 20px;font-weight:700;cursor:pointer}
+.solo-nav .navbtn:disabled{opacity:.4;cursor:default}
+.solo-nav .count{margin:0;min-width:7em;text-align:center}
+.solo-nav .star{color:#8FA3AE;width:40px;height:40px;font-size:1.5rem}
+.keys{text-align:center;color:#9FB0BA;font-size:.85rem;margin-top:10px}
+/* test */
+.testpanel{background:var(--card);color:var(--ink);border-radius:4px;padding:24px;max-width:760px;margin:0 auto;box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
+.testpanel h2{font-family:var(--serif);font-size:1.8rem;margin:0 0 6px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:16px 0}
+.mode{text-align:left;border:2px solid #D8D2C0;background:#fff;border-radius:8px;padding:12px;cursor:pointer;color:var(--ink)}
+.mode strong{display:block;font-family:var(--serif);font-size:1.12rem;margin-bottom:2px}
+.mode span{font-size:.86rem;color:var(--muted)}
+.mode[aria-pressed="true"]{border-color:var(--ink);background:#FDF6DE}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:12px 0}
+.row label{font-weight:600;font-size:.92rem}
+.row select{padding:8px;border-radius:6px;border:2px solid #D8D2C0;background:#fff}
+.primary{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:12px 22px;font-weight:700;cursor:pointer}
+.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink);border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer}
+.progress{height:8px;background:#E8E2D0;border-radius:4px;overflow:hidden;margin:4px 0 16px}
+.progress div{height:100%;background:var(--gold);transition:width .25s}
+.qmeta{display:flex;justify-content:space-between;font-size:.9rem;color:var(--muted)}
+.prompt{font-family:var(--serif);font-size:1.35rem;line-height:1.5;margin:12px 0 18px;text-align:center}
+.prompt .big{font-family:var(--zh);font-size:clamp(2.4rem,9vw,4rem);font-weight:700;display:block;margin-bottom:8px}
+.prompt .mid{font-family:var(--zh);font-size:1.6rem;display:block;margin-bottom:8px}
+.blank{display:inline-block;min-width:3em;border-bottom:2px solid var(--ink)}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;border:2px solid #D8D2C0;background:#fff;border-radius:8px;padding:12px 14px;cursor:pointer;font-family:var(--serif);font-size:1.06rem;color:var(--ink)}
+.opt .z{font-family:var(--zh);font-size:1.5rem;margin-right:10px}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--ok);background:#E5F2E8}
+.opt.wrong{border-color:var(--bad);background:#F8E3E5}
+.feedback{margin-top:16px;padding:12px 14px;border-radius:8px;background:#F4F0E3;font-family:var(--serif);line-height:1.55}
+.feedback .z{font-family:var(--zh)}
+.feedback mark{background:linear-gradient(transparent 55%,#F6DD8F 55%)}
+.score{font-family:var(--serif);font-size:3rem;font-weight:700;margin:6px 0}
+.missed{list-style:none;padding:0;margin:14px 0;display:grid;gap:8px}
+.missed li{border-left:4px solid var(--bad);padding:6px 10px;background:#FBF6EA;font-family:var(--serif)}
+.missed .z{font-family:var(--zh);font-size:1.2rem}
+footer{margin-top:40px;color:#9FB0BA;font-size:.85rem;max-width:74ch}
+@media (max-width:560px){.wrap{padding:16px 12px 40px}.testpanel{padding:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>汉字卡片<small>Chinese Word Cards · simplified characters with pinyin</small></h1>
+      <p class="sub">Three decks for conversation: characters for reading, words and phrases for speaking, and sentence frames that turn words into sentences.</p>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <button id="tabC" aria-pressed="true">汉字 Characters</button>
+      <button id="tabW" aria-pressed="false">词语 Words</button>
+      <button id="tabF" aria-pressed="false">句型 Frames</button>
+      <button id="tabTest" aria-pressed="false">Test yourself</button>
+    </nav>
+  </header>
+
+  <section id="browse">
+    <div class="toolbar">
+      <select id="view" aria-label="View">
+        <option value="grid">All cards</option>
+        <option value="one">One at a time</option>
+      </select>
+      <input type="search" id="q" placeholder="Search characters, pinyin, or English" aria-label="Search">
+      <div class="chips" id="lvlChips"></div>
+      <select id="sort" aria-label="Sort">
+        <option value="level">By level</option>
+        <option value="daily">Randomize (new order each day)</option>
+        <option value="random">Shuffle (new order every time)</option>
+        <option value="zh">By character</option>
+      </select>
+      <button class="plain" id="pyBtn" aria-pressed="false">Show pinyin</button>
+      <button class="plain" id="starOnly" aria-pressed="false">★ Starred only</button>
+    </div>
+    <p class="deckNote" id="deckNote"></p>
+    <p class="count" id="count"></p>
+    <div class="grid" id="grid"></div>
+    <div id="single" hidden></div>
+  </section>
+
+  <section id="test" hidden>
+    <div class="testpanel" id="testpanel"></div>
+  </section>
+
+  <footer>
+    Pinyin is hidden by default on purpose: children who read the pinyin often stop reading the characters. Tap a card or the Show pinyin button when you want it.
+    Audio uses your browser's Mandarin voice, which works best in Chrome, Edge, and Safari. Stars and scores are saved in this browser only.
+  </footer>
+</div>
+
+<script>
+/* zh | pinyin | deck (c/w/f) | level 1-3 | English | example zh | example en | related */
+const RAW = `一|yī|c|1|one|我有一个哥哥。|I have one older brother.|一个 one · 一起 together · 第一 first
+二|èr|c|1|two|我今年二年级。|I'm in second grade this year.|二月 February · 十二 twelve
+三|sān|c|1|three|我们家有三个人。|There are three people in my family.|三月 March · 星期三 Wednesday
+四|sì|c|1|four|桌子有四条腿。|A table has four legs.|四个 four of them · 四月 April
+五|wǔ|c|1|five|一只手有五个手指。|One hand has five fingers.|五月 May · 五分钟 five minutes
+六|liù|c|1|six|弟弟六岁了。|My little brother is six.|六月 June · 星期六 Saturday
+七|qī|c|1|seven|一个星期有七天。|A week has seven days.|七月 July
+八|bā|c|1|eight|八点上课。|Class starts at eight.|八月 August
+九|jiǔ|c|1|nine|我九点睡觉。|I go to bed at nine.|九月 September
+十|shí|c|1|ten|十个苹果。|Ten apples.|十分 very · 十月 October
+百|bǎi|c|1|hundred|这本书有一百页。|This book has a hundred pages.|一百 one hundred · 百分之十 ten percent
+千|qiān|c|3|thousand|一千块钱。|One thousand yuan.|一千 one thousand · 千万 by all means
+人|rén|c|1|person|那个人是谁？|Who is that person?|人们 people · 大人 adult · 别人 others
+大|dà|c|1|big|这个苹果很大。|This apple is big.|大家 everyone · 大人 grown-up · 长大 grow up
+小|xiǎo|c|1|small|小狗很可爱。|The little dog is cute.|小心 careful · 小时 hour · 小朋友 child
+上|shàng|c|1|up; to go to|我上楼去了。|I went upstairs.|上课 have class · 上学 go to school · 早上 morning
+下|xià|c|1|down; next|请下来吃饭。|Please come down and eat.|下午 afternoon · 下课 class ends · 下次 next time
+中|zhōng|c|1|middle; China|他在中间。|He is in the middle.|中文 Chinese · 中午 noon · 中国 China
+我|wǒ|c|1|I; me|我很饿。|I'm hungry.|我们 we · 我的 my
+你|nǐ|c|1|you|你好吗？|How are you?|你们 you (plural) · 你好 hello
+他|tā|c|1|he; him|他是我哥哥。|He's my older brother.|他们 they · 其他 other
+她|tā|c|1|she; her|她在写作业。|She is doing homework.|她们 they (female)
+们|men|c|1|plural marker for people|你们要去哪儿？|Where are you all going?|我们 we · 你们 you all · 他们 they
+的|de|c|1|possessive and descriptive particle|这是我的书。|This is my book.|我的 mine · 好的 okay
+是|shì|c|1|to be|他是老师。|He is a teacher.|是的 yes · 不是 is not · 但是 but
+不|bù|c|1|not|我不喜欢辣的。|I don't like spicy food.|不是 no · 不要 don't want · 不错 not bad
+有|yǒu|c|1|to have; there is|我有两只猫。|I have two cats.|没有 don't have · 有的 some · 有名 famous
+在|zài|c|1|at; to be located|妈妈在家。|Mom is at home.|现在 now · 正在 in the middle of
+这|zhè|c|1|this|这是什么？|What is this?|这里 here · 这些 these · 这样 like this
+那|nà|c|1|that|那是你的吗？|Is that yours?|那里 there · 那些 those · 那么 so
+个|gè|c|1|general measure word|给我一个。|Give me one.|一个 one · 那个 that one · 个子 height
+很|hěn|c|1|very|今天很热。|It's very hot today.|很多 a lot · 很好 very good
+好|hǎo|c|1|good|你好！|Hello!|好吃 tasty · 好看 good-looking · 好玩 fun
+多|duō|c|1|many; much|你有多少钱？|How much money do you have?|很多 many · 多少 how many · 差不多 about right
+少|shǎo|c|1|few; little|我吃得很少。|I eat very little.|多少 how many · 少数 minority
+来|lái|c|1|to come|你来我家玩吧。|Come play at my house.|回来 come back · 起来 get up · 后来 later
+去|qù|c|1|to go|我们去公园。|We're going to the park.|回去 go back · 过去 the past · 出去 go out
+吃|chī|c|1|to eat|我想吃面条。|I want to eat noodles.|吃饭 eat a meal · 好吃 tasty
+喝|hē|c|1|to drink|喝点水吧。|Have some water.|喝水 drink water · 喝茶 drink tea
+要|yào|c|1|to want; will|我要回家。|I want to go home.|想要 would like · 不要 don't · 重要 important
+会|huì|c|1|can; will|我会游泳。|I can swim.|一会儿 in a moment · 学会 learn to
+说|shuō|c|1|to speak|你说什么？|What did you say?|说话 talk · 听说 heard that
+看|kàn|c|2|to look; to watch|我在看书。|I'm reading a book.|看见 see · 看书 read · 好看 nice-looking
+走|zǒu|c|2|to walk; to leave|我们走路去。|We'll walk there.|走路 walk · 走开 go away
+坐|zuò|c|2|to sit|请坐。|Please sit down.|坐下 sit down · 坐车 ride
+开|kāi|c|2|to open; to start|请开门。|Please open the door.|开始 begin · 开心 happy · 开车 drive
+门|mén|c|2|door|门关着。|The door is closed.|门口 doorway · 开门 open the door
+口|kǒu|c|2|mouth; opening|张开口。|Open your mouth.|门口 doorway · 人口 population
+手|shǒu|c|2|hand|洗洗手。|Wash your hands.|手机 cell phone · 洗手 wash hands · 手表 watch
+心|xīn|c|2|heart|他心里很难过。|He feels sad inside.|开心 happy · 小心 careful · 关心 care about
+日|rì|c|2|sun; day|今天是几月几日？|What's today's date?|生日 birthday · 日本 Japan
+月|yuè|c|2|moon; month|月亮很圆。|The moon is round.|月亮 moon · 一个月 a month
+水|shuǐ|c|2|water|我要喝水。|I want water.|喝水 drink water · 水果 fruit
+火|huǒ|c|2|fire|火很烫。|Fire is hot.|火车 train · 着火 catch fire
+山|shān|c|2|mountain|山上有雪。|There's snow on the mountain.|爬山 hike · 火山 volcano
+天|tiān|c|2|day; sky|今天很冷。|It's cold today.|今天 today · 明天 tomorrow · 天气 weather
+地|dì|c|2|ground; earth|球掉在地上。|The ball fell on the ground.|地上 on the ground · 地方 place
+子|zi|c|2|noun suffix; child|桌子上有书。|There's a book on the table.|孩子 child · 桌子 table · 儿子 son
+女|nǚ|c|2|female|她是女生。|She's a girl.|女孩 girl · 女儿 daughter
+男|nán|c|2|male|他是男生。|He's a boy.|男孩 boy · 男人 man
+白|bái|c|2|white|白云在天上。|White clouds are in the sky.|白色 white · 明白 understand
+红|hóng|c|2|red|红苹果很甜。|Red apples are sweet.|红色 red · 红包 red envelope
+黑|hēi|c|2|black|外面天黑了。|It's dark outside.|黑色 black · 黑板 blackboard
+家|jiā|c|2|home; family|我家有四口人。|There are four people in my family.|回家 go home · 家人 family · 大家 everyone
+妈|mā|c|2|mom|妈妈做饭了。|Mom made dinner.|妈妈 mom · 奶奶 grandma
+爸|bà|c|2|dad|爸爸去上班。|Dad went to work.|爸爸 dad
+哥|gē|c|2|older brother|哥哥比我高。|My older brother is taller than me.|哥哥 older brother
+弟|dì|c|2|younger brother|弟弟还小。|My little brother is still little.|弟弟 younger brother
+姐|jiě|c|2|older sister|姐姐上初中。|My older sister is in middle school.|姐姐 older sister
+妹|mèi|c|2|younger sister|妹妹在睡觉。|My little sister is sleeping.|妹妹 younger sister
+叫|jiào|c|2|to call; to be named|我叫小明。|My name is Xiao Ming.|叫做 be called
+名|míng|c|2|name|你的名字很好听。|Your name sounds nice.|名字 name · 有名 famous
+字|zì|c|2|written character|这个字怎么写？|How do you write this character?|汉字 Chinese character · 写字 write
+年|nián|c|2|year|今年是龙年。|This is the year of the dragon.|今年 this year · 去年 last year
+今|jīn|c|2|present; now|今天星期五。|Today is Friday.|今天 today · 今年 this year
+明|míng|c|2|bright; next|明天见！|See you tomorrow!|明天 tomorrow · 明白 understand
+早|zǎo|c|2|early; morning|早上好！|Good morning!|早上 morning · 早饭 breakfast · 早点 earlier
+晚|wǎn|c|2|late; evening|晚上见。|See you tonight.|晚上 evening · 晚饭 dinner · 晚安 good night
+也|yě|c|2|also|我也想去。|I want to go too.|也是 also is
+和|hé|c|2|and; with|我和弟弟一起玩。|My brother and I play together.|和平 peace
+了|le|c|2|marks a completed action or change|我吃完了。|I've finished eating.|好了 all set · 算了 forget it
+吗|ma|c|2|yes-or-no question marker|你饿吗？|Are you hungry?|是吗 really?
+呢|ne|c|2|softening question particle|你呢？|And you?|
+学|xué|c|3|to study|我在学中文。|I'm learning Chinese.|学校 school · 学生 student · 学习 study
+校|xiào|c|3|school|学校在前面。|The school is ahead.|学校 school · 校长 principal
+生|shēng|c|3|to be born; life|我的生日在五月。|My birthday is in May.|生日 birthday · 学生 student · 医生 doctor
+老|lǎo|c|3|old; respectful prefix|老师来了。|The teacher is here.|老师 teacher · 老人 elderly person
+师|shī|c|3|teacher; master|谢谢老师。|Thank you, teacher.|老师 teacher · 师傅 master worker
+朋|péng|c|3|friend|我有很多朋友。|I have many friends.|朋友 friend
+友|yǒu|c|3|friend|他是好朋友。|He's a good friend.|朋友 friend · 友好 friendly
+书|shū|c|3|book|我在看书。|I'm reading a book.|看书 read · 书包 backpack · 图书馆 library
+写|xiě|c|3|to write|请写你的名字。|Please write your name.|写字 write · 写作业 do homework
+读|dú|c|3|to read aloud|我们一起读课文。|Let's read the text together.|读书 study · 朗读 read aloud
+听|tīng|c|3|to listen|听我说。|Listen to me.|听见 hear · 好听 nice to hear
+话|huà|c|3|speech; words|我要打电话。|I want to make a phone call.|说话 speak · 电话 telephone · 普通话 Mandarin
+文|wén|c|3|writing; culture|我喜欢中文课。|I like Chinese class.|中文 Chinese · 语文 language arts
+语|yǔ|c|3|language|英语很有意思。|English is interesting.|语言 language · 汉语 Chinese
+数|shù|c|3|number|数学不难。|Math isn't hard.|数学 math · 数字 number
+题|tí|c|3|problem; question|这道题很难。|This problem is hard.|问题 question · 做题 do problems
+问|wèn|c|3|to ask|我想问你一件事。|I want to ask you something.|问题 question · 请问 excuse me
+答|dá|c|3|to answer|请回答问题。|Please answer the question.|回答 answer · 答案 answer key
+对|duì|c|3|correct; toward|你说得对。|You're right.|对不起 sorry · 不对 wrong
+错|cuò|c|3|wrong; mistake|我写错了。|I wrote it wrong.|不错 pretty good · 错误 error
+什|shén|c|3|used in 什么 (what)|你在做什么？|What are you doing?|什么 what
+么|me|c|3|used in 什么 and 怎么|怎么办？|What should we do?|什么 what · 怎么 how · 那么 so
+谁|shéi|c|3|who|谁在门口？|Who's at the door?|
+哪|nǎ|c|3|which; where|你去哪儿？|Where are you going?|哪里 where · 哪个 which one
+为|wèi|c|3|for; because of|为什么？|Why?|因为 because · 为了 in order to
+因|yīn|c|3|because; cause|因为下雨，我没去。|Because it rained, I didn't go.|因为 because · 原因 reason
+所|suǒ|c|3|place; used in 所以|所以我回家了。|So I went home.|所以 therefore · 厕所 restroom
+但|dàn|c|3|but|我想去，但我很累。|I want to go, but I'm tired.|但是 but
+还|hái|c|3|still; also|我还没吃饭。|I haven't eaten yet.|还有 also · 还是 or; still
+就|jiù|c|3|then; right away|我马上就来。|I'm coming right away.|就是 exactly
+都|dōu|c|3|all; both|我们都喜欢。|We all like it.|都是 all are
+才|cái|c|3|only then; not until|他八点才回家。|He didn't get home until eight.|刚才 just now
+再|zài|c|3|again|再说一次。|Say it again.|再见 goodbye · 再来 come again
+又|yòu|c|3|again (already happened)|他又迟到了。|He's late again.|又…又… both…and…
+已|yǐ|c|3|already|我已经做完了。|I've already finished.|已经 already
+经|jīng|c|3|pass through; used in 已经|我已经吃过了。|I've already eaten.|已经 already · 经常 often
+常|cháng|c|3|often|我常常去图书馆。|I often go to the library.|常常 often · 经常 frequently
+每|měi|c|3|every|我每天读书。|I read every day.|每天 every day · 每个 each
+次|cì|c|3|time (occurrence)|再试一次。|Try one more time.|一次 once · 下次 next time
+时|shí|c|3|time|我没有时间。|I don't have time.|时间 time · 小时 hour · 有时候 sometimes
+候|hòu|c|3|wait; time|你什么时候回来？|When are you coming back?|时候 time · 等候 wait
+间|jiān|c|3|between; room|房间很干净。|The room is clean.|房间 room · 时间 time · 中间 middle
+分|fēn|c|3|minute; to divide|五点十分。|Ten past five.|分钟 minute · 分开 separate
+点|diǎn|c|3|o'clock; a bit; dot|三点上课。|Class is at three.|一点 a little · 点心 snack · 几点 what time
+半|bàn|c|3|half|七点半了。|It's seven thirty.|一半 half · 半个 half of
+星|xīng|c|4|star|星期天休息。|We rest on Sunday.|星期 week · 星星 star
+期|qī|c|4|period of time|这个星期很忙。|This week is busy.|星期 week · 假期 vacation
+快|kuài|c|4|fast; soon|快点儿！|Hurry up!|快乐 happy · 很快 quickly
+慢|màn|c|4|slow|请说慢一点。|Please speak more slowly.|慢慢 slowly · 慢车 slow train
+新|xīn|c|4|new|我有新书包。|I have a new backpack.|新年 New Year · 新闻 news
+旧|jiù|c|4|old (of things)|这件衣服很旧了。|These clothes are old.|旧的 old one
+累|lèi|c|4|tired|我今天很累。|I'm tired today.|好累 so tired
+饿|è|c|4|hungry|我饿了。|I'm hungry.|饿死了 starving
+渴|kě|c|4|thirsty|我很渴。|I'm thirsty.|口渴 thirsty
+冷|lěng|c|4|cold|外面很冷。|It's cold outside.|冷天 cold day · 变冷 turn cold
+热|rè|c|4|hot|汤很热。|The soup is hot.|热水 hot water · 热闹 lively
+忙|máng|c|4|busy|妈妈很忙。|Mom is busy.|帮忙 help · 忙着 be busy doing
+怕|pà|c|4|to fear|我怕黑。|I'm afraid of the dark.|害怕 be afraid · 恐怕 I'm afraid that
+笑|xiào|c|4|to laugh; to smile|他笑了。|He laughed.|笑话 joke · 微笑 smile
+哭|kū|c|4|to cry|妹妹哭了。|My little sister cried.|哭起来 start crying
+玩|wán|c|4|to play|我们去外面玩。|Let's go play outside.|好玩 fun · 玩儿 play
+跑|pǎo|c|4|to run|他跑得很快。|He runs fast.|跑步 jog · 跑开 run off
+跳|tiào|c|4|to jump; to dance|她会跳舞。|She can dance.|跳舞 dance · 跳高 high jump
+唱|chàng|c|4|to sing|我们一起唱歌。|Let's sing together.|唱歌 sing · 唱片 record
+画|huà|c|4|to draw; painting|我画了一只猫。|I drew a cat.|画画 draw · 图画 picture
+做|zuò|c|4|to do; to make|你在做什么？|What are you doing?|做饭 cook · 做作业 do homework
+用|yòng|c|4|to use|我用铅笔写。|I write with a pencil.|有用 useful · 不用 no need
+买|mǎi|c|4|to buy|我去买牛奶。|I'm going to buy milk.|买东西 shop
+卖|mài|c|4|to sell|这里卖水果。|They sell fruit here.|卖完 sold out
+给|gěi|c|4|to give; for|给我一支笔。|Give me a pen.|送给 give to
+送|sòng|c|4|to give as a gift; to see off|我送你回家。|I'll walk you home.|送礼物 give a gift
+带|dài|c|4|to bring; to carry|别忘了带书。|Don't forget to bring your book.|带来 bring · 皮带 belt
+拿|ná|c|4|to take; to hold|帮我拿一下。|Help me hold this.|拿走 take away
+放|fàng|c|4|to put; to release|把书放在桌上。|Put the book on the table.|放学 school lets out · 放假 have a holiday
+找|zhǎo|c|4|to look for|我在找我的鞋。|I'm looking for my shoes.|找到 find · 找人 look for someone
+帮|bāng|c|4|to help|我帮你。|I'll help you.|帮忙 help out · 帮助 assistance
+等|děng|c|4|to wait|等一下。|Wait a moment.|等等 wait · 等着 be waiting
+让|ràng|c|4|to let; to allow|妈妈不让我去。|Mom won't let me go.|让开 move aside
+想|xiǎng|c|4|to want; to think; to miss|我想吃冰淇淋。|I want ice cream.|想念 miss · 想法 idea
+知|zhī|c|4|to know|我不知道。|I don't know.|知道 know · 知识 knowledge
+道|dào|c|4|way; to say|你知道吗？|Do you know?|知道 know · 道理 reason · 味道 flavor
+记|jì|c|4|to remember; to record|我记得他。|I remember him.|记得 remember · 日记 diary
+忘|wàng|c|4|to forget|我忘了带钱。|I forgot to bring money.|忘记 forget
+觉|jué|c|4|to feel (also jiào, sleep)|我觉得很好。|I think it's good.|觉得 feel · 睡觉 sleep
+能|néng|c|4|to be able to|我能帮你吗？|Can I help you?|不能 cannot · 可能 maybe
+可|kě|c|4|may; can|可以进来吗？|May I come in?|可以 may · 可爱 cute · 可能 maybe
+应|yīng|c|4|should|你应该休息。|You should rest.|应该 should
+该|gāi|c|4|should; ought to|该走了。|It's time to go.|应该 should
+喜|xǐ|c|4|to like; happiness|我喜欢音乐。|I like music.|喜欢 like · 恭喜 congratulations
+欢|huān|c|4|joyful|欢迎你！|Welcome!|喜欢 like · 欢迎 welcome
+爱|ài|c|4|to love|我爱我的家人。|I love my family.|爱好 hobby · 可爱 cute
+最|zuì|c|5|most|这是最好的。|This is the best.|最后 last · 最近 recently
+更|gèng|c|5|even more|今天更热。|Today is even hotter.|更好 better · 更多 more
+比|bǐ|c|5|compared to|我比他高。|I'm taller than he is.|比赛 competition · 比较 fairly
+越|yuè|c|5|more and more (in 越…越…)|雨越下越大。|The rain is getting heavier.|越来越 more and more
+虽|suī|c|5|although|虽然很累，但我很开心。|Although I'm tired, I'm happy.|虽然 although
+然|rán|c|5|so; thus|然后我们回家了。|Then we went home.|然后 then · 虽然 although · 当然 of course
+如|rú|c|5|if; like|如果下雨就不去。|If it rains, we won't go.|如果 if · 比如 for example
+果|guǒ|c|5|fruit; result|我喜欢吃水果。|I like eating fruit.|水果 fruit · 如果 if · 结果 result
+或|huò|c|5|or|茶或者咖啡都行。|Tea or coffee is fine.|或者 or
+者|zhě|c|5|one who; used in 或者|或者你来我家。|Or you could come to my house.|或者 or · 作者 author
+而|ér|c|5|and; yet|他很聪明而且努力。|He is smart and hardworking.|而且 moreover
+且|qiě|c|5|moreover|不但好吃而且便宜。|Not only tasty but cheap.|而且 moreover · 并且 and also
+除|chú|c|5|except; to remove|除了我，都去了。|Everyone went except me.|除了 except · 除非 unless
+关|guān|c|5|to close; to concern|请关灯。|Please turn off the light.|关系 relationship · 关心 care about · 关上 shut
+系|xì|c|5|system; connection|没关系。|It doesn't matter.|关系 relationship · 系统 system
+决|jué|c|5|to decide|我决定去学游泳。|I decided to learn to swim.|决定 decide · 决心 determination
+定|dìng|c|5|to set; certain|我们定在星期六。|Let's set it for Saturday.|一定 certainly · 决定 decide
+计|jì|c|5|to plan; to count|这个计划很好。|This plan is good.|计划 plan · 计算 calculate
+划|huà|c|5|to plan; to draw a line|我们的计划改了。|Our plan changed.|计划 plan
+习|xí|c|5|to practice; habit|我每天练习中文。|I practice Chinese daily.|学习 study · 习惯 habit · 练习 practice
+惯|guàn|c|5|accustomed|我习惯早起。|I'm used to getting up early.|习惯 habit
+努|nǔ|c|5|to exert effort|要努力学习。|You should study hard.|努力 work hard
+力|lì|c|5|strength; power|他很有力气。|He is strong.|力气 strength · 努力 effort · 能力 ability
+进|jìn|c|5|to enter; to advance|请进。|Come in.|进来 come in · 进步 progress
+步|bù|c|5|step|我有进步了。|I've made progress.|进步 progress · 跑步 jogging · 一步 one step
+成|chéng|c|5|to become; to succeed|他成了老师。|He became a teacher.|成功 success · 完成 complete · 成绩 grades
+功|gōng|c|5|achievement; skill|他很成功。|He is successful.|成功 success · 功课 schoolwork
+准|zhǔn|c|5|accurate; to allow|我在准备考试。|I'm preparing for a test.|准备 prepare · 准时 on time
+备|bèi|c|5|to prepare|准备好了吗？|Are you ready?|准备 prepare · 设备 equipment
+完|wán|c|5|to finish|我做完作业了。|I finished my homework.|完成 complete · 完全 completely
+续|xù|c|5|to continue|请继续说。|Please continue.|继续 continue · 连续 in a row
+停|tíng|c|5|to stop|雨停了。|The rain stopped.|停止 stop · 停车 park a car
+改|gǎi|c|5|to change; to correct|请改一改。|Please revise it.|改变 change · 修改 revise
+变|biàn|c|5|to change|天气变冷了。|The weather turned cold.|改变 change · 变化 changes
+影|yǐng|c|5|shadow; film|我们去看电影。|Let's go see a movie.|电影 movie · 影响 influence
+响|xiǎng|c|5|to sound; to influence|铃响了。|The bell rang.|影响 influence · 响声 noise
+重|zhòng|c|6|heavy; important (also chóng, again)|这个箱子很重。|This box is heavy.|重要 important · 重新 anew
+病|bìng|c|6|illness; to be sick|他生病了。|He got sick.|生病 fall ill · 看病 see a doctor
+医|yī|c|6|medical; to treat|我要去医院。|I need to go to the hospital.|医生 doctor · 医院 hospital
+院|yuàn|c|6|courtyard; institution|医院很大。|The hospital is big.|医院 hospital · 学院 college
+药|yào|c|6|medicine|记得吃药。|Remember to take your medicine.|吃药 take medicine · 中药 Chinese medicine
+安|ān|c|6|safe; peaceful|晚安！|Good night!|安全 safe · 平安 safe and sound
+全|quán|c|6|whole; complete|全家人都来了。|The whole family came.|安全 safety · 完全 completely
+健|jiàn|c|6|healthy; strong|多运动才健康。|Exercise keeps you healthy.|健康 health · 健身 work out
+康|kāng|c|6|health|祝你健康。|I wish you good health.|健康 health
+银|yín|c|6|silver; bank|我去银行。|I'm going to the bank.|银行 bank · 银色 silver
+行|xíng|c|6|okay; to walk (also háng, a row)|行，我们走吧。|Okay, let's go.|不行 no way · 旅行 travel · 银行 bank
+商|shāng|c|6|commerce|商店关门了。|The store is closed.|商店 store · 商人 merchant
+店|diàn|c|6|shop|前面有一家店。|There's a shop ahead.|商店 store · 书店 bookstore
+公|gōng|c|6|public|我们坐公共汽车。|We take the bus.|公园 park · 公司 company · 公平 fair
+园|yuán|c|6|garden; park|公园里有花。|There are flowers in the park.|公园 park · 花园 garden
+图|tú|c|6|picture; map|图书馆很安静。|The library is quiet.|图书馆 library · 地图 map
+馆|guǎn|c|6|building for a public purpose|我们去博物馆。|We're going to the museum.|图书馆 library · 饭馆 restaurant
+城|chéng|c|6|city; wall|我住在城里。|I live in the city.|城市 city · 长城 Great Wall
+市|shì|c|6|market; city|这个城市很大。|This city is big.|城市 city · 超市 supermarket
+国|guó|c|6|country|我是美国人。|I'm American.|中国 China · 美国 America · 国家 country
+界|jiè|c|6|boundary; world|世界很大。|The world is big.|世界 world
+世|shì|c|6|world; generation|世界上有很多国家。|There are many countries in the world.|世界 world · 世纪 century
+科|kē|c|6|science; branch of study|我喜欢科学。|I like science.|科学 science · 科技 technology
+技|jì|c|6|skill; technique|科技发展很快。|Technology develops fast.|技术 technology · 科技 tech
+环|huán|c|6|ring; surroundings|保护环境很重要。|Protecting the environment matters.|环境 environment
+境|jìng|c|6|border; situation|环境很安静。|The surroundings are quiet.|环境 environment
+保|bǎo|c|6|to protect|我们要保护动物。|We should protect animals.|保护 protect · 保证 guarantee
+护|hù|c|6|to guard|护士很忙。|The nurse is busy.|保护 protect · 护士 nurse
+化|huà|c|6|to change into; -ize|中国文化很有意思。|Chinese culture is interesting.|文化 culture · 变化 change
+术|shù|c|6|art; technique|我喜欢美术课。|I like art class.|美术 art · 技术 skill
+表|biǎo|c|6|to express; watch; form|请表演一下。|Please perform for us.|表演 perform · 手表 watch · 表示 express
+演|yǎn|c|6|to perform|他在演戏。|He is acting in a play.|表演 performance · 演员 actor
+赛|sài|c|6|match; competition|明天有比赛。|There's a game tomorrow.|比赛 competition · 赛跑 race
+参|cān|c|6|to take part|我要参加比赛。|I want to join the competition.|参加 participate · 参观 visit
+加|jiā|c|6|to add|请加点糖。|Please add some sugar.|参加 join · 加油 go for it
+你好|nǐ hǎo|w|1|hello|你好，我叫小云。|Hello, my name is Xiaoyun.|您好 hello (polite) · 大家好 hi everyone
+再见|zài jiàn|w|1|goodbye|老师再见！|Goodbye, teacher!|拜拜 bye
+谢谢|xiè xie|w|1|thank you|谢谢你帮我。|Thank you for helping me.|多谢 many thanks
+不客气|bú kè qi|w|1|you're welcome|不客气，应该的。|You're welcome, it's nothing.|没事 no problem
+对不起|duì bu qǐ|w|1|sorry|对不起，我迟到了。|Sorry, I'm late.|不好意思 excuse me
+没关系|méi guān xi|w|1|it's okay; never mind|没关系，别担心。|It's fine, don't worry.|没事儿 no problem
+请|qǐng|w|1|please; to invite|请给我水。|Please give me water.|请问 excuse me · 请坐 please sit
+早上好|zǎo shang hǎo|w|1|good morning|早上好，妈妈。|Good morning, Mom.|晚上好 good evening
+晚安|wǎn ān|w|1|good night|晚安，做个好梦。|Good night, sweet dreams.|做梦 dream
+名字|míng zi|w|1|name|你叫什么名字？|What's your name?|姓 surname
+爸爸|bà ba|w|1|dad|爸爸在做饭。|Dad is cooking.|妈妈 mom
+妈妈|mā ma|w|1|mom|妈妈很爱我们。|Mom loves us very much.|爸爸 dad
+哥哥|gē ge|w|1|older brother|哥哥带我去公园。|My older brother took me to the park.|弟弟 younger brother
+姐姐|jiě jie|w|1|older sister|姐姐会弹钢琴。|My older sister can play piano.|妹妹 younger sister
+弟弟|dì di|w|1|younger brother|弟弟喜欢玩车。|My little brother likes playing with cars.|哥哥 older brother
+妹妹|mèi mei|w|1|younger sister|妹妹今年三岁。|My little sister is three.|姐姐 older sister
+爷爷|yé ye|w|1|grandpa (father's father)|爷爷喜欢看报纸。|Grandpa likes reading the newspaper.|奶奶 grandma
+奶奶|nǎi nai|w|1|grandma (father's mother)|奶奶做的饭最好吃。|Grandma's cooking is the best.|爷爷 grandpa
+外公|wài gōng|w|3|grandpa (mother's father)|外公住在中国。|My maternal grandpa lives in China.|外婆 maternal grandma · 姥爷 grandpa
+外婆|wài pó|w|3|grandma (mother's mother)|外婆很疼我。|My maternal grandma dotes on me.|外公 maternal grandpa · 姥姥 grandma
+家人|jiā rén|w|1|family members|我家人都在纽约。|My family is all in New York.|家里 at home
+朋友|péng you|w|1|friend|他是我最好的朋友。|He is my best friend.|好朋友 best friend
+老师|lǎo shī|w|1|teacher|老师教我们写字。|The teacher teaches us to write.|学生 student
+同学|tóng xué|w|1|classmate|我的同学很友好。|My classmates are friendly.|同桌 deskmate
+学生|xué sheng|w|1|student|我是三年级的学生。|I'm a third-grade student.|小学生 elementary student
+学校|xué xiào|w|1|school|学校离家很近。|The school is close to home.|中文学校 Chinese school
+中文|zhōng wén|w|1|Chinese language|我星期六上中文课。|I have Chinese class on Saturdays.|英文 English · 汉语 Chinese
+英文|yīng wén|w|1|English language|他的英文很好。|His English is good.|中文 Chinese
+上课|shàng kè|w|1|to have class|九点上课。|Class starts at nine.|下课 class ends
+下课|xià kè|w|1|class ends|下课以后我们去玩。|After class we'll go play.|上课 have class
+作业|zuò yè|w|1|homework|我要先写作业。|I have to do homework first.|功课 schoolwork
+考试|kǎo shì|w|3|exam; to take a test|明天有考试。|There's a test tomorrow.|测验 quiz · 成绩 grades
+铅笔|qiān bǐ|w|1|pencil|我的铅笔断了。|My pencil broke.|笔 pen · 橡皮 eraser
+书包|shū bāo|w|1|backpack|书包里有课本。|There are textbooks in my backpack.|书 book
+吃饭|chī fàn|w|1|to eat a meal|我们几点吃饭？|What time are we eating?|吃早饭 eat breakfast
+早饭|zǎo fàn|w|1|breakfast|我早饭吃鸡蛋。|I eat eggs for breakfast.|午饭 lunch · 晚饭 dinner
+午饭|wǔ fàn|w|1|lunch|午饭在学校吃。|I eat lunch at school.|早饭 breakfast
+晚饭|wǎn fàn|w|1|dinner|晚饭快好了。|Dinner is almost ready.|吃饭 have a meal
+米饭|mǐ fàn|w|1|cooked rice|我要一碗米饭。|I'd like a bowl of rice.|炒饭 fried rice
+面条|miàn tiáo|w|1|noodles|这家的面条很好吃。|The noodles here are delicious.|饺子 dumplings
+饺子|jiǎo zi|w|1|dumplings|过年我们包饺子。|We make dumplings for New Year.|包子 steamed bun
+包子|bāo zi|w|3|steamed stuffed bun|早饭吃两个包子。|I had two buns for breakfast.|馒头 steamed bread
+鸡蛋|jī dàn|w|1|egg|我喜欢吃鸡蛋。|I like eating eggs.|鸡肉 chicken
+牛奶|niú nǎi|w|1|milk|每天喝一杯牛奶。|Drink a glass of milk every day.|奶茶 milk tea
+水果|shuǐ guǒ|w|1|fruit|多吃水果对身体好。|Eating fruit is good for you.|苹果 apple · 香蕉 banana
+苹果|píng guǒ|w|1|apple|这个苹果很甜。|This apple is sweet.|水果 fruit
+香蕉|xiāng jiāo|w|1|banana|猴子喜欢吃香蕉。|Monkeys like bananas.|水果 fruit
+西瓜|xī guā|w|1|watermelon|夏天吃西瓜真爽。|Watermelon in summer is great.|水果 fruit
+蔬菜|shū cài|w|3|vegetables|要多吃蔬菜。|You should eat more vegetables.|青菜 greens
+青菜|qīng cài|w|1|green vegetables|妈妈炒了青菜。|Mom stir-fried some greens.|蔬菜 vegetables
+肉|ròu|w|1|meat|我不太喜欢吃肉。|I don't like meat much.|牛肉 beef · 鸡肉 chicken
+鱼|yú|w|1|fish|奶奶做的鱼很香。|Grandma's fish smells wonderful.|钓鱼 fish (verb)
+汤|tāng|w|1|soup|汤有点烫。|The soup is a bit hot.|喝汤 have soup
+茶|chá|w|1|tea|爷爷每天喝茶。|Grandpa drinks tea every day.|奶茶 milk tea · 茶杯 teacup
+水饺|shuǐ jiǎo|w|5|boiled dumplings|我们晚上吃水饺。|We're having boiled dumplings tonight.|饺子 dumplings
+好吃|hǎo chī|w|1|tasty|这个菜真好吃！|This dish is really tasty!|难吃 bad-tasting
+饱|bǎo|w|1|full (from eating)|我吃饱了。|I'm full.|饿 hungry
+筷子|kuài zi|w|1|chopsticks|我会用筷子。|I can use chopsticks.|勺子 spoon · 碗 bowl
+碗|wǎn|w|1|bowl; measure word for bowls|请给我一个碗。|Please give me a bowl.|一碗饭 a bowl of rice
+杯子|bēi zi|w|1|cup|杯子里有水。|There's water in the cup.|一杯水 a glass of water
+开心|kāi xīn|w|1|happy|今天我很开心。|I'm happy today.|高兴 glad · 快乐 joyful
+高兴|gāo xìng|w|1|glad; pleased|见到你很高兴。|Nice to meet you.|开心 happy
+快乐|kuài lè|w|1|happy; joyful|生日快乐！|Happy birthday!|新年快乐 Happy New Year
+难过|nán guò|w|3|sad|他看起来很难过。|He looks sad.|伤心 heartbroken
+生气|shēng qì|w|1|angry|妈妈生气了。|Mom got angry.|发脾气 throw a tantrum
+害怕|hài pà|w|3|afraid|我害怕打雷。|I'm afraid of thunder.|怕 fear
+着急|zháo jí|w|3|anxious; in a hurry|别着急，还有时间。|Don't worry, there's still time.|急 urgent
+紧张|jǐn zhāng|w|3|nervous|考试前我很紧张。|I get nervous before tests.|放松 relax
+无聊|wú liáo|w|3|bored; boring|下雨天很无聊。|Rainy days are boring.|好玩 fun
+累|lèi|w|1|tired|走了一天，好累。|I walked all day and I'm tired.|休息 rest
+困|kùn|w|3|sleepy|我困了，想睡觉。|I'm sleepy and want to sleep.|睡觉 sleep
+喜欢|xǐ huan|w|1|to like|我喜欢画画。|I like drawing.|爱 love · 讨厌 dislike
+讨厌|tǎo yàn|w|3|to dislike; annoying|我讨厌蚊子。|I hate mosquitoes.|喜欢 like
+想|xiǎng|w|1|to want; to miss|我想回家。|I want to go home.|想念 miss someone
+知道|zhī dào|w|1|to know|我知道答案。|I know the answer.|不知道 don't know
+觉得|jué de|w|1|to feel; to think|我觉得有点冷。|I feel a bit cold.|认为 believe
+希望|xī wàng|w|3|to hope|我希望明天不下雨。|I hope it won't rain tomorrow.|盼望 look forward to
+需要|xū yào|w|3|to need|我需要帮忙。|I need help.|要 want
+可以|kě yǐ|w|1|may; can|我可以出去玩吗？|May I go out to play?|能 can · 不可以 may not
+应该|yīng gāi|w|3|should|你应该先洗手。|You should wash your hands first.|不应该 shouldn't
+必须|bì xū|w|5|must|我们必须准时到。|We must arrive on time.|一定要 definitely need to
+一起|yì qǐ|w|1|together|我们一起玩吧。|Let's play together.|一块儿 together
+帮忙|bāng máng|w|1|to help out|我需要帮忙。|I need help.|帮助 help · 帮我一个忙 do me a favor
+等一下|děng yí xià|w|1|wait a moment|等一下，我马上来。|Hold on, I'm coming.|马上 right away
+马上|mǎ shàng|w|1|right away|我马上就好。|I'll be ready in a second.|立刻 immediately
+快点|kuài diǎn|w|1|hurry up|快点，要迟到了！|Hurry, we'll be late!|慢点 slow down
+小心|xiǎo xīn|w|1|be careful|小心台阶。|Watch the step.|注意 pay attention
+加油|jiā yóu|w|1|go for it; keep it up|加油，你一定行！|You can do it!|努力 work hard
+休息|xiū xi|w|1|to rest|我们休息五分钟。|Let's rest for five minutes.|睡觉 sleep
+起床|qǐ chuáng|w|1|to get up|我七点起床。|I get up at seven.|睡觉 go to bed
+睡觉|shuì jiào|w|1|to sleep|弟弟在睡觉。|My little brother is sleeping.|起床 get up
+洗手|xǐ shǒu|w|1|to wash hands|吃饭前要洗手。|Wash your hands before eating.|洗澡 take a bath
+洗澡|xǐ zǎo|w|1|to take a bath or shower|我晚上洗澡。|I shower in the evening.|洗手 wash hands
+刷牙|shuā yá|w|1|to brush teeth|睡觉前要刷牙。|Brush your teeth before bed.|牙刷 toothbrush
+穿|chuān|w|1|to wear; to put on|今天要穿外套。|Wear a jacket today.|脱 take off
+衣服|yī fu|w|1|clothes|我的衣服湿了。|My clothes got wet.|裤子 pants · 鞋 shoes
+鞋|xié|w|1|shoes|新鞋有点紧。|The new shoes are a bit tight.|袜子 socks
+上学|shàng xué|w|1|to go to school|我走路上学。|I walk to school.|放学 get out of school
+放学|fàng xué|w|1|school lets out|放学后我去踢球。|After school I play soccer.|上学 go to school
+回家|huí jiā|w|1|to go home|我们六点回家。|We go home at six.|到家 arrive home
+出去|chū qù|w|1|to go out|我们出去走走。|Let's go out for a walk.|进来 come in
+回来|huí lái|w|1|to come back|爸爸什么时候回来？|When is Dad coming back?|回去 go back
+今天|jīn tiān|w|1|today|今天是星期六。|Today is Saturday.|明天 tomorrow · 昨天 yesterday
+明天|míng tiān|w|1|tomorrow|明天我们去公园。|Tomorrow we're going to the park.|后天 day after tomorrow
+昨天|zuó tiān|w|1|yesterday|昨天下雨了。|It rained yesterday.|前天 day before yesterday
+现在|xiàn zài|w|1|now|现在几点了？|What time is it now?|刚才 a moment ago
+星期|xīng qī|w|1|week|这个星期很忙。|This week is busy.|星期天 Sunday · 周末 weekend
+周末|zhōu mò|w|3|weekend|周末我上中文课。|On weekends I have Chinese class.|星期六 Saturday
+时候|shí hou|w|1|time; moment|小时候我住在中国。|When I was little I lived in China.|什么时候 when
+以后|yǐ hòu|w|3|after; later|吃完以后再玩。|Play after you finish eating.|以前 before
+以前|yǐ qián|w|3|before; in the past|以前这里是农场。|This used to be a farm.|以后 after
+天气|tiān qì|w|1|weather|今天天气很好。|The weather is nice today.|下雨 rain · 刮风 windy
+下雨|xià yǔ|w|1|to rain|外面下雨了。|It's raining outside.|下雪 snow
+下雪|xià xuě|w|2|to snow|昨天下雪了。|It snowed yesterday.|雪人 snowman
+太阳|tài yáng|w|2|sun|今天太阳很大。|The sun is strong today.|月亮 moon
+公园|gōng yuán|w|2|park|我们去公园跑步。|We go running in the park.|操场 playground
+商店|shāng diàn|w|2|store|商店九点开门。|The store opens at nine.|超市 supermarket
+超市|chāo shì|w|2|supermarket|妈妈去超市买菜。|Mom went to the supermarket.|商店 store
+医院|yī yuàn|w|3|hospital|奶奶在医院工作。|Grandma works at a hospital.|医生 doctor
+餐厅|cān tīng|w|3|restaurant; dining hall|我们在餐厅吃饭。|We ate at a restaurant.|饭馆 restaurant
+图书馆|tú shū guǎn|w|3|library|图书馆里要安静。|You must be quiet in the library.|借书 borrow books
+厕所|cè suǒ|w|2|restroom|厕所在哪里？|Where's the restroom?|洗手间 washroom
+房间|fáng jiān|w|2|room|我的房间很干净。|My room is clean.|客厅 living room
+厨房|chú fáng|w|3|kitchen|妈妈在厨房做饭。|Mom is cooking in the kitchen.|客厅 living room
+汽车|qì chē|w|2|car|我们开汽车去。|We're driving there.|公共汽车 bus
+公共汽车|gōng gòng qì chē|w|3|bus|我坐公共汽车上学。|I take the bus to school.|地铁 subway
+地铁|dì tiě|w|3|subway|纽约的地铁很快。|New York's subway is fast.|火车 train
+飞机|fēi jī|w|3|airplane|我们坐飞机去中国。|We're flying to China.|机场 airport
+自行车|zì xíng chē|w|3|bicycle|我会骑自行车。|I can ride a bike.|骑车 ride a bike
+玩具|wán jù|w|2|toy|请收好你的玩具。|Please put away your toys.|玩 play
+游戏|yóu xì|w|2|game|我们玩一个游戏吧。|Let's play a game.|电子游戏 video game
+球|qiú|w|2|ball|我们去打球。|Let's go play ball.|足球 soccer · 篮球 basketball
+足球|zú qiú|w|2|soccer|他每天踢足球。|He plays soccer every day.|篮球 basketball
+篮球|lán qiú|w|2|basketball|哥哥喜欢打篮球。|My brother likes basketball.|足球 soccer
+音乐|yīn yuè|w|2|music|我喜欢听音乐。|I like listening to music.|唱歌 sing
+唱歌|chàng gē|w|2|to sing|她唱歌很好听。|She sings beautifully.|跳舞 dance
+跳舞|tiào wǔ|w|2|to dance|妹妹在学跳舞。|My sister is learning to dance.|唱歌 sing
+画画|huà huà|w|2|to draw; to paint|我最喜欢画画。|I like drawing most.|画 picture
+看书|kàn shū|w|2|to read|睡前我看书。|I read before bed.|读书 study
+电视|diàn shì|w|2|television|别看太多电视。|Don't watch too much TV.|电影 movie
+电影|diàn yǐng|w|2|movie|周末我们看电影。|We watch a movie on weekends.|电视 TV
+电脑|diàn nǎo|w|2|computer|电脑坏了。|The computer is broken.|手机 cell phone
+手机|shǒu jī|w|2|cell phone|爸爸在打手机。|Dad is on his phone.|打电话 make a call
+打电话|dǎ diàn huà|w|2|to make a phone call|我给奶奶打电话。|I'm calling Grandma.|接电话 answer the phone
+钱|qián|w|2|money|这个多少钱？|How much is this?|块 yuan · 零钱 change
+多少|duō shao|w|2|how many; how much|你要多少？|How much do you want?|几 how many
+几|jǐ|w|2|how many (small numbers); several|你几岁了？|How old are you?|几点 what time
+岁|suì|w|2|years of age|我八岁了。|I'm eight years old.|生日 birthday
+生日|shēng rì|w|2|birthday|今天是我的生日。|Today is my birthday.|蛋糕 cake
+礼物|lǐ wù|w|2|gift|谢谢你的礼物。|Thank you for the gift.|送礼物 give a gift
+颜色|yán sè|w|2|color|你喜欢什么颜色？|What color do you like?|红色 red · 蓝色 blue
+红色|hóng sè|w|2|red|我的书包是红色的。|My backpack is red.|颜色 color
+蓝色|lán sè|w|2|blue|天是蓝色的。|The sky is blue.|绿色 green
+绿色|lǜ sè|w|2|green|树叶是绿色的。|Leaves are green.|蓝色 blue
+黄色|huáng sè|w|2|yellow|香蕉是黄色的。|Bananas are yellow.|红色 red
+动物|dòng wù|w|2|animal|我喜欢小动物。|I like small animals.|动物园 zoo
+小狗|xiǎo gǒu|w|2|puppy; dog|小狗在睡觉。|The dog is sleeping.|小猫 kitten
+小猫|xiǎo māo|w|2|kitten; cat|小猫很可爱。|The kitten is cute.|小狗 puppy
+可爱|kě ài|w|2|cute|这只小兔子好可爱。|This little rabbit is so cute.|漂亮 pretty
+漂亮|piào liang|w|2|pretty|这条裙子很漂亮。|This skirt is pretty.|好看 good-looking
+好玩|hǎo wán|w|2|fun|这个游戏很好玩。|This game is fun.|无聊 boring
+有意思|yǒu yì si|w|3|interesting|这本书很有意思。|This book is interesting.|没意思 boring
+不错|bú cuò|w|3|pretty good|你的中文不错！|Your Chinese is pretty good!|很好 very good
+厉害|lì hai|w|3|impressive; formidable|你太厉害了！|You're amazing!|棒 great
+真的|zhēn de|w|2|really; true|真的吗？|Really?|假的 fake
+当然|dāng rán|w|3|of course|当然可以。|Of course you can.|一定 certainly
+一定|yí dìng|w|3|certainly; must|我一定会来。|I'll definitely come.|肯定 surely
+也许|yě xǔ|w|5|maybe|也许他忘了。|Maybe he forgot.|可能 possibly
+可能|kě néng|w|3|maybe; possible|明天可能下雨。|It might rain tomorrow.|也许 perhaps
+好像|hǎo xiàng|w|5|seems like|他好像生病了。|He seems to be sick.|看起来 looks like
+个|gè|w|2|measure word for people and most things|我要三个苹果。|I want three apples.|counts: 人、苹果、问题
+只|zhī|w|2|measure word for animals and one of a pair|我家有两只猫。|We have two cats.|counts: 猫、狗、鸟、手
+张|zhāng|w|2|measure word for flat things|给我一张纸。|Give me a sheet of paper.|counts: 纸、桌子、照片、票
+条|tiáo|w|2|measure word for long thin things|这条鱼很大。|This fish is big.|counts: 鱼、路、裤子、狗
+本|běn|w|2|measure word for books|我买了两本书。|I bought two books.|counts: 书、本子、杂志
+杯|bēi|w|2|measure word for cups and glasses|我要一杯水。|I'd like a glass of water.|counts: 水、茶、牛奶
+件|jiàn|w|2|measure word for clothes and matters|这件衣服很贵。|This piece of clothing is expensive.|counts: 衣服、事情
+双|shuāng|w|3|measure word for pairs|我买了一双鞋。|I bought a pair of shoes.|counts: 鞋、袜子、筷子、手
+辆|liàng|w|3|measure word for vehicles|门口有一辆车。|There's a car at the door.|counts: 汽车、自行车
+块|kuài|w|2|piece; unit of money|给我一块蛋糕。|Give me a piece of cake.|counts: 蛋糕、钱、肉
+次|cì|w|2|measure word for times|我去过两次北京。|I've been to Beijing twice.|第一次 the first time
+点|diǎn|w|2|a little; o'clock|再吃一点吧。|Have a little more.|一点点 a tiny bit
+些|xiē|w|3|some (with 这/那/一)|这些书是我的。|These books are mine.|一些 some · 那些 those
+位|wèi|w|3|polite measure word for people|那位老师很好。|That teacher is very nice.|counts: 老师、客人
+什么|shén me|w|2|what|你想吃什么？|What do you want to eat?|为什么 why
+为什么|wèi shén me|w|2|why|你为什么不来？|Why aren't you coming?|因为 because
+怎么|zěn me|w|2|how|这个字怎么念？|How do you read this character?|怎么样 how about
+怎么样|zěn me yàng|w|2|how is it; how about|这样怎么样？|How about this?|好不好 is that okay
+哪里|nǎ li|w|2|where|你住在哪里？|Where do you live?|哪儿 where
+什么时候|shén me shí hou|w|3|when|你什么时候回来？|When will you be back?|几点 what time
+谁|shéi|w|2|who|谁教你中文？|Who teaches you Chinese?|谁的 whose
+因为|yīn wèi|w|3|because|因为太晚了，所以我回家了。|Because it was late, I went home.|所以 so
+所以|suǒ yǐ|w|3|so; therefore|下雨了，所以不去公园。|It's raining, so we're not going to the park.|因为 because
+但是|dàn shì|w|3|but|我很饿，但是没时间吃。|I'm hungry, but there's no time to eat.|可是 but
+可是|kě shì|w|3|but; however|我想去，可是妈妈不让。|I want to go, but Mom won't let me.|但是 but
+然后|rán hòu|w|3|then; after that|先写作业，然后玩。|Do homework first, then play.|以后 afterwards
+还是|hái shì|w|3|or (in questions); still|你喝茶还是喝水？|Tea or water?|或者 or
+或者|huò zhě|w|5|or (in statements)|周末或者星期一都行。|The weekend or Monday both work.|还是 or
+如果|rú guǒ|w|5|if|如果下雨，我们就在家。|If it rains, we'll stay home.|要是 if
+虽然|suī rán|w|5|although|虽然很难，但我不放弃。|Although it's hard, I won't give up.|但是 but
+而且|ér qiě|w|5|moreover|这里便宜而且好吃。|It's cheap here, and tasty too.|还有 also
+除了|chú le|w|5|except; besides|除了我，大家都去了。|Everyone went except me.|都 all
+比如|bǐ rú|w|5|for example|水果，比如苹果和香蕉。|Fruit, like apples and bananas.|例如 for instance
+一边|yì biān|w|5|while doing (in 一边…一边…)|他一边走一边唱。|He sings while walking.|同时 at the same time
+越来越|yuè lái yuè|w|5|more and more|天气越来越冷了。|The weather is getting colder and colder.|更 more
+差不多|chà bu duō|w|3|about; almost the same|我们差不多高。|We're about the same height.|大概 roughly
+大概|dà gài|w|5|roughly; probably|大概要十分钟。|It'll take about ten minutes.|差不多 about
+一点儿|yì diǎnr|w|2|a little bit|我会一点儿中文。|I speak a little Chinese.|一些 some
+非常|fēi cháng|w|3|extremely|这个故事非常有趣。|This story is extremely interesting.|很 very
+真|zhēn|w|2|really|你真棒！|You're really great!|真的 really
+太|tài|w|2|too (excessively)|太贵了！|That's too expensive!|太…了 too…
+最|zuì|w|3|most|我最喜欢夏天。|I like summer best.|最好 best
+都|dōu|w|2|all; both|我们都饿了。|We're all hungry.|全都 all
+只有|zhǐ yǒu|w|3|to have only; only|我只有五块钱。|I only have five dollars.|才 only · 只好 have no choice but
+又|yòu|w|3|again (already happened)|他又忘了。|He forgot again.|再 again
+再|zài|w|2|again (not yet happened)|明天再说吧。|Let's talk about it tomorrow.|又 again
+已经|yǐ jīng|w|3|already|我已经吃过了。|I've already eaten.|还没 not yet
+还没|hái méi|w|3|not yet|我还没做完。|I haven't finished yet.|已经 already
+正在|zhèng zài|w|3|in the middle of doing|我正在写作业。|I'm doing homework right now.|在 in the middle of
+刚才|gāng cái|w|4|just now|刚才谁来了？|Who was here just now?|刚刚 just now
+常常|cháng cháng|w|4|often|我常常去图书馆。|I often go to the library.|经常 frequently
+有时候|yǒu shí hou|w|4|sometimes|有时候我自己做饭。|Sometimes I cook by myself.|总是 always
+总是|zǒng shì|w|4|always|他总是迟到。|He's always late.|从来不 never
+从来不|cóng lái bù|w|5|never|我从来不吃辣的。|I never eat spicy food.|总是 always
+一直|yì zhí|w|6|continuously; straight|雨一直下。|It has been raining nonstop.|一直走 go straight
+马马虎虎|mǎ ma hū hū|w|6|so-so; careless|我的字写得马马虎虎。|My handwriting is so-so.|还行 okay
+一样|yí yàng|w|4|the same|我们的书包一样。|Our backpacks are the same.|不一样 different
+不同|bù tóng|w|6|different|每个人都不同。|Everyone is different.|一样 the same
+容易|róng yì|w|4|easy|这道题很容易。|This problem is easy.|难 hard
+难|nán|w|2|difficult|中文字有点难。|Chinese characters are a bit hard.|容易 easy
+重要|zhòng yào|w|4|important|休息也很重要。|Rest is important too.|主要 main
+特别|tè bié|w|4|especially; special|我特别喜欢秋天。|I especially like autumn.|非常 very
+干净|gān jìng|w|4|clean|房间很干净。|The room is clean.|脏 dirty
+脏|zāng|w|4|dirty|你的手很脏。|Your hands are dirty.|干净 clean
+安静|ān jìng|w|4|quiet|请安静一点。|Please be a bit quieter.|吵 noisy
+吵|chǎo|w|4|noisy; to quarrel|外面太吵了。|It's too noisy outside.|安静 quiet
+高|gāo|w|2|tall; high|哥哥比我高。|My brother is taller than me.|矮 short
+矮|ǎi|w|4|short (in height)|我比他矮一点。|I'm a bit shorter than he is.|高 tall
+长|cháng|w|2|long|这条路很长。|This road is long.|短 short
+短|duǎn|w|4|short (in length)|头发剪短了。|My hair was cut short.|长 long
+胖|pàng|w|4|chubby; fat|小猫有点胖。|The kitten is a bit chubby.|瘦 thin
+瘦|shòu|w|4|thin|他很瘦。|He is thin.|胖 chubby
+贵|guì|w|2|expensive|太贵了，我买不起。|Too expensive, I can't afford it.|便宜 cheap
+便宜|pián yi|w|2|cheap|这里的水果很便宜。|The fruit here is cheap.|贵 expensive
+远|yuǎn|w|2|far|学校离这儿远吗？|Is the school far from here?|近 near
+近|jìn|w|2|near|超市很近。|The supermarket is close.|远 far
+前面|qián miàn|w|2|in front|超市在前面。|The supermarket is ahead.|后面 behind
+后面|hòu miàn|w|2|behind|我坐在他后面。|I sit behind him.|前面 in front
+里面|lǐ miàn|w|2|inside|书包里面有什么？|What's inside the backpack?|外面 outside
+外面|wài miàn|w|2|outside|外面很冷。|It's cold outside.|里面 inside
+上面|shàng miàn|w|2|on top; above|书在桌子上面。|The book is on the table.|下面 below
+下面|xià miàn|w|2|below; under|猫在椅子下面。|The cat is under the chair.|上面 above
+旁边|páng biān|w|4|beside|他坐在我旁边。|He sits next to me.|中间 in the middle
+中间|zhōng jiān|w|4|in the middle|我站在中间。|I'm standing in the middle.|旁边 beside
+左边|zuǒ biān|w|4|left side|左边是我家。|My house is on the left.|右边 right side
+右边|yòu biān|w|4|right side|右边有一家店。|There's a shop on the right.|左边 left side
+这里|zhè lǐ|w|2|here|这里有座位。|There's a seat here.|那里 there
+那里|nà lǐ|w|2|there|那里是我的学校。|That's my school over there.|这里 here
+东西|dōng xi|w|2|thing; stuff|别忘了带东西。|Don't forget your things.|买东西 shop
+事情|shì qing|w|4|matter; affair|我有一件事情告诉你。|I have something to tell you.|事儿 matter
+地方|dì fang|w|4|place|这个地方很漂亮。|This place is beautiful.|哪个地方 which place
+时间|shí jiān|w|2|time|我们没有时间了。|We're out of time.|有空 free time
+问题|wèn tí|w|2|question; problem|我有一个问题。|I have a question.|没问题 no problem
+办法|bàn fǎ|w|4|way; method|我想到一个办法。|I thought of a way.|想办法 figure out a way
+意思|yì si|w|4|meaning|这个词是什么意思？|What does this word mean?|有意思 interesting
+故事|gù shi|w|2|story|奶奶讲故事给我听。|Grandma tells me stories.|讲故事 tell a story
+声音|shēng yīn|w|4|sound; voice|他的声音很大。|His voice is loud.|安静 quiet
+努力|nǔ lì|w|4|to work hard|他学习很努力。|He studies hard.|加油 keep it up
+进步|jìn bù|w|6|progress|你进步了很多。|You've made a lot of progress.|退步 fall behind
+成绩|chéng jì|w|6|grades; results|他的成绩很好。|His grades are good.|考试 test
+练习|liàn xí|w|4|to practice|每天练习一点。|Practice a little every day.|复习 review
+复习|fù xí|w|6|to review|考试前要复习。|Review before the test.|预习 preview
+懂|dǒng|w|2|to understand|我听不懂。|I don't understand.|明白 understand
+明白|míng bai|w|4|to understand clearly|我明白了。|I get it now.|懂 understand
+记得|jì de|w|4|to remember|记得带钥匙。|Remember to bring your keys.|忘记 forget
+忘记|wàng jì|w|4|to forget|我忘记他的名字了。|I forgot his name.|记得 remember
+告诉|gào su|w|4|to tell|请告诉我答案。|Please tell me the answer.|说 say
+教|jiāo|w|2|to teach|妈妈教我写字。|Mom teaches me to write.|学 learn
+学习|xué xí|w|2|to study; to learn|我在学习中文。|I'm studying Chinese.|复习 review
+开始|kāi shǐ|w|2|to begin|比赛开始了。|The game has started.|结束 end
+结束|jié shù|w|6|to end|课结束了。|Class is over.|开始 begin
+准备|zhǔn bèi|w|4|to prepare; to be about to|我准备好了。|I'm ready.|预备 get ready
+决定|jué dìng|w|6|to decide|我决定参加比赛。|I decided to enter the competition.|选择 choose
+选|xuǎn|w|4|to choose|你选哪个？|Which one do you pick?|选择 choose
+试|shì|w|4|to try|我想试一试。|I want to give it a try.|试试看 give it a try
+用|yòng|w|2|to use|可以用我的笔。|You can use my pen.|有用 useful
+带|dài|w|2|to bring along|我带了午饭。|I brought lunch.|拿 take
+借|jiè|w|4|to borrow; to lend|我可以借你的书吗？|May I borrow your book?|还 return
+还|huán|w|4|to return something|我明天还你。|I'll return it to you tomorrow.|借 borrow
+找到|zhǎo dào|w|4|to find|我找到我的鞋了。|I found my shoes.|找 look for
+拿到|ná dào|w|6|to get; to obtain|他拿到了第一名。|He got first place.|得到 receive
+掉|diào|w|4|to fall; to drop|我的笔掉了。|I dropped my pen.|捡 pick up
+坏|huài|w|2|broken; bad|玩具坏了。|The toy is broken.|好 good
+修|xiū|w|6|to fix|爸爸在修自行车。|Dad is fixing the bike.|坏 broken
+疼|téng|w|2|to hurt; painful|我的肚子疼。|My stomach hurts.|痛 painful
+生病|shēng bìng|w|4|to fall ill|他生病请假了。|He's sick and took the day off.|看医生 see a doctor
+医生|yī shēng|w|2|doctor|医生说要多喝水。|The doctor said to drink more water.|护士 nurse
+药|yào|w|4|medicine|吃了药就好了。|You'll feel better after the medicine.|生病 be sick
+头|tóu|w|2|head|我的头有点疼。|My head hurts a little.|头发 hair
+眼睛|yǎn jing|w|2|eyes|她的眼睛很大。|She has big eyes.|鼻子 nose
+鼻子|bí zi|w|4|nose|小狗的鼻子很凉。|The dog's nose is cold.|嘴 mouth
+嘴|zuǐ|w|4|mouth|张开嘴说啊。|Open your mouth and say ah.|牙 teeth
+耳朵|ěr duo|w|4|ears|兔子的耳朵很长。|Rabbits have long ears.|眼睛 eyes
+肚子|dù zi|w|2|stomach; belly|我肚子饿了。|My stomach is hungry.|疼 hurt
+脚|jiǎo|w|4|foot|我的脚很累。|My feet are tired.|手 hand
+身体|shēn tǐ|w|4|body; health|多运动身体好。|Exercise is good for your health.|健康 healthy
+运动|yùn dòng|w|4|exercise; sports|我每天运动半小时。|I exercise for half an hour daily.|跑步 running
+游泳|yóu yǒng|w|2|to swim|夏天我们去游泳。|We swim in the summer.|游泳池 pool
+旅行|lǚ xíng|w|6|to travel|暑假我们去旅行。|We travel during summer break.|放假 vacation
+放假|fàng jià|w|4|to have time off|明天开始放假。|Vacation starts tomorrow.|暑假 summer break
+过年|guò nián|w|4|to celebrate the New Year|过年的时候吃饺子。|We eat dumplings at New Year.|新年 New Year
+红包|hóng bāo|w|4|red envelope with money|爷爷给我一个红包。|Grandpa gave me a red envelope.|过年 New Year
+生词|shēng cí|w|6|new vocabulary word|今天学了十个生词。|We learned ten new words today.|复习 review
+句子|jù zi|w|6|sentence|请用这个词造句子。|Please make a sentence with this word.|词 word
+汉字|hàn zì|w|4|Chinese character|我会写一百个汉字。|I can write a hundred characters.|拼音 pinyin
+拼音|pīn yīn|w|4|pinyin|拼音帮我念生字。|Pinyin helps me read new characters.|汉字 characters
+声调|shēng diào|w|6|tone|中文有四个声调。|Chinese has four tones.|拼音 pinyin
+我要___|wǒ yào ___|f|1|I want ___ (asking for something)|我要一杯水。|I want a glass of water.|我要面条。 I want noodles.
+我想___|wǒ xiǎng ___|f|1|I want to ___ / I'd like to ___|我想出去玩。|I want to go out and play.|我想吃冰淇淋。 I want ice cream.
+我不想___|wǒ bù xiǎng ___|f|1|I don't want to ___|我不想吃青菜。|I don't want to eat vegetables.|我不想睡觉。 I don't want to sleep.
+我喜欢___|wǒ xǐ huan ___|f|1|I like ___|我喜欢画画。|I like drawing.|我喜欢小狗。 I like dogs.
+我不喜欢___|wǒ bù xǐ huan ___|f|1|I don't like ___|我不喜欢下雨天。|I don't like rainy days.|我不喜欢辣的。 I don't like spicy food.
+我会___|wǒ huì ___|f|1|I can ___ (a learned skill)|我会用筷子。|I can use chopsticks.|我会游泳。 I can swim.
+我不会___|wǒ bú huì ___|f|1|I can't ___ (haven't learned)|我不会骑自行车。|I can't ride a bike.|我不会写这个字。 I can't write this character.
+我有___|wǒ yǒu ___|f|1|I have ___|我有两只猫。|I have two cats.|我有一个问题。 I have a question.
+我没有___|wǒ méi yǒu ___|f|1|I don't have ___|我没有零钱。|I don't have change.|我没有时间。 I don't have time.
+这是___|zhè shì ___|f|1|this is ___|这是我的书包。|This is my backpack.|这是我妹妹。 This is my little sister.
+那是___|nà shì ___|f|1|that is ___|那是学校的操场。|That's the school playground.|那是谁的？ Whose is that?
+我是___|wǒ shì ___|f|1|I am ___|我是三年级的学生。|I'm a third grader.|我是美国人。 I'm American.
+我叫___|wǒ jiào ___|f|1|my name is ___|我叫小云。|My name is Xiaoyun.|他叫小明。 His name is Xiaoming.
+你叫什么名字？|nǐ jiào shén me míng zi|f|1|what's your name?|你叫什么名字？|What's your name?|我叫… My name is…
+___在哪里？|___ zài nǎ li|f|1|where is ___?|厕所在哪里？|Where is the restroom?|妈妈在哪里？ Where is Mom?
+我在___|wǒ zài ___|f|1|I'm at ___ / I'm ___ing|我在学校。|I'm at school.|我在写作业。 I'm doing homework.
+可以___吗？|kě yǐ ___ ma|f|1|may I ___?|可以出去玩吗？|May I go out to play?|可以喝水吗？ May I have some water?
+我可以___吗？|wǒ kě yǐ ___ ma|f|1|may I ___? (with subject)|我可以看电视吗？|May I watch TV?|我可以进来吗？ May I come in?
+请你___|qǐng nǐ ___|f|1|please ___|请你等一下。|Please wait a moment.|请你说慢一点。 Please speak slower.
+你要___吗？|nǐ yào ___ ma|f|2|do you want ___?|你要苹果吗？|Do you want an apple?|你要帮忙吗？ Do you want help?
+你喜欢___吗？|nǐ xǐ huan ___ ma|f|2|do you like ___?|你喜欢吃饺子吗？|Do you like dumplings?|你喜欢这本书吗？ Do you like this book?
+___好不好？|___ hǎo bu hǎo|f|2|is ___ okay? how about ___?|我们去公园，好不好？|Let's go to the park, okay?|吃面条好不好？ How about noodles?
+我们一起___吧|wǒ men yì qǐ ___ ba|f|2|let's ___ together|我们一起唱歌吧。|Let's sing together.|我们一起做作业吧。 Let's do homework together.
+___吧|___ ba|f|2|let's ___ / go ahead and ___ (suggestion)|快吃吧。|Go ahead and eat.|走吧。 Let's go.
+太___了|tài ___ le|f|2|too ___ / so ___|太好吃了！|So delicious!|太累了。 I'm so tired.
+很___|hěn ___|f|2|very ___ (links adjective to subject)|今天很热。|It's very hot today.|他很高兴。 He's very happy.
+不太___|bú tài ___|f|3|not very ___|我不太饿。|I'm not very hungry.|今天不太冷。 It's not very cold today.
+有点儿___|yǒu diǎnr ___|f|3|a little bit ___ (something negative)|这个有点儿贵。|This is a bit expensive.|我有点儿累。 I'm a little tired.
+___一点儿|___ yì diǎnr|f|3|a bit more ___ (a request)|请说慢一点儿。|Please speak a bit slower.|再快一点儿。 A bit faster.
+我___了|wǒ ___ le|f|2|I ___ed / I'm now ___ (change or completion)|我吃饱了。|I'm full now.|我懂了。 I get it now.
+我已经___了|wǒ yǐ jīng ___ le|f|3|I have already ___|我已经写完作业了。|I've already finished my homework.|我已经吃过了。 I already ate.
+我还没___|wǒ hái méi ___|f|3|I haven't ___ yet|我还没吃饭。|I haven't eaten yet.|我还没准备好。 I'm not ready yet.
+我正在___|wǒ zhèng zài ___|f|3|I'm in the middle of ___ing|我正在做作业。|I'm doing homework right now.|他正在打电话。 He's on the phone.
+我要去___|wǒ yào qù ___|f|2|I'm going to ___ (a place)|我要去图书馆。|I'm going to the library.|我要去洗手间。 I'm going to the restroom.
+我们去___吧|wǒ men qù ___ ba|f|2|let's go to ___|我们去超市吧。|Let's go to the supermarket.|我们去外面吧。 Let's go outside.
+你去过___吗？|nǐ qù guo ___ ma|f|5|have you ever been to ___?|你去过中国吗？|Have you ever been to China?|你去过那家店吗？ Have you been to that shop?
+我___过|wǒ ___ guo|f|5|I have ___ before (experience)|我吃过北京烤鸭。|I've had Peking duck before.|我见过他。 I've met him before.
+___是什么意思？|___ shì shén me yì si|f|3|what does ___ mean?|这个字是什么意思？|What does this character mean?|"马虎" 是什么意思？ What does mǎhu mean?
+___怎么说？|___ zěn me shuō|f|3|how do you say ___?|这个用中文怎么说？|How do you say this in Chinese?|"apple" 怎么说？ How do you say apple?
+___怎么写？|___ zěn me xiě|f|3|how do you write ___?|这个字怎么写？|How do you write this character?|你的名字怎么写？ How do you write your name?
+怎么___？|zěn me ___|f|3|how do you ___?|这个怎么用？|How do you use this?|怎么去学校？ How do you get to school?
+为什么___？|wèi shén me ___|f|3|why ___?|你为什么不高兴？|Why are you unhappy?|为什么这么晚？ Why so late?
+因为___，所以___|yīn wèi ___, suǒ yǐ ___|f|3|because ___, so ___|因为下雨，所以我们没去。|Because it rained, we didn't go.|因为累，所以早睡。 Because I was tired, I slept early.
+___的时候|___ de shí hou|f|3|when ___ (at the time of)|吃饭的时候不要看手机。|Don't look at your phone while eating.|小的时候我住在中国。 When I was little I lived in China.
+先___，再___|xiān ___, zài ___|f|3|first ___, then ___|先洗手，再吃饭。|Wash your hands first, then eat.|先做作业，再玩。 Homework first, then play.
+___以后|___ yǐ hòu|f|3|after ___|放学以后我去打球。|After school I play ball.|吃完以后收拾。 Clean up after eating.
+___以前|___ yǐ qián|f|3|before ___|睡觉以前要刷牙。|Brush your teeth before bed.|来美国以前他住北京。 Before coming to the US he lived in Beijing.
+然后___|rán hòu ___|f|3|and then ___|我们吃了饭，然后去公园。|We ate, and then went to the park.|然后呢？ And then?
+我觉得___|wǒ jué de ___|f|3|I think / I feel ___|我觉得这本书很有意思。|I think this book is interesting.|我觉得有点冷。 I feel a bit cold.
+我知道___|wǒ zhī dào ___|f|3|I know ___|我知道怎么做。|I know how to do it.|我知道他住哪里。 I know where he lives.
+我不知道___|wǒ bù zhī dào ___|f|3|I don't know ___|我不知道为什么。|I don't know why.|我不知道他的名字。 I don't know his name.
+我希望___|wǒ xī wàng ___|f|5|I hope ___|我希望明天天气好。|I hope the weather is nice tomorrow.|我希望你能来。 I hope you can come.
+我应该___|wǒ yīng gāi ___|f|4|I should ___|我应该早点睡。|I should go to bed earlier.|你应该问老师。 You should ask the teacher.
+我必须___|wǒ bì xū ___|f|5|I must ___|我必须先写完作业。|I must finish my homework first.|我们必须准时。 We must be on time.
+你能___吗？|nǐ néng ___ ma|f|4|can you ___? (a request)|你能帮我一下吗？|Can you help me for a second?|你能等我吗？ Can you wait for me?
+能不能___？|néng bu néng ___|f|4|could you ___? (softer request)|能不能再说一次？|Could you say that again?|能不能给我看看？ Could you let me see?
+请问___|qǐng wèn ___|f|4|excuse me, may I ask ___|请问，图书馆在哪里？|Excuse me, where is the library?|请问现在几点？ Excuse me, what time is it?
+让我___|ràng wǒ ___|f|4|let me ___|让我想一想。|Let me think.|让我看看。 Let me have a look.
+别___|bié ___|f|2|don't ___|别跑！|Don't run!|别担心。 Don't worry.
+不要___|bú yào ___|f|2|don't ___ (stronger)|不要吵。|Don't be noisy.|不要忘了带书。 Don't forget your book.
+我比___更___|wǒ bǐ ___ gèng ___|f|5|I am more ___ than ___|我比哥哥更喜欢音乐。|I like music even more than my brother does.|今天比昨天更冷。 Today is colder than yesterday.
+___比___|___ bǐ ___|f|4|___ is more ... than ___ (comparison)|哥哥比我高。|My older brother is taller than me.|这个比那个好吃。 This one tastes better than that one.
+和___一样___|hé ___ yí yàng ___|f|5|as ___ as ___|他和我一样高。|He is as tall as I am.|这个和那个一样贵。 This is as expensive as that.
+没有___那么___|méi yǒu ___ nà me ___|f|5|not as ___ as ___|今天没有昨天那么热。|Today isn't as hot as yesterday.|我没有他那么快。 I'm not as fast as he is.
+最___的是___|zuì ___ de shì ___|f|5|the most ___ is ___|最好吃的是饺子。|The tastiest thing is dumplings.|最难的是写字。 The hardest part is writing.
+越来越___|yuè lái yuè ___|f|5|more and more ___|天气越来越冷了。|The weather is getting colder and colder.|他中文越来越好。 His Chinese is getting better and better.
+越___越___|yuè ___ yuè ___|f|5|the more ___, the more ___|越练习越容易。|The more you practice, the easier it gets.|雨越下越大。 The harder it rains.
+一边___一边___|yì biān ___ yì biān ___|f|5|___ while ___|他一边走一边唱歌。|He sings while walking.|别一边吃饭一边看电视。 Don't watch TV while eating.
+虽然___，但是___|suī rán ___, dàn shì ___|f|5|although ___, ___|虽然很累，但是我很开心。|Although I'm tired, I'm happy.|虽然贵，但是很好。 Although it's expensive, it's good.
+如果___，就___|rú guǒ ___, jiù ___|f|5|if ___, then ___|如果下雨，我们就在家。|If it rains, we'll stay home.|如果饿了就吃点。 If you're hungry, eat something.
+除了___，还有___|chú le ___, hái yǒu ___|f|6|besides ___, there's also ___|除了数学，还有中文作业。|Besides math, there's Chinese homework too.|除了苹果，还有香蕉。 Besides apples, there are bananas.
+不但___，而且___|bú dàn ___, ér qiě ___|f|6|not only ___, but also ___|这家店不但便宜，而且好吃。|This place is not only cheap but tasty.|他不但会中文，而且会西班牙文。 He speaks not only Chinese but Spanish.
+一___就___|yī ___ jiù ___|f|6|as soon as ___, ___|我一回家就写作业。|As soon as I get home, I do homework.|他一看就懂。 He understands at a glance.
+是不是___？|shì bu shì ___|f|4|is it that ___? (checking)|你是不是不舒服？|Are you not feeling well?|是不是他拿走了？ Did he take it?
+有没有___？|yǒu méi yǒu ___|f|4|do you have ___? is there ___?|有没有水？|Is there any water?|你有没有铅笔？ Do you have a pencil?
+要不要___？|yào bu yào ___|f|4|do you want to ___?|要不要一起去？|Do you want to come along?|要不要再吃一点？ Want a bit more?
+会不会___？|huì bu huì ___|f|4|can you ___? will it ___?|你会不会说中文？|Can you speak Chinese?|明天会不会下雨？ Will it rain tomorrow?
+___，对不对？|___, duì bu duì|f|4|___, right?|你是新同学，对不对？|You're the new student, right?|这样写，对不对？ You write it this way, right?
+___，好吗？|___, hǎo ma|f|2|___, okay?|我们早点走，好吗？|Let's leave early, okay?|明天再说，好吗？ Let's talk tomorrow, okay?
+几点___？|jǐ diǎn ___|f|2|what time ___?|几点上课？|What time does class start?|你几点睡觉？ What time do you go to bed?
+多少钱？|duō shao qián|f|2|how much money?|这个多少钱？|How much is this?|一共多少钱？ How much altogether?
+有多少___？|yǒu duō shao ___|f|4|how many ___ are there?|你们班有多少学生？|How many students are in your class?|有多少时间？ How much time is there?
+___多久？|___ duō jiǔ|f|6|how long does ___ take?|要等多久？|How long do we have to wait?|你学了多久？ How long have you studied?
+从___到___|cóng ___ dào ___|f|6|from ___ to ___|从家到学校要十分钟。|It takes ten minutes from home to school.|从早到晚 from morning to night
+给我___|gěi wǒ ___|f|2|give me ___|给我一张纸。|Give me a piece of paper.|给我看看。 Let me see it.
+帮我___|bāng wǒ ___|f|2|help me ___|帮我拿一下书。|Help me hold the book.|帮我开门。 Help me open the door.
+我给你___|wǒ gěi nǐ ___|f|4|I'll give you ___ / I'll ___ for you|我给你讲个故事。|I'll tell you a story.|我给你写信。 I'll write to you.
+跟我___|gēn wǒ ___|f|4|___ with me|跟我来。|Come with me.|跟我一起念。 Read along with me.
+在___上|zài ___ shàng|f|4|on the ___|书在桌子上。|The book is on the table.|坐在椅子上。 Sit on the chair.
+在___里|zài ___ lǐ|f|4|inside the ___|钥匙在书包里。|The keys are in the backpack.|在房间里玩。 Play in the room.
+把___放在___|bǎ ___ fàng zài ___|f|6|put ___ in/on ___|把书放在桌子上。|Put the book on the table.|把鞋放在门口。 Put the shoes by the door.
+___得很___|___ de hěn ___|f|6|does ___ very ___ (describing how)|他跑得很快。|He runs very fast.|你写得很好。 You write very well.
+___了没有？|___ le méi yǒu|f|6|have you ___ yet?|你吃了没有？|Have you eaten yet?|作业写了没有？ Have you done your homework?
+快___了|kuài ___ le|f|4|about to ___|我们快到了。|We're almost there.|快下雨了。 It's about to rain.
+再___一次|zài ___ yí cì|f|4|___ one more time|再说一次。|Say it one more time.|再试一次。 Try once more.
+一点也不___|yì diǎn yě bù ___|f|6|not ___ at all|我一点也不累。|I'm not tired at all.|他一点也不怕。 He isn't scared at all.
+从来没___过|cóng lái méi ___ guo|f|6|have never ___ before|我从来没去过日本。|I've never been to Japan.|他从来没迟到过。 He has never been late.
+好像___|hǎo xiàng ___|f|6|it seems that ___|他好像生病了。|He seems to be sick.|好像有人来了。 Someone seems to be coming.
+听说___|tīng shuō ___|f|6|I heard that ___|听说明天下雪。|I heard it's going to snow tomorrow.|听说他搬家了。 I heard he moved.
+祝你___|zhù nǐ ___|f|4|I wish you ___|祝你生日快乐！|Happy birthday to you!|祝你健康。 I wish you good health.
+谢谢你___|xiè xie nǐ ___|f|2|thank you for ___|谢谢你帮我。|Thank you for helping me.|谢谢你来。 Thank you for coming.
+对不起，我___|duì bu qǐ, wǒ ___|f|2|sorry, I ___|对不起，我迟到了。|Sorry, I'm late.|对不起，我忘了。 Sorry, I forgot.
+我___不了|wǒ ___ bu liǎo|f|6|I can't manage to ___|我吃不了这么多。|I can't eat this much.|我等不了了。 I can't wait any longer.
+听不懂|tīng bu dǒng|f|4|can't understand what is said|老师说得太快，我听不懂。|The teacher speaks too fast; I can't follow.|看不懂 can't understand in writing
+看得见|kàn de jiàn|f|6|can see (able to)|我看得见黑板。|I can see the blackboard.|看不见 can't see
+从|cóng|c|4|from|我从学校回来。|I came back from school.|从来 ever · 从前 once upon a time
+向|xiàng|c|5|toward|向左转。|Turn left.|方向 direction · 向前 forward
+往|wǎng|c|5|toward; to go|一直往前走。|Keep going straight ahead.|往前 forward · 来往 contact
+把|bǎ|c|5|marks the object being acted on|把门关上。|Close the door.|把手 handle
+被|bèi|c|6|by (passive); quilt|杯子被打破了。|The cup got broken.|被子 quilt
+使|shǐ|c|7|to cause; to use|这使我很高兴。|This makes me happy.|使用 use · 使得 cause
+得|dé|c|5|to get (also de, děi)|他得了第一名。|He got first place.|得到 obtain · 觉得 feel
+着|zhe|c|5|marks an ongoing state|他站着说话。|He talks while standing.|穿着 wearing · 拿着 holding
+过|guò|c|4|to pass; marks past experience|我去过北京。|I've been to Beijing.|过来 come over · 难过 sad
+起|qǐ|c|4|to rise; to start|快起来！|Get up!|起床 get up · 一起 together
+出|chū|c|4|to go out|我们出去吧。|Let's go out.|出来 come out · 出发 set off
+回|huí|c|4|to return|我要回家了。|I'm going home.|回来 come back · 回答 answer
+到|dào|c|4|to arrive; to reach|我们到了。|We've arrived.|到了 arrived · 迟到 be late
+接|jiē|c|5|to receive; to pick up|妈妈来接我。|Mom is picking me up.|接电话 answer the phone
+拉|lā|c|5|to pull|拉一下门。|Pull the door.|拉手 hold hands
+推|tuī|c|5|to push|推开窗户。|Push the window open.|推车 cart
+打|dǎ|c|4|to hit; to play (ball); to make (a call)|我们去打球。|Let's go play ball.|打球 play ball · 打开 open
+拍|pāi|c|6|to pat; to take (a photo)|我拍了一张照片。|I took a photo.|拍照 take pictures
+扔|rēng|c|5|to throw away|别乱扔垃圾。|Don't litter.|扔掉 throw out
+捡|jiǎn|c|6|to pick up|我捡到一支笔。|I picked up a pen.|捡起 pick up
+擦|cā|c|6|to wipe|请擦桌子。|Please wipe the table.|擦干 wipe dry
+挂|guà|c|6|to hang|把画挂在墙上。|Hang the picture on the wall.|挂号 register
+倒|dào|c|6|to pour; upside down|请倒杯水。|Please pour a glass of water.|倒下 fall over
+装|zhuāng|c|7|to load; to pretend|把书装进书包。|Put the books in your bag.|装满 fill up
+剪|jiǎn|c|6|to cut with scissors|我剪了头发。|I got a haircut.|剪刀 scissors
+贴|tiē|c|6|to paste; to stick|把画贴在墙上。|Stick the drawing on the wall.|贴纸 sticker
+折|zhé|c|7|to fold; to break|我们折纸飞机。|We fold paper airplanes.|折纸 origami
+抱|bào|c|5|to hug; to hold|妈妈抱着妹妹。|Mom is holding my little sister.|拥抱 hug
+背|bèi|c|6|to carry on the back; to recite|我背着书包。|I'm carrying my backpack.|背书 recite · 后背 back
+抬|tái|c|6|to lift|我们一起抬桌子。|Let's lift the table together.|抬头 look up
+摔|shuāi|c|6|to fall; to drop|他摔了一跤。|He took a fall.|摔倒 fall down
+碰|pèng|c|6|to bump; to touch|别碰热锅。|Don't touch the hot pot.|碰到 run into
+踢|tī|c|5|to kick|他会踢足球。|He can play soccer.|踢球 play soccer
+爬|pá|c|5|to climb|我们去爬山。|Let's go hiking.|爬山 hike · 爬树 climb a tree
+飞|fēi|c|5|to fly|鸟飞走了。|The bird flew away.|飞机 airplane · 飞快 very fast
+游|yóu|c|5|to swim; to travel|我们去游泳。|Let's go swimming.|游泳 swim · 旅游 travel
+跟|gēn|c|5|with; to follow|跟我来。|Follow me.|跟着 following
+追|zhuī|c|6|to chase|小狗追着球跑。|The dog chased the ball.|追上 catch up
+躲|duǒ|c|6|to hide (oneself)|他躲在门后。|He hid behind the door.|躲开 dodge
+藏|cáng|c|6|to hide something|我把糖藏起来了。|I hid the candy.|捉迷藏 hide and seek
+猜|cāi|c|5|to guess|你猜猜看。|Take a guess.|猜对 guess right
+换|huàn|c|5|to change; to exchange|我换了新书包。|I got a new backpack.|换衣服 change clothes
+查|chá|c|6|to check; to look up|查一下字典。|Look it up in the dictionary.|检查 check · 调查 survey
+讲|jiǎng|c|5|to tell; to explain|老师讲得很清楚。|The teacher explains clearly.|讲故事 tell a story
+念|niàn|c|5|to read aloud; to miss|请念课文。|Please read the text aloud.|念书 study · 想念 miss
+抄|chāo|c|7|to copy out|把生词抄一遍。|Copy the new words once.|抄写 transcribe
+填|tián|c|7|to fill in|请填这张表。|Please fill out this form.|填空 fill in the blank
+练|liàn|c|5|to practice|每天练一练。|Practice a bit every day.|练习 practice · 训练 training
+复|fù|c|6|to repeat; again|我在复习功课。|I'm reviewing my lessons.|复习 review · 重复 repeat
+预|yù|c|7|in advance|我预习了新课。|I previewed the new lesson.|预习 preview · 预报 forecast
+脸|liǎn|c|4|face|洗洗脸吧。|Go wash your face.|笑脸 smiling face
+眼|yǎn|c|4|eye|他的眼睛很亮。|His eyes are bright.|眼睛 eyes · 眼泪 tears
+耳|ěr|c|5|ear|兔子的耳朵很长。|A rabbit's ears are long.|耳朵 ears
+鼻|bí|c|5|nose|我的鼻子不通。|My nose is stuffy.|鼻子 nose
+嘴|zuǐ|c|4|mouth|别用嘴呼吸。|Don't breathe through your mouth.|嘴巴 mouth
+牙|yá|c|4|tooth|我的牙有点疼。|My tooth hurts a bit.|刷牙 brush teeth · 牙医 dentist
+腿|tuǐ|c|5|leg|我的腿很酸。|My legs are sore.|大腿 thigh
+脚|jiǎo|c|4|foot|脚上有泥。|There's mud on my feet.|脚步 footstep
+头|tóu|c|4|head; top|我头疼。|My head hurts.|头发 hair · 外头 outside
+发|fà|c|5|hair (also fā, to send)|她的头发很长。|Her hair is long.|头发 hair · 发现 discover
+皮|pí|c|6|skin; leather|苹果皮别扔。|Don't throw away the apple peel.|皮肤 skin · 书皮 book cover
+血|xuè|c|8|blood|他流了一点血。|He bled a little.|血液 blood
+骨|gǔ|c|8|bone|喝牛奶对骨头好。|Milk is good for your bones.|骨头 bone
+疼|téng|c|4|to ache|哪里疼？|Where does it hurt?|头疼 headache · 心疼 feel bad for
+困|kùn|c|4|sleepy; trapped|我很困。|I'm sleepy.|困难 difficulty
+饱|bǎo|c|4|full (from eating)|我吃饱了。|I'm full.|吃饱 eat one's fill
+瘦|shòu|c|5|thin|这只猫太瘦了。|This cat is too thin.|瘦肉 lean meat
+胖|pàng|c|5|chubby|小狗有点胖。|The dog is a bit chubby.|发胖 gain weight
+干|gān|c|5|dry (also gàn, to do)|衣服干了。|The clothes are dry.|干净 clean · 干活 work
+净|jìng|c|5|clean|房间很干净。|The room is clean.|干净 clean
+脏|zāng|c|5|dirty|鞋子很脏。|The shoes are dirty.|脏话 bad language
+洗|xǐ|c|4|to wash|去洗手。|Go wash your hands.|洗手 wash hands · 洗澡 shower
+刷|shuā|c|5|to brush|刷牙了吗？|Did you brush your teeth?|刷牙 brush teeth · 刷子 brush
+穿|chuān|c|4|to wear|外面冷，穿外套。|It's cold, wear a coat.|穿鞋 put on shoes
+脱|tuō|c|5|to take off|进门要脱鞋。|Take off your shoes indoors.|脱衣服 undress
+戴|dài|c|6|to wear (hat, glasses, watch)|他戴着眼镜。|He wears glasses.|戴帽子 wear a hat
+睡|shuì|c|4|to sleep|快睡吧。|Go to sleep.|睡觉 sleep · 午睡 nap
+醒|xǐng|c|5|to wake up|我七点就醒了。|I woke up at seven.|醒来 wake up
+站|zhàn|c|4|to stand; station|请站起来。|Please stand up.|车站 station · 站住 halt
+躺|tǎng|c|6|to lie down|他躺在床上。|He's lying on the bed.|躺下 lie down
+掉|diào|c|5|to drop; to fall|钱包掉了。|The wallet fell.|掉下来 fall down
+收|shōu|c|5|to put away; to receive|把玩具收好。|Put your toys away.|收拾 tidy · 收到 receive
+拾|shí|c|8|to pick up; to tidy|我们收拾房间。|We're tidying the room.|收拾 tidy up
+搬|bān|c|6|to move (something or house)|他们搬家了。|They moved house.|搬家 move · 搬动 shift
+借|jiè|c|5|to borrow; to lend|我借了一本书。|I borrowed a book.|借书 borrow a book
+挑|tiāo|c|7|to pick; to choose|你挑一个吧。|Pick one.|挑选 select
+陪|péi|c|6|to accompany|我陪你去。|I'll go with you.|陪伴 keep company
+风|fēng|c|4|wind|今天风很大。|It's windy today.|刮风 windy · 风景 scenery
+雨|yǔ|c|4|rain|下雨了，带伞。|It's raining, take an umbrella.|下雨 rain · 雨衣 raincoat
+雪|xuě|c|4|snow|雪下得很大。|It's snowing hard.|下雪 snow · 雪人 snowman
+云|yún|c|5|cloud|天上有白云。|There are white clouds in the sky.|白云 white cloud
+雷|léi|c|6|thunder|打雷了，快进屋。|It's thundering, come inside.|打雷 thunder
+电|diàn|c|4|electricity|停电了。|The power went out.|电话 phone · 电视 TV · 电脑 computer
+冰|bīng|c|5|ice|水结冰了。|The water froze.|冰淇淋 ice cream · 冰箱 fridge
+河|hé|c|5|river|河水很清。|The river water is clear.|小河 stream
+海|hǎi|c|5|sea|夏天我们去海边。|We go to the seaside in summer.|大海 the sea · 海边 seaside
+湖|hú|c|6|lake|湖边有很多鸟。|There are many birds by the lake.|湖水 lake water
+树|shù|c|4|tree|树上有鸟窝。|There's a bird's nest in the tree.|大树 big tree · 树叶 leaf
+草|cǎo|c|4|grass|草地上很软。|The grass is soft.|草地 lawn · 小草 grass
+花|huā|c|4|flower; to spend|花开了。|The flowers are blooming.|花园 garden · 花钱 spend money
+叶|yè|c|6|leaf|秋天树叶变黄。|Leaves turn yellow in fall.|树叶 leaf · 叶子 leaf
+根|gēn|c|7|root; measure word for long things|树根很深。|The tree's roots are deep.|一根 one (stick) · 根本 fundamentally
+石|shí|c|6|stone|小河里有石头。|There are stones in the stream.|石头 stone
+土|tǔ|c|6|soil; earth|花种在土里。|The flowers are planted in soil.|土地 land
+沙|shā|c|6|sand|我们在沙滩上玩。|We play on the sandy beach.|沙滩 beach · 沙子 sand
+空|kōng|c|6|empty; air|盒子是空的。|The box is empty.|空气 air · 有空 free time
+气|qì|c|5|air; gas; anger|空气很新鲜。|The air is fresh.|天气 weather · 生气 angry
+光|guāng|c|6|light|阳光很好。|The sunlight is nice.|阳光 sunshine · 光明 bright
+猫|māo|c|4|cat|猫在睡觉。|The cat is sleeping.|小猫 kitten · 熊猫 panda
+狗|gǒu|c|4|dog|狗在叫。|The dog is barking.|小狗 puppy
+鸟|niǎo|c|4|bird|树上有三只鸟。|There are three birds in the tree.|小鸟 little bird
+虫|chóng|c|5|insect|草里有小虫。|There are bugs in the grass.|虫子 bug · 昆虫 insect
+马|mǎ|c|4|horse|马跑得很快。|Horses run fast.|马上 right away · 马路 road
+牛|niú|c|4|cow; ox|牛在吃草。|The cow is eating grass.|牛奶 milk · 牛肉 beef
+羊|yáng|c|5|sheep; goat|山上有羊。|There are sheep on the hill.|羊肉 lamb · 小羊 lamb
+猪|zhū|c|5|pig|猪很聪明。|Pigs are smart.|猪肉 pork
+鸡|jī|c|4|chicken|鸡蛋在冰箱里。|The eggs are in the fridge.|鸡蛋 egg · 鸡肉 chicken
+鸭|yā|c|5|duck|湖里有鸭子。|There are ducks in the lake.|鸭子 duck · 烤鸭 roast duck
+兔|tù|c|5|rabbit|兔子爱吃胡萝卜。|Rabbits love carrots.|兔子 rabbit
+虎|hǔ|c|6|tiger|老虎住在森林里。|Tigers live in the forest.|老虎 tiger
+象|xiàng|c|6|elephant; appearance|大象的鼻子很长。|An elephant's trunk is long.|大象 elephant · 象棋 chess
+熊|xióng|c|6|bear|熊猫吃竹子。|Pandas eat bamboo.|熊猫 panda
+猴|hóu|c|6|monkey|猴子爬树很快。|Monkeys climb trees fast.|猴子 monkey
+蛇|shé|c|7|snake|别碰蛇。|Don't touch snakes.|小蛇 small snake
+龙|lóng|c|5|dragon|今年是龙年。|This is the year of the dragon.|龙年 year of the dragon
+鼠|shǔ|c|7|mouse; rat|老鼠怕猫。|Mice fear cats.|老鼠 mouse
+房|fáng|c|5|house; room|我们的房子不大。|Our house isn't big.|房间 room · 房子 house
+楼|lóu|c|5|building; floor|我住在三楼。|I live on the third floor.|楼上 upstairs · 大楼 building
+床|chuáng|c|4|bed|快上床睡觉。|Get into bed and sleep.|起床 get up · 床上 on the bed
+桌|zhuō|c|4|table|书在桌子上。|The book is on the table.|桌子 table · 书桌 desk
+椅|yǐ|c|4|chair|请坐在椅子上。|Please sit on the chair.|椅子 chair
+灯|dēng|c|4|lamp; light|请开灯。|Please turn on the light.|开灯 turn on the light · 红灯 red light
+窗|chuāng|c|5|window|请开窗。|Please open the window.|窗户 window · 窗外 outside the window
+墙|qiáng|c|6|wall|墙上有画。|There are pictures on the wall.|墙上 on the wall
+钟|zhōng|c|5|clock; o'clock|墙上有个钟。|There's a clock on the wall.|分钟 minute · 闹钟 alarm clock
+刀|dāo|c|5|knife|小心刀很快。|Careful, the knife is sharp.|小刀 small knife · 刀子 knife
+叉|chā|c|6|fork|我用叉子吃面。|I eat noodles with a fork.|叉子 fork
+勺|sháo|c|6|spoon|用勺子喝汤。|Use a spoon for the soup.|勺子 spoon
+锅|guō|c|6|pot; wok|锅里有汤。|There's soup in the pot.|火锅 hot pot
+瓶|píng|c|5|bottle|给我一瓶水。|Give me a bottle of water.|瓶子 bottle · 一瓶 a bottle of
+盒|hé|c|6|box|这个盒子很轻。|This box is light.|盒子 box · 饭盒 lunch box
+袋|dài|c|6|bag|请给我一个袋子。|Please give me a bag.|袋子 bag · 口袋 pocket
+箱|xiāng|c|6|case; box|行李箱很重。|The suitcase is heavy.|箱子 box · 冰箱 fridge
+伞|sǎn|c|5|umbrella|别忘了带伞。|Don't forget your umbrella.|雨伞 umbrella
+钥|yào|c|7|key (in 钥匙)|钥匙在包里。|The keys are in the bag.|钥匙 key
+匙|shi|c|7|key (in 钥匙)|我丢了钥匙。|I lost my key.|钥匙 key
+纸|zhǐ|c|5|paper|给我一张纸。|Give me a sheet of paper.|报纸 newspaper · 纸巾 tissue
+笔|bǐ|c|4|pen; writing tool|我的笔没水了。|My pen ran out of ink.|铅笔 pencil · 毛笔 brush
+尺|chǐ|c|6|ruler; a Chinese foot|用尺子画线。|Use a ruler to draw a line.|尺子 ruler
+报|bào|c|6|newspaper; to report|爷爷在看报。|Grandpa is reading the paper.|报纸 newspaper · 报名 sign up
+信|xìn|c|5|letter; to believe|我给外婆写信。|I'm writing a letter to Grandma.|写信 write a letter · 相信 believe
+卡|kǎ|c|6|card|这是我的图书卡。|This is my library card.|卡片 card · 贺卡 greeting card
+票|piào|c|5|ticket|我买了两张票。|I bought two tickets.|车票 ticket · 门票 admission
+包|bāo|c|4|bag; to wrap|我们包饺子。|We're wrapping dumplings.|书包 backpack · 面包 bread
+衣|yī|c|4|clothing|衣服在柜子里。|The clothes are in the closet.|衣服 clothes · 毛衣 sweater
+裤|kù|c|5|pants|这条裤子太长。|These pants are too long.|裤子 pants · 短裤 shorts
+裙|qún|c|6|skirt|她穿了一条裙子。|She's wearing a skirt.|裙子 skirt
+帽|mào|c|5|hat|戴上帽子。|Put on your hat.|帽子 hat
+袜|wà|c|6|socks|袜子破了。|The socks have a hole.|袜子 socks
+鞋|xié|c|4|shoes|鞋子湿了。|My shoes are wet.|球鞋 sneakers · 皮鞋 leather shoes
+米|mǐ|c|4|rice; meter|米饭煮好了。|The rice is done.|米饭 rice · 大米 uncooked rice
+面|miàn|c|4|noodles; surface; face|我爱吃面。|I love noodles.|面条 noodles · 前面 in front
+油|yóu|c|5|oil|锅里放点油。|Put some oil in the pan.|加油 go for it · 油炸 deep-fry
+盐|yán|c|5|salt|汤里少放盐。|Don't put much salt in the soup.|咸 salty
+糖|táng|c|4|sugar; candy|少吃糖。|Eat less candy.|糖果 candy · 白糖 sugar
+甜|tián|c|4|sweet|西瓜很甜。|The watermelon is sweet.|甜的 sweet · 甜点 dessert
+酸|suān|c|5|sour; sore|柠檬很酸。|Lemons are sour.|酸的 sour · 腰酸 sore back
+苦|kǔ|c|6|bitter; hardship|药有点苦。|The medicine is a little bitter.|辛苦 hard work · 苦的 bitter
+辣|là|c|5|spicy|四川菜很辣。|Sichuan food is spicy.|辣的 spicy · 辣椒 chili
+咸|xián|c|6|salty|这个汤太咸了。|This soup is too salty.|咸的 salty
+香|xiāng|c|5|fragrant; tasty-smelling|饭菜真香。|The food smells wonderful.|香蕉 banana · 很香 fragrant
+菜|cài|c|4|vegetable; dish|妈妈做了三个菜。|Mom made three dishes.|青菜 greens · 做菜 cook
+饭|fàn|c|4|cooked rice; meal|吃饭了！|Time to eat!|米饭 rice · 早饭 breakfast
+茶|chá|c|4|tea|爷爷爱喝茶。|Grandpa loves tea.|茶杯 teacup · 喝茶 drink tea
+酒|jiǔ|c|7|alcohol|大人才能喝酒。|Only adults may drink alcohol.|啤酒 beer
+蛋|dàn|c|4|egg|鸡蛋煮好了。|The eggs are boiled.|鸡蛋 egg · 蛋糕 cake
+糕|gāo|c|6|cake|生日蛋糕真好吃。|The birthday cake is delicious.|蛋糕 cake
+瓜|guā|c|5|melon|夏天吃西瓜。|We eat watermelon in summer.|西瓜 watermelon · 南瓜 pumpkin
+桃|táo|c|6|peach|桃子熟了。|The peaches are ripe.|桃子 peach
+梨|lí|c|6|pear|这个梨很甜。|This pear is sweet.|梨子 pear
+橘|jú|c|7|tangerine|橘子很好剥。|Tangerines are easy to peel.|橘子 tangerine
+意|yì|c|7|meaning; intention|这是什么意思？|What does this mean?|意思 meaning · 注意 pay attention
+义|yì|c|9|meaning; righteousness|这个词的意义很深。|This word has deep meaning.|意义 significance · 正义 justice
+理|lǐ|c|8|reason; to manage|他讲得有道理。|What he says makes sense.|道理 sense · 理由 reason · 管理 manage
+论|lùn|c|9|to discuss; theory|我们讨论了这个问题。|We discussed this question.|讨论 discuss · 理论 theory
+观|guān|c|8|to observe; view|我们去参观博物馆。|We're visiting the museum.|参观 visit · 观察 observe
+察|chá|c|9|to examine|仔细观察这张图。|Observe this picture carefully.|观察 observe · 警察 police
+研|yán|c|9|to research|他在做研究。|He does research.|研究 research
+究|jiū|c|9|to investigate|研究很有意思。|Research is interesting.|研究 research · 究竟 after all
+实|shí|c|8|real; solid|这是事实。|This is a fact.|事实 fact · 实验 experiment · 其实 actually
+验|yàn|c|9|to test; to examine|我们做了一个实验。|We did an experiment.|实验 experiment · 经验 experience
+思|sī|c|7|to think|我思考了很久。|I thought about it for a long time.|思考 think · 意思 meaning
+考|kǎo|c|6|to test; to examine|明天要考试。|There's a test tomorrow.|考试 exam · 思考 think
+析|xī|c|10|to analyze|请分析这段文章。|Please analyze this passage.|分析 analyze
+构|gòu|c|10|to build; structure|文章的结构很清楚。|The essay's structure is clear.|结构 structure · 构成 make up
+方|fāng|c|6|square; direction; method|这个方法很好。|This method is good.|方法 method · 地方 place · 方向 direction
+法|fǎ|c|7|law; method|这是法律规定的。|The law requires this.|法律 law · 办法 way · 方法 method
+则|zé|c|10|rule; then|我们要守规则。|We must follow the rules.|规则 rule · 原则 principle
+规|guī|c|9|rule; regulation|学校有规定。|The school has rules.|规则 rule · 规定 regulation
+制|zhì|c|10|system; to make|这个制度很旧。|This system is old.|制度 system · 制作 produce
+度|dù|c|8|degree; extent|今天三十度。|It's thirty degrees today.|温度 temperature · 制度 system
+社|shè|c|9|society; association|社会在变化。|Society is changing.|社会 society
+史|shǐ|c|8|history|我喜欢历史课。|I like history class.|历史 history
+历|lì|c|8|to experience; calendar|中国历史很长。|China has a long history.|历史 history · 经历 experience
+政|zhèng|c|10|politics; government|政府盖了新学校。|The government built a new school.|政府 government · 政治 politics
+府|fǔ|c|10|government office|政府在市中心。|The government offices are downtown.|政府 government
+权|quán|c|10|right; power|每个人都有权利。|Everyone has rights.|权利 rights · 权力 power
+利|lì|c|8|benefit; sharp|这对我们有利。|This benefits us.|利益 benefit · 顺利 smooth
+责|zé|c|9|duty; to blame|这是我的责任。|This is my responsibility.|责任 responsibility · 负责 be in charge
+任|rèn|c|9|duty; to appoint|他很负责任。|He is very responsible.|责任 responsibility · 任务 task
+由|yóu|c|8|from; by; cause|这件事由我决定。|I'll decide this matter.|自由 freedom · 理由 reason
+自|zì|c|6|self|我自己来。|I'll do it myself.|自己 oneself · 自由 freedom · 自然 nature
+己|jǐ|c|6|oneself|靠自己努力。|Rely on your own effort.|自己 oneself · 知己 close friend
+民|mín|c|9|the people|人民很勤劳。|The people are hardworking.|人民 the people · 民族 ethnic group
+族|zú|c|9|ethnic group; clan|中国有很多民族。|China has many ethnic groups.|民族 ethnic group · 家族 clan
+教|jiào|c|7|education; to teach|教育很重要。|Education matters.|教育 education · 教室 classroom
+育|yù|c|8|to raise; to educate|体育课我最喜欢。|PE is my favorite class.|体育 PE · 教育 education
+展|zhǎn|c|9|to develop; to spread out|城市发展很快。|The city is developing fast.|发展 develop · 展开 unfold
+建|jiàn|c|9|to build|他们在建新楼。|They're building a new building.|建立 establish · 建议 suggest
+设|shè|c|9|to set up|学校设了新课。|The school set up a new course.|设计 design · 建设 construction
+创|chuàng|c|10|to create|他有创造力。|He is creative.|创造 create · 创新 innovate
+造|zào|c|9|to make; to create|请用这个词造句。|Please make a sentence with this word.|造句 make a sentence · 制造 manufacture
+供|gōng|c|10|to supply|学校提供午饭。|The school provides lunch.|提供 provide
+提|tí|c|8|to raise; to carry|我提一个问题。|Let me raise a question.|提问 ask · 提高 raise
+支|zhī|c|9|to support; measure word for pens|谢谢你的支持。|Thanks for your support.|支持 support · 一支笔 a pen
+持|chí|c|9|to hold; to maintain|请保持安静。|Please keep quiet.|保持 keep · 支持 support
+增|zēng|c|9|to increase|人数增加了。|The number increased.|增加 increase · 增长 growth
+减|jiǎn|c|7|to reduce; to subtract|十减三等于七。|Ten minus three is seven.|减少 reduce · 减法 subtraction
+善|shàn|c|10|good; to improve|情况改善了。|The situation improved.|改善 improve · 友善 friendly
+解|jiě|c|8|to solve; to untie|问题解决了。|The problem is solved.|解决 solve · 解释 explain · 了解 understand
+释|shì|c|10|to explain|老师解释了原因。|The teacher explained the reason.|解释 explain
+达|dá|c|9|to reach; to express|他表达得很清楚。|He expresses himself clearly.|表达 express · 到达 arrive
+交|jiāo|c|7|to hand over; to interact|请交作业。|Please hand in your homework.|交作业 turn in homework · 交流 exchange
+流|liú|c|8|to flow; current|河水流得很快。|The river flows fast.|交流 communicate · 流行 popular
+沟|gōu|c|10|ditch; channel|我们需要沟通。|We need to communicate.|沟通 communicate
+通|tōng|c|8|to go through; to connect|这条路不通。|This road is blocked.|通过 pass · 普通 ordinary · 交通 traffic
+合|hé|c|8|to join; to suit|我们合作吧。|Let's work together.|合作 cooperate · 适合 suit
+作|zuò|c|6|to do; work|请写作文。|Please write an essay.|工作 work · 作业 homework · 作文 essay
+争|zhēng|c|9|to compete; to argue|别和弟弟争。|Don't fight with your brother.|竞争 compete · 战争 war
+标|biāo|c|10|mark; standard|我们的目标很清楚。|Our goal is clear.|目标 goal · 标准 standard
+程|chéng|c|9|process; journey|学习过程很长。|The learning process is long.|过程 process · 课程 course
+状|zhuàng|c|10|state; form|他的状态很好。|He's in good shape.|状态 condition · 形状 shape
+势|shì|c|10|trend; force|这是新的趋势。|This is a new trend.|趋势 trend · 姿势 posture
+据|jù|c|9|according to; evidence|数据很清楚。|The data is clear.|数据 data · 根据 according to
+息|xī|c|9|breath; news|我收到了信息。|I received the message.|休息 rest · 信息 information
+统|tǒng|c|10|to unify; system|这个系统很新。|This system is new.|系统 system · 传统 tradition
+质|zhì|c|10|quality; nature|质量很重要。|Quality matters.|质量 quality · 物质 matter
+量|liàng|c|9|quantity; to measure|雨量很大。|The rainfall is heavy.|数量 quantity · 质量 quality
+效|xiào|c|10|effect; efficiency|这个办法很有效。|This method is effective.|效果 effect · 效率 efficiency
+率|lǜ|c|10|rate|效率提高了。|Efficiency has improved.|效率 efficiency · 比率 ratio
+益|yì|c|10|benefit|运动对身体有益。|Exercise benefits the body.|利益 benefit · 有益 beneficial
+险|xiǎn|c|9|danger; risk|这里很危险。|It's dangerous here.|危险 danger · 保险 insurance
+危|wēi|c|9|danger|过马路要小心危险。|Watch for danger crossing the street.|危险 danger
+机|jī|c|6|machine; opportunity|这是个好机会。|This is a good opportunity.|机会 chance · 飞机 plane · 手机 phone
+战|zhàn|c|9|war; to fight|战争很可怕。|War is terrible.|战争 war · 挑战 challenge
+压|yā|c|9|pressure; to press|考试压力很大。|Exam pressure is heavy.|压力 pressure
+必|bì|c|7|must; necessarily|你必须早点睡。|You must sleep earlier.|必须 must · 必要 necessary
+须|xū|c|8|must|必须完成作业。|The homework must be finished.|必须 must
+需|xū|c|7|to need|我需要帮助。|I need help.|需要 need · 需求 demand
+求|qiú|c|8|to seek; to beg|我求你了。|I'm begging you.|要求 demand · 需求 need
+养|yǎng|c|8|to raise; to nurture|我们养了一只狗。|We keep a dog.|养成 develop (a habit) · 营养 nutrition
+营|yíng|c|10|to operate; camp|夏令营很好玩。|Summer camp is fun.|营养 nutrition · 露营 camping
+污|wū|c|10|dirty; pollution|空气污染很严重。|Air pollution is serious.|污染 pollution
+染|rǎn|c|10|to dye; to infect|水被污染了。|The water is polluted.|污染 pollution · 传染 contagious
+省|shěng|c|9|province; to save|要省着用水。|Use water sparingly.|省钱 save money · 广东省 Guangdong Province
+费|fèi|c|8|fee; to spend|别浪费时间。|Don't waste time.|学费 tuition · 浪费 waste
+浪|làng|c|9|wave; wasteful|海浪很大。|The waves are big.|浪费 waste · 海浪 waves
+贵|guì|c|5|expensive; honored|这个太贵了。|This is too expensive.|贵姓 your surname (polite)
+穷|qióng|c|8|poor|他小时候家里很穷。|His family was poor when he was small.|穷人 poor people
+富|fù|c|8|rich|这个国家很富。|This country is wealthy.|丰富 abundant · 富有 wealthy
+福|fú|c|7|blessing; good fortune|新年快乐，幸福平安。|Happy New Year, joy and peace.|幸福 happiness · 福气 good fortune
+幸|xìng|c|8|fortunate|我很幸运。|I'm lucky.|幸福 happiness · 幸运 lucky
+运|yùn|c|7|luck; to transport|祝你好运。|Good luck.|运动 exercise · 幸运 lucky
+数学|shù xué|w|4|math|数学课我最喜欢。|Math is my favorite class.|语文 language arts
+语文|yǔ wén|w|4|language arts|语文作业很多。|There's a lot of language arts homework.|中文 Chinese
+科学|kē xué|w|4|science|科学实验很好玩。|Science experiments are fun.|实验 experiment
+历史|lì shǐ|w|5|history|我喜欢中国历史。|I like Chinese history.|故事 story
+地理|dì lǐ|w|6|geography|地理课讲山和河。|Geography class covers mountains and rivers.|地图 map
+美术|měi shù|w|5|art class|美术课要带彩笔。|Bring colored pencils to art class.|画画 draw
+体育|tǐ yù|w|4|physical education; sports|体育课在操场上。|PE class is on the field.|运动 exercise
+音乐课|yīn yuè kè|w|4|music class|音乐课我们唱歌。|We sing in music class.|音乐 music
+课本|kè běn|w|4|textbook|请打开课本。|Please open your textbook.|书 book
+课文|kè wén|w|5|text; lesson passage|今天的课文很长。|Today's lesson text is long.|生词 new words
+黑板|hēi bǎn|w|4|blackboard|老师在黑板上写字。|The teacher writes on the board.|白板 whiteboard
+橡皮|xiàng pí|w|4|eraser|我借你橡皮。|I'll lend you my eraser.|铅笔 pencil
+本子|běn zi|w|4|notebook|请拿出本子。|Please take out your notebook.|笔记本 notebook
+文具|wén jù|w|6|stationery|文具都在书包里。|My school supplies are in my bag.|铅笔 pencil
+教室|jiào shì|w|4|classroom|教室里很安静。|The classroom is quiet.|学校 school
+操场|cāo chǎng|w|5|playground; sports field|下课我们去操场。|We go to the field after class.|体育 PE
+同桌|tóng zhuō|w|5|deskmate|我的同桌很有趣。|My deskmate is funny.|同学 classmate
+校长|xiào zhǎng|w|5|principal|校长来我们班了。|The principal came to our class.|老师 teacher
+年级|nián jí|w|4|grade level|你上几年级？|What grade are you in?|班 class
+班|bān|w|4|class; team|我们班有二十个人。|Our class has twenty people.|同班 same class
+举手|jǔ shǒu|w|4|to raise one's hand|回答问题要举手。|Raise your hand to answer.|回答 answer
+排队|pái duì|w|4|to line up|请排队进教室。|Please line up to enter.|队 line
+迟到|chí dào|w|4|to be late|今天我迟到了。|I was late today.|准时 on time
+请假|qǐng jià|w|6|to ask for leave|他生病请假了。|He's sick and took leave.|放假 vacation
+努力学习|nǔ lì xué xí|w|5|to study hard|他努力学习中文。|He studies Chinese hard.|用功 diligent
+认真|rèn zhēn|w|4|serious; careful|她做事很认真。|She does things carefully.|马虎 careless
+马虎|mǎ hu|w|5|careless|做题不能马虎。|Don't be careless with problems.|认真 careful
+粗心|cū xīn|w|6|careless; sloppy|我粗心写错了。|I carelessly wrote it wrong.|细心 careful
+细心|xì xīn|w|6|attentive to detail|奶奶很细心。|Grandma is very attentive.|粗心 careless
+聪明|cōng míng|w|4|smart|他很聪明。|He is smart.|笨 dull
+笨|bèn|w|5|slow; clumsy|我觉得自己有点笨。|I feel a bit slow at this.|聪明 smart
+勇敢|yǒng gǎn|w|5|brave|她很勇敢。|She is brave.|害怕 afraid
+诚实|chéng shí|w|6|honest|做人要诚实。|Be an honest person.|说谎 lie
+谦虚|qiān xū|w|8|modest|他很谦虚。|He is modest.|骄傲 proud
+骄傲|jiāo ào|w|7|proud; arrogant|我为你骄傲。|I'm proud of you.|谦虚 modest
+懒|lǎn|w|5|lazy|周末我有点懒。|I'm a bit lazy on weekends.|勤劳 hardworking
+勤劳|qín láo|w|7|hardworking|农民很勤劳。|Farmers work hard.|懒 lazy
+耐心|nài xīn|w|6|patience|教弟弟要有耐心。|Teaching my brother takes patience.|着急 impatient
+害羞|hài xiū|w|5|shy|他见生人会害羞。|He gets shy with strangers.|大方 at ease
+大方|dà fang|w|7|generous; poised|她很大方。|She is generous.|小气 stingy
+小气|xiǎo qì|w|6|stingy|别那么小气。|Don't be so stingy.|大方 generous
+友好|yǒu hǎo|w|5|friendly|邻居很友好。|The neighbors are friendly.|朋友 friend
+温柔|wēn róu|w|6|gentle|妈妈的声音很温柔。|Mom's voice is gentle.|凶 fierce
+凶|xiōng|w|6|fierce; mean|那只狗很凶。|That dog is fierce.|温柔 gentle
+可怜|kě lián|w|6|pitiful|那只小猫好可怜。|That kitten is so pitiful.|同情 sympathy
+礼貌|lǐ mào|w|5|manners; polite|要有礼貌。|Have good manners.|客气 polite
+客气|kè qi|w|5|polite; formal|别客气。|Don't be so formal.|不客气 you're welcome
+习惯|xí guàn|w|5|habit; to be used to|我习惯早起。|I'm used to getting up early.|养成 develop
+性格|xìng gé|w|8|personality|他的性格很好。|He has a good personality.|脾气 temper
+脾气|pí qi|w|7|temper|他脾气不好。|He has a bad temper.|生气 angry
+邻居|lín jū|w|5|neighbor|我们的邻居很热心。|Our neighbors are warm-hearted.|旁边 next door
+客人|kè rén|w|5|guest|今天家里有客人。|We have guests today.|主人 host
+亲戚|qīn qi|w|7|relatives|过年亲戚都来。|Relatives come at New Year.|家人 family
+表哥|biǎo gē|w|6|older male cousin|我表哥上高中。|My cousin is in high school.|表妹 younger female cousin
+阿姨|ā yí|w|5|aunt; woman of parents' age|阿姨给我糖。|Auntie gave me candy.|叔叔 uncle
+叔叔|shū shu|w|5|uncle; man of parents' age|叔叔开车来的。|Uncle drove here.|阿姨 auntie
+客厅|kè tīng|w|4|living room|我们在客厅看电视。|We watch TV in the living room.|房间 room
+卧室|wò shì|w|6|bedroom|我的卧室很小。|My bedroom is small.|床 bed
+洗手间|xǐ shǒu jiān|w|4|restroom|洗手间在那边。|The restroom is over there.|厕所 toilet
+楼上|lóu shàng|w|4|upstairs|妈妈在楼上。|Mom is upstairs.|楼下 downstairs
+楼下|lóu xià|w|4|downstairs|弟弟在楼下玩。|My brother is playing downstairs.|楼上 upstairs
+院子|yuàn zi|w|6|yard|院子里有花。|There are flowers in the yard.|花园 garden
+家具|jiā jù|w|7|furniture|新家具很漂亮。|The new furniture is nice.|桌子 table
+冰箱|bīng xiāng|w|4|refrigerator|牛奶在冰箱里。|The milk is in the fridge.|冷冻 freeze
+空调|kōng tiáo|w|6|air conditioning|开空调吧，太热了。|Turn on the AC, it's too hot.|电风扇 fan
+钥匙|yào shi|w|5|key|别忘了带钥匙。|Don't forget your keys.|开门 open the door
+垃圾|lā jī|w|5|trash|请倒垃圾。|Please take out the trash.|扔 throw away
+打扫|dǎ sǎo|w|5|to clean up|周末我们打扫房间。|We clean the room on weekends.|收拾 tidy
+整理|zhěng lǐ|w|6|to tidy; to organize|整理一下书桌。|Tidy up your desk.|收拾 tidy
+做饭|zuò fàn|w|4|to cook|爸爸会做饭。|Dad can cook.|炒菜 stir-fry
+炒|chǎo|w|5|to stir-fry|妈妈炒了鸡蛋。|Mom stir-fried some eggs.|炒饭 fried rice
+煮|zhǔ|w|6|to boil; to cook|煮一锅面条。|Boil a pot of noodles.|煮饭 cook rice
+蒸|zhēng|w|7|to steam|我们蒸包子。|We're steaming buns.|蒸饺 steamed dumplings
+烤|kǎo|w|6|to bake; to roast|烤鸭很有名。|Roast duck is famous.|烤箱 oven
+切|qiē|w|5|to cut; to slice|切一点水果。|Cut some fruit.|切开 cut open
+尝|cháng|w|6|to taste|你尝尝这个。|Give this a taste.|味道 flavor
+味道|wèi dao|w|5|taste; smell|这个味道很好。|This tastes great.|好吃 tasty
+香|xiāng|w|4|fragrant; smells good|饭好香啊。|The food smells so good.|臭 stinky
+臭|chòu|w|6|stinky|臭豆腐很臭。|Stinky tofu smells strong.|香 fragrant
+新鲜|xīn xiān|w|5|fresh|这些菜很新鲜。|These vegetables are fresh.|坏 spoiled
+饮料|yǐn liào|w|5|drink; beverage|你要什么饮料？|What would you like to drink?|果汁 juice
+果汁|guǒ zhī|w|4|juice|我要一杯果汁。|I'd like a glass of juice.|饮料 drink · 橙汁 orange juice
+零食|líng shí|w|5|snacks|少吃零食。|Don't eat too many snacks.|糖果 candy
+点心|diǎn xin|w|5|dim sum; snack|周末我们去吃点心。|We eat dim sum on weekends.|包子 bun
+饭馆|fàn guǎn|w|5|restaurant|这家饭馆很有名。|This restaurant is famous.|餐厅 restaurant
+菜单|cài dān|w|5|menu|请给我菜单。|Please give me the menu.|点菜 order
+点菜|diǎn cài|w|6|to order food|我们点菜吧。|Let's order.|菜单 menu
+买单|mǎi dān|w|7|to pay the bill|我来买单。|I'll get the bill.|结账 settle up
+排骨|pái gǔ|w|7|pork ribs|奶奶做的排骨真香。|Grandma's ribs smell wonderful.|红烧 braised
+豆腐|dòu fu|w|5|tofu|我爱吃麻婆豆腐。|I love mapo tofu.|豆浆 soy milk
+粥|zhōu|w|6|congee; porridge|早饭喝粥。|We have congee for breakfast.|稀饭 rice porridge
+汤圆|tāng yuán|w|7|sweet rice balls|元宵节吃汤圆。|We eat tangyuan at the Lantern Festival.|元宵节 Lantern Festival
+月饼|yuè bǐng|w|6|mooncake|中秋节吃月饼。|We eat mooncakes at Mid-Autumn Festival.|中秋节 Mid-Autumn Festival
+春节|chūn jié|w|5|Chinese New Year|春节是最热闹的节日。|Spring Festival is the liveliest holiday.|过年 celebrate New Year
+中秋节|zhōng qiū jié|w|6|Mid-Autumn Festival|中秋节我们赏月。|We admire the moon at Mid-Autumn.|月饼 mooncake
+节日|jié rì|w|5|holiday; festival|我最喜欢的节日是春节。|My favorite holiday is Spring Festival.|放假 time off
+礼貌用语|lǐ mào yòng yǔ|w|7|polite expressions|请和谢谢是礼貌用语。|Please and thank you are polite words.|客气 polite
+商场|shāng chǎng|w|6|shopping mall|周末商场人很多。|The mall is crowded on weekends.|商店 store
+价钱|jià qián|w|6|price|这个价钱很合理。|This price is reasonable.|便宜 cheap
+付钱|fù qián|w|6|to pay|我用手机付钱。|I pay with my phone.|买单 pay the bill
+找钱|zhǎo qián|w|6|to give change|阿姨给我找钱。|The clerk gave me my change.|零钱 change
+元|yuán|w|5|yuan (formal)|一共二十元。|Twenty yuan altogether.|块 yuan (spoken)
+公交车|gōng jiāo chē|w|5|city bus|我坐公交车回家。|I take the bus home.|地铁 subway
+火车|huǒ chē|w|5|train|火车很快。|The train is fast.|高铁 high-speed rail
+机场|jī chǎng|w|6|airport|我们去机场接人。|We're going to the airport to meet someone.|飞机 airplane
+车站|chē zhàn|w|5|station; stop|车站就在前面。|The stop is right ahead.|地铁站 subway station
+开车|kāi chē|w|4|to drive|爸爸开车送我。|Dad drives me.|坐车 ride
+骑|qí|w|5|to ride (bike, horse)|我骑自行车上学。|I bike to school.|自行车 bicycle
+过马路|guò mǎ lù|w|4|to cross the street|过马路要看车。|Look for cars when crossing.|小心 careful
+红绿灯|hóng lǜ dēng|w|5|traffic light|红绿灯坏了。|The traffic light is broken.|路口 intersection
+地图|dì tú|w|5|map|我们看地图找路。|We use a map to find the way.|路 road
+迷路|mí lù|w|6|to get lost|我们在公园迷路了。|We got lost in the park.|找路 find the way
+方向|fāng xiàng|w|6|direction|走错方向了。|We went the wrong way.|左 left · 右 right
+附近|fù jìn|w|5|nearby|附近有超市吗？|Is there a supermarket nearby?|旁边 next to
+安全|ān quán|w|5|safe; safety|安全最重要。|Safety comes first.|危险 danger
+危险|wēi xiǎn|w|5|dangerous|那里很危险。|It's dangerous there.|安全 safe
+注意|zhù yì|w|5|to pay attention|请注意听。|Please listen carefully.|小心 careful
+帮助|bāng zhù|w|5|to help; help|谢谢你的帮助。|Thank you for your help.|帮忙 help out
+照顾|zhào gù|w|6|to take care of|姐姐照顾妹妹。|The older sister takes care of the younger one.|关心 care about
+关心|guān xīn|w|5|to care about|爷爷很关心我们。|Grandpa cares about us.|照顾 look after
+同意|tóng yì|w|5|to agree|我同意你的看法。|I agree with your view.|反对 oppose
+反对|fǎn duì|w|7|to oppose|大家都反对这个主意。|Everyone opposes this idea.|同意 agree
+意见|yì jiàn|w|7|opinion; suggestion|你有什么意见？|What's your opinion?|建议 suggestion
+建议|jiàn yì|w|7|to suggest; suggestion|我建议早点出发。|I suggest leaving early.|意见 opinion
+讨论|tǎo lùn|w|7|to discuss|我们讨论一下。|Let's discuss it.|商量 talk over
+商量|shāng liang|w|7|to talk over|这件事再商量。|Let's talk this over again.|讨论 discuss
+解释|jiě shì|w|7|to explain|请你解释一下。|Please explain.|说明 explain
+说明|shuō míng|w|7|to explain; instructions|说明书很清楚。|The instructions are clear.|解释 explain
+表示|biǎo shì|w|8|to express; to indicate|他表示同意。|He indicated agreement.|表达 express
+表达|biǎo dá|w|8|to express|用中文表达很难。|Expressing this in Chinese is hard.|表示 indicate
+交流|jiāo liú|w|8|to communicate; exchange|我们用中文交流。|We communicate in Chinese.|沟通 communicate
+合作|hé zuò|w|7|to cooperate|我们合作完成了作业。|We finished the project together.|一起 together
+比赛|bǐ sài|w|5|competition; match|明天有篮球比赛。|There's a basketball game tomorrow.|参加 take part
+参加|cān jiā|w|5|to take part in|我要参加比赛。|I want to join the competition.|比赛 competition
+赢|yíng|w|5|to win|我们赢了！|We won!|输 lose
+输|shū|w|5|to lose|输了也没关系。|It's okay to lose.|赢 win
+冠军|guàn jūn|w|7|champion|他得了冠军。|He won the championship.|第一名 first place
+奖|jiǎng|w|6|prize; award|她得了一个奖。|She won a prize.|奖状 certificate
+练球|liàn qiú|w|6|to practice a ball sport|我每天练球。|I practice ball every day.|练习 practice
+跑步|pǎo bù|w|4|to jog; to run|早上我去跑步。|I go running in the morning.|运动 exercise
+滑冰|huá bīng|w|6|to ice skate|冬天我们去滑冰。|We skate in winter.|滑雪 ski
+钢琴|gāng qín|w|5|piano|姐姐在练钢琴。|My sister is practicing piano.|音乐 music
+画笔|huà bǐ|w|6|paintbrush|我的画笔干了。|My paintbrush dried out.|画画 paint
+故事书|gù shi shū|w|4|storybook|我在看故事书。|I'm reading a storybook.|小说 novel
+小说|xiǎo shuō|w|7|novel|这本小说很厚。|This novel is thick.|故事 story
+手表|shǒu biǎo|w|5|wristwatch|这是爷爷的手表。|This is Grandpa's watch.|时间 time
+照片|zhào piàn|w|5|photograph|这张照片真好看。|This photo is lovely.|拍照 take a photo
+拍照|pāi zhào|w|5|to take pictures|我们拍照吧。|Let's take a photo.|照片 photo
+网上|wǎng shàng|w|6|online|我在网上查资料。|I look things up online.|上网 go online
+上网|shàng wǎng|w|6|to go online|做完作业才能上网。|You can go online after homework.|网上 online
+视频|shì pín|w|6|video|我们视频聊天吧。|Let's video chat.|电话 phone call
+原因|yuán yīn|w|7|reason; cause|迟到的原因是堵车。|The reason for being late was traffic.|结果 result
+结果|jié guǒ|w|7|result|比赛结果出来了。|The game results are out.|原因 cause
+方法|fāng fǎ|w|7|method|这个方法很有效。|This method works well.|办法 way
+经验|jīng yàn|w|8|experience|他很有经验。|He has a lot of experience.|经历 to experience
+机会|jī huì|w|7|chance; opportunity|这是个好机会。|This is a good opportunity.|运气 luck
+能力|néng lì|w|8|ability|他的阅读能力很强。|His reading ability is strong.|水平 level
+水平|shuǐ píng|w|8|level; standard|我的中文水平一般。|My Chinese is about average.|能力 ability
+责任|zé rèn|w|8|responsibility|保护环境是我们的责任。|Protecting the environment is our responsibility.|义务 duty
+态度|tài du|w|8|attitude|他的态度很认真。|His attitude is serious.|性格 personality
+目标|mù biāo|w|8|goal|我的目标是学好中文。|My goal is to learn Chinese well.|计划 plan
+计划|jì huà|w|7|plan|暑假有什么计划？|Any plans for summer?|安排 arrange
+安排|ān pái|w|8|to arrange|老师安排了座位。|The teacher arranged the seats.|计划 plan
+过程|guò chéng|w|9|process|学习是一个过程。|Learning is a process.|结果 result
+情况|qíng kuàng|w|8|situation|情况有点复杂。|The situation is a bit complicated.|条件 conditions
+条件|tiáo jiàn|w|8|condition; requirement|条件不太好。|Conditions aren't great.|情况 situation
+复杂|fù zá|w|8|complicated|这个问题很复杂。|This problem is complicated.|简单 simple
+简单|jiǎn dān|w|6|simple|这道题很简单。|This problem is simple.|复杂 complex
+清楚|qīng chu|w|6|clear|说得很清楚。|Said very clearly.|明白 understand
+仔细|zǐ xì|w|7|careful; detailed|仔细看题目。|Read the question carefully.|认真 careful
+突然|tū rán|w|7|suddenly|他突然笑了。|He suddenly laughed.|忽然 suddenly
+终于|zhōng yú|w|7|finally|我终于做完了。|I finally finished.|最后 at last
+其实|qí shí|w|7|actually|其实我也不知道。|Actually, I don't know either.|真的 really
+一般|yì bān|w|7|ordinary; generally|我的成绩一般。|My grades are average.|普通 ordinary
+普通|pǔ tōng|w|8|ordinary|这是一个普通的日子。|It's an ordinary day.|一般 average
+特点|tè diǎn|w|8|characteristic|熊猫的特点是黑白色。|Pandas are known for being black and white.|特别 special
+区别|qū bié|w|8|difference|这两个字有什么区别？|What's the difference between these characters?|一样 same
+比较|bǐ jiào|w|7|to compare; fairly|今天比较冷。|Today is fairly cold.|更 more
+主要|zhǔ yào|w|8|main|主要原因是天气。|The main reason is the weather.|重要 important
+关系|guān xi|w|7|relationship; connection|他们关系很好。|They have a good relationship.|没关系 never mind
+影响|yǐng xiǎng|w|8|to influence; influence|天气影响心情。|Weather affects your mood.|作用 effect
+作用|zuò yòng|w|9|effect; function|药起作用了。|The medicine is working.|影响 influence
+发现|fā xiàn|w|7|to discover|我发现了一个问题。|I found a problem.|找到 find
+发生|fā shēng|w|7|to happen|发生了什么事？|What happened?|出事 have an accident
+出现|chū xiàn|w|8|to appear|天上出现了彩虹。|A rainbow appeared in the sky.|消失 disappear
+消失|xiāo shī|w|9|to disappear|云慢慢消失了。|The clouds slowly disappeared.|出现 appear
+变化|biàn huà|w|8|change|天气变化很快。|The weather changes fast.|改变 change
+增加|zēng jiā|w|8|to increase|人数增加了。|The number increased.|减少 decrease
+减少|jiǎn shǎo|w|8|to reduce|要减少浪费。|We should reduce waste.|增加 increase
+提高|tí gāo|w|8|to raise; to improve|我要提高中文水平。|I want to improve my Chinese.|进步 progress
+保护|bǎo hù|w|7|to protect|保护环境人人有责。|Protecting the environment is everyone's job.|环境 environment
+环境|huán jìng|w|7|environment|学习环境很重要。|The learning environment matters.|保护 protect
+污染|wū rǎn|w|9|pollution|空气污染很严重。|Air pollution is serious.|环境 environment
+资源|zī yuán|w|9|resources|水是宝贵的资源。|Water is a precious resource.|节约 conserve
+节约|jié yuē|w|9|to conserve; to save|节约用水。|Conserve water.|浪费 waste
+浪费|làng fèi|w|8|to waste|别浪费食物。|Don't waste food.|节约 save
+社会|shè huì|w|9|society|社会在进步。|Society is progressing.|国家 country
+国家|guó jiā|w|7|country|中国是一个大国家。|China is a large country.|世界 world
+世界|shì jiè|w|6|world|世界上有很多语言。|There are many languages in the world.|国家 country
+文化|wén huà|w|7|culture|中国文化很有意思。|Chinese culture is interesting.|历史 history
+传统|chuán tǒng|w|8|tradition; traditional|这是一个传统节日。|This is a traditional holiday.|现代 modern
+现代|xiàn dài|w|8|modern|现代生活很方便。|Modern life is convenient.|古代 ancient
+古代|gǔ dài|w|8|ancient times|古代没有电。|There was no electricity in ancient times.|现代 modern
+经济|jīng jì|w|9|economy|经济发展得很快。|The economy is growing fast.|发展 develop
+发展|fā zhǎn|w|8|to develop|城市发展很快。|The city is developing fast.|进步 progress
+科技|kē jì|w|8|technology|科技改变了生活。|Technology has changed life.|科学 science
+政府|zhèng fǔ|w|9|government|政府修了新路。|The government built a new road.|国家 country
+法律|fǎ lǜ|w|9|law|法律保护每个人。|The law protects everyone.|规定 rule
+规定|guī dìng|w|8|rule; to stipulate|学校规定不能带手机。|School rules forbid phones.|规则 rule
+自由|zì yóu|w|8|freedom|我们有选择的自由。|We have freedom of choice.|权利 rights
+平等|píng děng|w|9|equality; equal|人人平等。|Everyone is equal.|公平 fair
+公平|gōng píng|w|8|fair|这样不公平。|That's not fair.|平等 equal
+和平|hé píng|w|8|peace|世界需要和平。|The world needs peace.|战争 war
+战争|zhàn zhēng|w|9|war|战争带来痛苦。|War brings suffering.|和平 peace
+健康|jiàn kāng|w|6|health; healthy|身体健康最重要。|Health matters most.|生病 illness
+营养|yíng yǎng|w|8|nutrition|蔬菜很有营养。|Vegetables are nutritious.|健康 health
+锻炼|duàn liàn|w|8|to exercise; to train|每天锻炼身体。|Exercise every day.|运动 sports
+压力|yā lì|w|8|pressure; stress|考试压力有点大。|Exam pressure is a bit heavy.|放松 relax
+放松|fàng sōng|w|7|to relax|考完试放松一下。|Relax after the exam.|紧张 nervous
+信心|xìn xīn|w|8|confidence|我对自己有信心。|I have confidence in myself.|勇气 courage
+勇气|yǒng qì|w|8|courage|他鼓起勇气发言。|He gathered courage to speak.|勇敢 brave
+鼓励|gǔ lì|w|8|to encourage|老师鼓励我们多读书。|The teacher encourages us to read.|支持 support
+支持|zhī chí|w|8|to support|谢谢你的支持。|Thank you for your support.|帮助 help
+坚持|jiān chí|w|8|to persist|坚持练习就会进步。|Keep practicing and you'll improve.|放弃 give up
+放弃|fàng qì|w|8|to give up|别轻易放弃。|Don't give up easily.|坚持 persist
+成功|chéng gōng|w|7|success; to succeed|努力才会成功。|Effort leads to success.|失败 failure
+失败|shī bài|w|8|failure; to fail|失败是成功之母。|Failure is the mother of success.|成功 success
+后悔|hòu huǐ|w|8|to regret|我有点后悔。|I regret it a little.|遗憾 regret
+遗憾|yí hàn|w|10|regrettable; pity|很遗憾你不能来。|It's a pity you can't come.|可惜 what a shame
+可惜|kě xī|w|8|what a pity|可惜下雨了。|Too bad it rained.|遗憾 regret
+幸运|xìng yùn|w|8|lucky|我很幸运。|I'm lucky.|运气 luck
+运气|yùn qi|w|7|luck|今天运气不错。|I've got good luck today.|幸运 fortunate
+经历|jīng lì|w|9|to experience; experience|那是难忘的经历。|That was an unforgettable experience.|经验 experience
+印象|yìn xiàng|w|9|impression|他给我的印象很好。|He made a good impression on me.|感觉 feeling
+感觉|gǎn jué|w|7|feeling; to feel|我感觉好多了。|I feel much better.|觉得 feel
+感动|gǎn dòng|w|8|to be moved|这个故事让我感动。|This story moved me.|感谢 thank
+感谢|gǎn xiè|w|8|to be grateful|感谢老师的帮助。|I'm grateful for the teacher's help.|谢谢 thanks
+表现|biǎo xiàn|w|8|performance; to show|今天他表现很好。|He did well today.|成绩 results
+批评|pī píng|w|8|to criticize|老师批评了他。|The teacher criticized him.|表扬 praise
+表扬|biǎo yáng|w|8|to praise|老师表扬了我们班。|The teacher praised our class.|批评 criticize
+误会|wù huì|w|9|misunderstanding|这是一个误会。|This is a misunderstanding.|明白 understand
+道歉|dào qiàn|w|8|to apologize|他向我道歉了。|He apologized to me.|对不起 sorry
+原谅|yuán liàng|w|8|to forgive|请原谅我。|Please forgive me.|道歉 apologize
+麻烦|má fan|w|7|trouble; troublesome|麻烦你了。|Sorry to trouble you.|帮忙 help
+困难|kùn nan|w|8|difficulty|遇到困难别怕。|Don't fear difficulties.|问题 problem
+解决|jiě jué|w|8|to solve|问题解决了。|The problem is solved.|办法 solution
+选择|xuǎn zé|w|8|to choose; choice|这是我的选择。|This is my choice.|决定 decide
+考虑|kǎo lǜ|w|9|to consider|让我考虑一下。|Let me think it over.|想 think
+判断|pàn duàn|w|10|to judge; judgment|他的判断很准。|His judgment is accurate.|决定 decide
+观察|guān chá|w|9|to observe|仔细观察这张图。|Observe this picture carefully.|注意 notice
+研究|yán jiū|w|9|to research; research|他在大学做研究。|He does research at a university.|实验 experiment
+实验|shí yàn|w|8|experiment|科学课有实验。|There are experiments in science class.|科学 science
+数据|shù jù|w|10|data|数据很清楚。|The data is clear.|信息 information
+信息|xìn xī|w|9|information|我收到一条信息。|I got a message.|消息 news
+消息|xiāo xi|w|8|news; message|有个好消息。|I have good news.|新闻 news
+新闻|xīn wén|w|8|news|爸爸每天看新闻。|Dad watches the news daily.|消息 message
+知识|zhī shi|w|8|knowledge|读书增长知识。|Reading builds knowledge.|学问 learning
+智慧|zhì huì|w|10|wisdom|老人很有智慧。|Old people have wisdom.|聪明 clever
+意义|yì yì|w|9|significance; meaning|这件事很有意义。|This is very meaningful.|意思 meaning
+道理|dào lǐ|w|8|sense; principle|你说得有道理。|What you say makes sense.|理由 reason
+理由|lǐ yóu|w|8|reason|你有什么理由？|What's your reason?|原因 cause
+证明|zhèng míng|w|9|to prove; proof|事实证明他是对的。|The facts proved him right.|说明 show
+例子|lì zi|w|8|example|请举个例子。|Please give an example.|比如 for instance
+内容|nèi róng|w|9|content|文章的内容很有趣。|The article's content is interesting.|题目 topic
+题目|tí mù|w|8|title; test question|作文题目是什么？|What's the essay topic?|作文 essay
+作文|zuò wén|w|7|essay; composition|我写了一篇作文。|I wrote an essay.|文章 article
+文章|wén zhāng|w|8|article; essay|这篇文章很长。|This article is long.|作文 composition
+翻译|fān yì|w|8|to translate; translation|请帮我翻译一下。|Please translate this for me.|中文 Chinese
+词典|cí diǎn|w|8|dictionary|查一查词典。|Look it up in the dictionary.|查 look up
+成语|chéng yǔ|w|8|four-character idiom|中文成语很有意思。|Chinese idioms are interesting.|谚语 proverb
+一举两得|yì jǔ liǎng dé|w|9|to get two things with one action|走路上学一举两得。|Walking to school does two things at once.|成语 idiom
+熟能生巧|shú néng shēng qiǎo|w|9|practice makes perfect|熟能生巧，多练习吧。|Practice makes perfect, so keep at it.|练习 practice
+半途而废|bàn tú ér fèi|w|10|to give up halfway|学中文别半途而废。|Don't give up halfway with Chinese.|坚持 persist
+画蛇添足|huà shé tiān zú|w|10|to ruin something by overdoing it|再改就画蛇添足了。|Editing more would spoil it.|多余 unnecessary
+亡羊补牢|wáng yáng bǔ láo|w|10|to fix a problem before it worsens|现在复习还不晚，亡羊补牢。|It's not too late to review and fix things.|补救 remedy
+守株待兔|shǒu zhū dài tù|w|10|to wait for luck instead of working|光等机会就是守株待兔。|Just waiting for luck gets you nowhere.|努力 effort
+对牛弹琴|duì niú tán qín|w|10|to talk over someone's head|跟他讲这个是对牛弹琴。|Explaining this to him is wasted breath.|白费 in vain
+井底之蛙|jǐng dǐ zhī wā|w|10|someone with a narrow view|不要做井底之蛙。|Don't be narrow-minded.|见识 insight
+入乡随俗|rù xiāng suí sú|w|10|when in Rome, do as the Romans|入乡随俗，我们也脱鞋。|When in Rome, we take our shoes off too.|习俗 custom
+一言为定|yì yán wéi dìng|w|9|it's a deal|明天见，一言为定！|See you tomorrow, it's a deal!|说定 settled
+不好意思|bù hǎo yì si|w|6|embarrassed; excuse me|不好意思，我来晚了。|Sorry, I'm late.|对不起 sorry
+没想到|méi xiǎng dào|w|7|didn't expect|没想到你也来了。|I didn't expect you to come too.|想不到 unexpectedly
+原来|yuán lái|w|7|it turns out; originally|原来是你啊！|Oh, it's you!|其实 actually
+反正|fǎn zhèng|w|9|anyway|反正我不去。|I'm not going anyway.|无论如何 in any case
+至少|zhì shǎo|w|8|at least|至少要练十分钟。|Practice at least ten minutes.|最少 minimum
+甚至|shèn zhì|w|9|even (to the point that)|他甚至忘了自己的生日。|He even forgot his own birthday.|连 even
+尤其|yóu qí|w|9|especially|我喜欢水果，尤其是芒果。|I like fruit, especially mangoes.|特别 especially
+幸亏|xìng kuī|w|10|fortunately|幸亏带了伞。|Luckily I brought an umbrella.|还好 luckily
+难怪|nán guài|w|9|no wonder|难怪他这么高兴。|No wonder he's so happy.|怪不得 no wonder
+到底|dào dǐ|w|9|after all; on earth|你到底想说什么？|What on earth do you want to say?|究竟 exactly
+恐怕|kǒng pà|w|9|I'm afraid that|恐怕来不及了。|I'm afraid there isn't time.|可能 probably
+不管|bù guǎn|w|9|no matter|不管多难我都要试。|No matter how hard, I'll try.|无论 regardless
+无论|wú lùn|w|10|regardless of|无论如何都要去。|We must go no matter what.|不管 no matter
+于是|yú shì|w|9|and so|天黑了，于是我们回家。|It got dark, so we went home.|所以 therefore
+既然|jì rán|w|10|since (given that)|既然你来了，就一起吃吧。|Since you're here, eat with us.|因为 because
+只要|zhǐ yào|w|8|as long as|只要努力就有进步。|As long as you try, you'll improve.|如果 if
+除非|chú fēi|w|10|unless|除非下雨，我们照常去。|Unless it rains, we'll go as planned.|要不然 otherwise
+要不然|yào bù rán|w|9|otherwise|快点，要不然迟到了。|Hurry, otherwise we'll be late.|不然 or else
+其中|qí zhōng|w|9|among them|三个人，其中两个是我朋友。|Of the three, two are my friends.|之中 among
+另外|lìng wài|w|8|in addition; another|另外还有一个问题。|There's another question as well.|还有 also
+比如说|bǐ rú shuō|w|8|for example|水果，比如说苹果。|Fruit, for example apples.|例如 such as
+总之|zǒng zhī|w|10|in short|总之，我们要努力。|In short, we must work hard.|反正 anyway
+把___拿过来|bǎ ___ ná guò lái|f|4|bring ___ over here|把书拿过来。|Bring the book over.|把碗拿过来。 Bring the bowl over.
+把___给我|bǎ ___ gěi wǒ|f|4|give me the ___|把钥匙给我。|Give me the keys.|把笔给我。 Hand me the pen.
+被___了|bèi ___ le|f|6|got ___ed (passive)|我的伞被拿走了。|My umbrella was taken.|杯子被打破了。 The cup got broken.
+___得怎么样？|___ de zěn me yàng|f|5|how well does ___ do it?|他中文说得怎么样？|How well does he speak Chinese?|你考得怎么样？ How did the test go?
+___得不错|___ de bú cuò|f|5|does ___ pretty well|你写得不错。|You write pretty well.|他跑得不错。 He runs pretty well.
+___不下去了|___ bú xià qù le|f|8|can't keep ___ing|我看不下去了。|I can't keep reading.|太难了，学不下去了。 It's too hard to keep studying.
+___起来|___ qǐ lái|f|7|to start ___ing; it seems ___ when you try|他笑起来了。|He started laughing.|看起来很好吃。 It looks delicious.
+看起来___|kàn qǐ lái ___|f|6|it looks ___|看起来要下雨了。|It looks like rain.|你看起来很累。 You look tired.
+听起来___|tīng qǐ lái ___|f|7|it sounds ___|听起来很有趣。|That sounds interesting.|听起来不太对。 That doesn't sound right.
+我以为___|wǒ yǐ wéi ___|f|7|I thought (mistakenly) ___|我以为今天不上课。|I thought there was no class today.|我以为你知道。 I thought you knew.
+原来___|yuán lái ___|f|7|it turns out that ___|原来他是新老师。|It turns out he's the new teacher.|原来你在这儿。 So here you are.
+难怪___|nán guài ___|f|8|no wonder ___|难怪这么安静。|No wonder it's so quiet.|难怪你不饿。 No wonder you're not hungry.
+难道___吗？|nán dào ___ ma|f|9|don't tell me ___?|难道你忘了吗？|Don't tell me you forgot?|难道他没来？ Did he really not come?
+怪不得___|guài bu de ___|f|9|that explains why ___|怪不得他今天不开心。|That explains why he's unhappy today.|怪不得这么冷。 No wonder it's so cold.
+恐怕___|kǒng pà ___|f|9|I'm afraid that ___|恐怕我去不了。|I'm afraid I can't go.|恐怕时间不够。 I'm afraid there isn't enough time.
+幸亏___|xìng kuī ___|f|9|luckily ___|幸亏我带了钱。|Luckily I brought money.|幸亏没下雨。 Luckily it didn't rain.
+只要___就___|zhǐ yào ___ jiù ___|f|7|as long as ___, then ___|只要努力就能学会。|As long as you try, you can learn it.|只要有时间我就去。 As long as I have time, I'll go.
+只有___才___|zhǐ yǒu ___ cái ___|f|9|only if ___ can ___|只有多练才能进步。|Only with practice can you improve.|只有他才知道。 Only he knows.
+无论___都___|wú lùn ___ dōu ___|f|10|no matter ___, ___|无论下不下雨我都去。|I'll go whether or not it rains.|无论谁问都别说。 No matter who asks, don't tell.
+不管___还是___|bù guǎn ___ hái shì ___|f|9|whether ___ or ___|不管中文还是英文都行。|Chinese or English is fine.|不管早还是晚都要做。 Early or late, it must be done.
+既然___就___|jì rán ___ jiù ___|f|10|since ___, then ___|既然累了就休息吧。|Since you're tired, rest.|既然来了就多坐一会儿。 Since you're here, stay a while.
+除非___，否则___|chú fēi ___, fǒu zé ___|f|10|unless ___, otherwise ___|除非下雪，否则照常上课。|Unless it snows, class is as usual.|除非你去，否则我不去。 Unless you go, I won't.
+万一___怎么办？|wàn yī ___ zěn me bàn|f|9|what if ___?|万一下雨怎么办？|What if it rains?|万一忘了怎么办？ What if I forget?
+要是___就好了|yào shi ___ jiù hǎo le|f|8|if only ___|要是今天放假就好了。|If only today were a holiday.|要是他在就好了。 If only he were here.
+连___都___|lián ___ dōu ___|f|9|even ___ ___|连小孩都会用手机。|Even little kids can use phones.|他连饭都没吃。 He didn't even eat.
+甚至___|shèn zhì ___|f|9|even to the point of ___|他甚至忘了自己的生日。|He even forgot his own birthday.|甚至没说再见。 He didn't even say goodbye.
+一点儿也不___|yì diǎnr yě bù ___|f|7|not ___ at all|我一点儿也不累。|I'm not tired at all.|一点儿也不难。 Not hard at all.
+再也不___了|zài yě bú ___ le|f|8|will never ___ again|我再也不迟到了。|I'll never be late again.|他再也不来了。 He won't come again.
+越___越好|yuè ___ yuè hǎo|f|8|the more ___, the better|越早越好。|The earlier the better.|越多越好。 The more the better.
+不但___而且___|bú dàn ___ ér qiě ___|f|9|not only ___ but also ___|他不但会中文而且会日文。|He speaks not only Chinese but also Japanese.|不但便宜而且好吃。 Not only cheap but tasty.
+一方面___一方面___|yì fāng miàn ___ yì fāng miàn ___|f|10|on one hand ___, on the other ___|一方面想去，一方面又怕累。|Part of me wants to go, part of me fears the effort.|两方面 two sides
+对___来说|duì ___ lái shuō|f|8|as far as ___ is concerned|对我来说，中文不难。|For me, Chinese isn't hard.|对孩子来说很重要。 It matters a lot for children.
+对___有好处|duì ___ yǒu hǎo chù|f|8|is good for ___|运动对身体有好处。|Exercise is good for your health.|对眼睛有好处。 It's good for your eyes.
+关于___|guān yú ___|f|8|about ___; regarding ___|这是一本关于动物的书。|This is a book about animals.|关于这件事我不知道。 I don't know about this matter.
+根据___|gēn jù ___|f|10|according to ___|根据天气预报，明天下雨。|According to the forecast, it'll rain tomorrow.|根据老师说的 according to the teacher
+为了___|wèi le ___|f|7|in order to ___|为了考好，他每天复习。|To do well, he reviews daily.|为了健康要多运动。 Exercise for your health.
+因此___|yīn cǐ ___|f|10|therefore ___|下大雪，因此学校放假。|It snowed heavily, therefore school closed.|所以 so
+于是___|yú shì ___|f|9|and so ___|天黑了，于是我们回家了。|It got dark, so we went home.|然后 then
+结果___|jié guǒ ___|f|8|as a result ___|他没准备，结果考砸了。|He didn't prepare, and as a result he bombed the test.|后来 later
+后来___|hòu lái ___|f|7|later on ___|后来我们成了好朋友。|Later we became good friends.|然后 then
+本来___|běn lái ___|f|9|originally ___|我本来想去的。|I originally wanted to go.|原来 originally
+差点儿___|chà diǎnr ___|f|9|almost ___ (but didn't)|我差点儿迟到。|I almost was late.|差一点 nearly
+终于___了|zhōng yú ___ le|f|7|finally ___|我终于学会了。|I finally learned it.|最后 at last
+正好___|zhèng hǎo ___|f|8|it so happens that ___|我正好也要去。|It happens I'm going too.|刚好 just right
+顺便___|shùn biàn ___|f|9|while you're at it, ___|顺便帮我买瓶水。|Grab me a bottle of water while you're at it.|顺路 on the way
+尽量___|jǐn liàng ___|f|9|try your best to ___|尽量早点到。|Try to arrive early.|努力 try hard
+最好___|zuì hǎo ___|f|7|it's best to ___|你最好先问老师。|You'd better ask the teacher first.|应该 should
+你最好别___|nǐ zuì hǎo bié ___|f|7|you'd better not ___|你最好别告诉他。|You'd better not tell him.|别 don't
+千万别___|qiān wàn bié ___|f|8|whatever you do, don't ___|千万别迟到。|Whatever you do, don't be late.|一定别 be sure not to
+记得___|jì de ___|f|5|remember to ___|记得带钥匙。|Remember your keys.|别忘了 don't forget
+别忘了___|bié wàng le ___|f|5|don't forget to ___|别忘了写作业。|Don't forget your homework.|记得 remember
+我来___|wǒ lái ___|f|5|let me ___ (I'll do it)|我来帮你。|Let me help you.|我来拿。 I'll take it.
+该___了|gāi ___ le|f|5|it's time to ___|该睡觉了。|It's bedtime.|该吃饭了。 Time to eat.
+到___为止|dào ___ wéi zhǐ|f|10|up until ___|到今天为止，我学了三年。|Up to today, I've studied three years.|为止 until
+一共___|yí gòng ___|f|5|altogether ___|一共多少钱？|How much altogether?|一共十个。 Ten in total.
+至少___|zhì shǎo ___|f|8|at least ___|至少要练十分钟。|Practice at least ten minutes.|最少 minimum
+差不多___|chà bu duō ___|f|6|about ___; roughly ___|差不多十点了。|It's about ten o'clock.|大概 roughly
+大概___|dà gài ___|f|7|probably ___; roughly ___|他大概不来了。|He probably isn't coming.|可能 maybe
+好像___似的|hǎo xiàng ___ shì de|f|10|as if ___|他好像没听见似的。|It's as if he didn't hear.|好像 seem
+比___早___|bǐ ___ zǎo ___|f|8|___ earlier than ___|我比他早到十分钟。|I arrived ten minutes earlier than he did.|比 compare
+有的___有的___|yǒu de ___ yǒu de ___|f|8|some ___, others ___|有的同学跑步，有的打球。|Some classmates run, others play ball.|有些 some
+一___比一___|yī ___ bǐ yī ___|f|10|each one more ___ than the last|一天比一天冷。|It gets colder by the day.|越来越 increasingly
+凡是___都___|fán shì ___ dōu ___|f|10|anything that ___, ___|凡是他做的菜都好吃。|Everything he cooks is delicious.|所有 all
+所有的___都___|suǒ yǒu de ___ dōu ___|f|7|all the ___ are ___|所有的作业都做完了。|All the homework is done.|全部 all
+每___都___|měi ___ dōu ___|f|6|every ___ ___|每个星期六都上中文课。|Every Saturday there's Chinese class.|每次 each time
+第一次___|dì yī cì ___|f|6|the first time ___|这是我第一次坐飞机。|This is my first time flying.|第二次 second time
+___的话|___ de huà|f|8|if ___|有时间的话，我们去看电影。|If there's time, let's see a movie.|如果 if
+说不定___|shuō bu dìng ___|f|9|maybe ___; who knows|说不定他已经到了。|Maybe he's already arrived.|也许 perhaps
+看样子___|kàn yàng zi ___|f|10|by the look of it, ___|看样子要下雨了。|By the look of it, it's going to rain.|看起来 it seems
+不见得___|bú jiàn de ___|f|10|not necessarily ___|贵的不见得好。|Expensive isn't necessarily better.|不一定 not necessarily
+舍不得___|shě bu de ___|f|9|can't bear to ___|我舍不得离开。|I can't bear to leave.|不想 don't want
+来不及___|lái bu jí ___|f|8|there isn't time to ___|来不及吃早饭了。|There's no time for breakfast.|来得及 there's still time
+来得及|lái de jí|f|8|there's still time|现在走还来得及。|There's still time if we leave now.|来不及 too late
+V得下 / V不下|___ de xià / ___ bu xià|f|10|can or cannot fit or hold|这么多菜我吃不下。|I can't eat this much food.|放得下 can fit
+听得懂 / 听不懂|tīng de dǒng / tīng bu dǒng|f|6|can or cannot understand by ear|老师说慢点我就听得懂。|If the teacher speaks slowly I can understand.|看得懂 can read
+想起来|xiǎng qǐ lái|f|7|to recall; to remember suddenly|我想起来了！|I remember now!|想不起来 can't recall
+忘不了|wàng bu liǎo|f|9|cannot forget|那天我忘不了。|I'll never forget that day.|记得 remember
+受不了|shòu bu liǎo|f|8|can't stand it|太吵了，我受不了。|It's too noisy, I can't stand it.|忍不住 can't help
+忍不住|rěn bu zhù|f|9|can't help doing|我忍不住笑了。|I couldn't help laughing.|受不了 can't stand
+是___的|shì ___ de|f|8|it was ___ (emphasizing when, where, how)|我是坐地铁来的。|I came by subway.|是昨天来的。 It was yesterday that I came.
+越来越喜欢___|yuè lái yuè xǐ huan ___|f|7|to like ___ more and more|我越来越喜欢中文。|I like Chinese more and more.|越来越 increasingly
+对___感兴趣|duì ___ gǎn xìng qù|f|8|to be interested in ___|我对科学很感兴趣。|I'm very interested in science.|兴趣 interest
+擅长___|shàn cháng ___|f|10|to be good at ___|她擅长画画。|She's good at drawing.|会 can
+负责___|fù zé ___|f|9|to be in charge of ___|我负责擦黑板。|I'm in charge of cleaning the board.|责任 responsibility
+打算___|dǎ suan ___|f|7|to plan to ___|暑假我打算学游泳。|I plan to learn to swim this summer.|计划 plan
+决定___|jué dìng ___|f|7|to decide to ___|我决定每天读中文。|I decided to read Chinese daily.|打算 plan
+答应___|dā ying ___|f|8|to promise to ___|他答应帮我。|He promised to help me.|同意 agree
+同意___|tóng yì ___|f|7|to agree to ___|妈妈同意我去。|Mom agreed to let me go.|答应 promise
+怪___|guài ___|f|9|to blame ___|别怪他。|Don't blame him.|怪自己 blame oneself
+替___|tì ___|f|9|on behalf of ___; for ___|我替你去。|I'll go in your place.|帮 help
+陪___|péi ___|f|7|to keep ___ company|我陪你去医院。|I'll go to the hospital with you.|一起 together
+跟___商量|gēn ___ shāng liang|f|8|to talk it over with ___|我跟爸爸商量一下。|I'll talk it over with Dad.|商量 discuss
+向___学习|xiàng ___ xué xí|f|8|to learn from ___|我们向他学习。|Let's learn from him.|学习 learn
+帮___一个忙|bāng ___ yí gè máng|f|6|to do ___ a favor|你能帮我一个忙吗？|Can you do me a favor?|帮忙 help
+麻烦你___|má fan nǐ ___|f|7|would you mind ___|麻烦你关一下门。|Would you mind closing the door?|请 please
+不好意思，___|bù hǎo yì si, ___|f|6|excuse me / sorry, ___|不好意思，借过一下。|Excuse me, may I get through?|对不起 sorry
+辛苦了|xīn kǔ le|f|7|thanks for your hard work|老师辛苦了！|Thank you for your hard work, teacher!|谢谢 thanks
+没事儿|méi shìr|f|5|it's nothing; I'm fine|没事儿，别担心。|It's fine, don't worry.|没关系 no problem
+算了|suàn le|f|7|forget it; let it go|算了，下次再说。|Forget it, next time.|不要紧 never mind
+随便|suí biàn|f|7|whatever you like; casually|随便你。|Up to you.|都行 either is fine
+都行|dōu xíng|f|6|either works|吃什么都行。|Anything is fine to eat.|随便 whatever`;
+
+const DECKS = {
+  c:{name:"汉字 Characters", tab:"汉字 Character", note:"Single characters, most frequent first, each shown with common words it appears in. Reading these builds the base for everything else."},
+  w:{name:"词语 Words", tab:"词语 Word", note:"Words and set phrases grouped by everyday situations: meals, school, feelings, asking for things. This is the deck that feeds conversation."},
+  f:{name:"句型 Frames", tab:"句型 Frame", note:"Sentence patterns with a blank to fill. Learn one frame and any word from the Words deck can go in it, which is how a few hundred words become thousands of sentences."}
+};
+const LEVELS = {};
+for (let i=1;i<=10;i++) LEVELS[i] = {name:"L"+i};
+const LEVEL_BANDS = "1–2 starter · 3–4 building · 5–6 everyday · 7–8 stretch · 9–10 advanced";
+
+const CARDS = (() => {
+  const seen = new Set(), out = [];
+  RAW.split("\n").forEach(line => {
+    line = line.trim(); if (!line) return;
+    const p = line.split("|");
+    if (p.length < 5) return;
+    const zh = p[0].trim(), deck = p[2].trim(), key = deck + zh;
+    if (seen.has(key)) return; seen.add(key);
+    out.push({zh, py:p[1].trim(), deck, lvl:+p[3], en:p[4].trim(),
+              exz:(p[5]||"").trim(), exe:(p[6]||"").trim(), rel:(p[7]||"").trim()});
+  });
+  return out;
+})();
+
+/* ---------- storage ---------- */
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let stars = new Set(store.get("cn_stars", []));
+const saveStars = () => store.set("cn_stars", [...stars]);
+
+/* ---------- speech ---------- */
+let voice = null;
+function pickVoice(){
+  if (!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /zh[-_]CN|zh[-_]Hans/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+}
+if ("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+let warned = false;
+function say(text, rate=0.8){
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  if (!voice && !warned){ warned = true; pickVoice();
+    if (!voice) alert("No Mandarin voice found in this browser. On Windows, add Chinese in Settings > Time & Language > Language; on iPhone or Mac, add a Chinese voice under Accessibility > Spoken Content."); }
+  const u = new SpeechSynthesisUtterance(text);
+  if (voice) u.voice = voice;
+  u.lang = voice ? voice.lang : "zh-CN"; u.rate = rate;
+  speechSynthesis.speak(u);
+}
+const SPEAK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+
+/* ---------- helpers ---------- */
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const $ = id => document.getElementById(id);
+const todayKey = () => { const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const todayLabel = () => new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+function seededShuffle(arr, seedStr){
+  let h = 1779033703 ^ seedStr.length;
+  for (const c of seedStr){ h = Math.imul(h ^ c.charCodeAt(0), 3432918353); h = h << 13 | h >>> 19; }
+  let s = h >>> 0;
+  const rnd = () => { s = (s + 0x6D2B79F5)|0; let t = Math.imul(s ^ s>>>15, 1|s); t = (t + Math.imul(t ^ t>>>7, 61|t)) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; };
+  const a = arr.slice();
+  for (let i=a.length-1;i>0;i--){ const j = Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+const dailyOrder = () => new Map(seededShuffle(CARDS.map(x => x.deck+x.zh), "cncards-"+todayKey()).map((k,i)=>[k,i]));
+
+/* tone of the first syllable, read from the pinyin marks */
+const TONE_MARKS = {1:"āēīōūǖĀĒĪŌŪǕ",2:"áéíóúǘÁÉÍÓÚǗ",3:"ǎěǐǒǔǚǍĚǏǑǓǙ",4:"àèìòùǜÀÈÌÒÙǛ"};
+function firstToneOf(py){
+  const first = py.trim().split(/[\s·]+/)[0] || "";
+  for (const ch of first) for (const t of [1,2,3,4]) if (TONE_MARKS[t].includes(ch)) return t;
+  return 0;
+}
+const TONE_NAME = {1:"First tone (mā, high and flat)",2:"Second tone (má, rising)",3:"Third tone (mǎ, dipping)",4:"Fourth tone (mà, falling)"};
+const speakText = x => x.deck==="f" ? (x.exz || x.zh.replace(/[_＿]+/g,"")) : x.zh;
+
+/* ---------- tabs ---------- */
+let deck = "c";
+function showTab(which){
+  ["C","W","F"].forEach(k => $("tab"+k).setAttribute("aria-pressed", which===k.toLowerCase()));
+  $("tabTest").setAttribute("aria-pressed", which==="test");
+  $("browse").hidden = which==="test"; $("test").hidden = which!=="test";
+  if (which==="test"){ if (!quiz) renderSetup(); return; }
+  if (which !== deck){ deck = which; soloWord = null; shuffled = null; }
+  renderGrid();
+}
+["c","w","f"].forEach(d => $("tab"+d.toUpperCase()).onclick = () => showTab(d));
+$("tabTest").onclick = () => showTab("test");
+
+/* ---------- browse ---------- */
+const browseLv = new Set([1,2,3,4,5,6,7,8,9,10]);
+let shuffled = null;
+$("lvlChips").innerHTML = Object.entries(LEVELS).map(([k,v]) => `<button class="chip lvl lv${k}" data-l="${k}" aria-pressed="true">${v.name}</button>`).join("")
+  + `<button class="tiny" id="lvAll">All</button><button class="tiny" id="lvLow">1–4</button>`;
+function setLevels(arr){
+  browseLv.clear(); arr.forEach(l => browseLv.add(l));
+  document.querySelectorAll("#lvlChips .chip").forEach(c => c.setAttribute("aria-pressed", browseLv.has(+c.dataset.l)));
+  soloWord = null; renderGrid();
+}
+$("lvlChips").onclick = e => {
+  if (e.target.closest("#lvAll")) return setLevels([1,2,3,4,5,6,7,8,9,10]);
+  if (e.target.closest("#lvLow")) return setLevels([1,2,3,4]);
+  const b = e.target.closest(".chip"); if (!b) return;
+  const l = +b.dataset.l; browseLv.has(l) ? browseLv.delete(l) : browseLv.add(l);
+  b.setAttribute("aria-pressed", browseLv.has(l)); renderGrid();
+};
+$("sort").value = store.get("cn_sort","level");
+$("view").value = store.get("cn_view","grid");
+$("pyBtn").setAttribute("aria-pressed", store.get("cn_py",false));
+["q","sort"].forEach(id => $(id).addEventListener("input", () => { shuffled = null; soloWord = null; store.set("cn_sort",$("sort").value); renderGrid(); }));
+$("view").addEventListener("input", () => { store.set("cn_view",$("view").value); renderGrid(); });
+["pyBtn","starOnly"].forEach(id => $(id).onclick = e => {
+  const b = e.currentTarget, on = b.getAttribute("aria-pressed")!=="true";
+  b.setAttribute("aria-pressed", on);
+  if (id==="pyBtn") store.set("cn_py", on);
+  renderGrid();
+});
+const pyOn = () => $("pyBtn").getAttribute("aria-pressed")==="true";
+
+function exHTML(x){
+  if (!x.exz) return "";
+  let z = esc(x.exz);
+  if (x.deck!=="f" && x.exz.includes(x.zh)) z = z.split(esc(x.zh)).join("<mark>"+esc(x.zh)+"</mark>");
+  return `<p class="ex"><span class="exzh">${z}</span>${x.exe ? `<span class="exen">${esc(x.exe)}</span>` : ""}</p>`;
+}
+function cardHTML(x){
+  const id = x.deck + x.zh;
+  return `<article class="card d${x.deck}" data-tab="${DECKS[x.deck].tab} · ${x.lvl}">
+    <div class="head">
+      <h3 class="zh">${esc(x.zh)}</h3>
+      <span class="py ${pyOn()?"":"hide"}">${esc(x.py)}</span>
+      <button class="iconbtn speak" data-t="${esc(speakText(x))}" aria-label="Say it" title="Say it">${SPEAK_SVG}</button>
+      <button class="iconbtn star" data-id="${esc(id)}" aria-pressed="${stars.has(id)}" aria-label="Star" title="Star for review">★</button>
+    </div>
+    <p class="en">${esc(x.en)}</p>
+    ${exHTML(x)}
+    ${x.rel ? `<p class="rel">${x.deck==="c" ? "Words with it: " : "Also: "}<b>${esc(x.rel)}</b></p>` : ""}
+  </article>`;
+}
+function currentList(){
+  const q = $("q").value.trim().toLowerCase();
+  const so = $("starOnly").getAttribute("aria-pressed")==="true";
+  let list = CARDS.filter(x => x.deck===deck && browseLv.has(x.lvl)
+    && (!so || stars.has(x.deck+x.zh))
+    && (!q || x.zh.includes(q) || x.py.toLowerCase().includes(q) || x.en.toLowerCase().includes(q) || x.rel.includes(q)));
+  const s = $("sort").value;
+  if (s==="zh") list.sort((a,b)=>a.zh.localeCompare(b.zh,"zh"));
+  else if (s==="level") list.sort((a,b)=>a.lvl-b.lvl);
+  else if (s==="daily"){ const pos = dailyOrder(); list.sort((a,b)=>pos.get(a.deck+a.zh)-pos.get(b.deck+b.zh)); }
+  else { if (!shuffled) shuffled = shuffle(CARDS).map(x=>x.deck+x.zh); const pos = new Map(shuffled.map((k,i)=>[k,i])); list.sort((a,b)=>pos.get(a.deck+a.zh)-pos.get(b.deck+b.zh)); }
+  return list;
+}
+function renderGrid(){
+  $("deckNote").textContent = DECKS[deck].note + " Levels: " + LEVEL_BANDS + ".";
+  const list = currentList(), s = $("sort").value;
+  const total = CARDS.filter(x => x.deck===deck).length;
+  $("count").textContent = `Showing ${list.length} of ${total} cards` + (s==="daily" ? ` in today's order (${todayLabel()})` : "");
+  const one = $("view").value==="one";
+  $("grid").hidden = one; $("single").hidden = !one;
+  if (one){
+    soloList = list;
+    if (!soloWord && s==="daily"){ const sv = store.get("cn_daily_"+deck,null); if (sv && sv.d===todayKey()) soloWord = sv.w; }
+    const k = soloWord ? list.findIndex(x => x.deck+x.zh === soloWord) : 0;
+    soloIdx = k < 0 ? 0 : k; $("grid").innerHTML = ""; return renderSolo();
+  }
+  $("grid").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty">No cards match. Clear the search, turn on more levels, or switch off Starred only.</div>`;
+}
+$("grid").onclick = e => {
+  const sp = e.target.closest(".speak"); if (sp) return say(sp.dataset.t);
+  const st = e.target.closest(".star");
+  if (st){ const id = st.dataset.id; stars.has(id) ? stars.delete(id) : stars.add(id); saveStars(); st.setAttribute("aria-pressed", stars.has(id)); return; }
+  const c = e.target.closest(".card"); if (c){ const p = c.querySelector(".py"); if (p) p.classList.toggle("hide"); }
+};
+
+/* ---------- one at a time ---------- */
+let soloList = [], soloIdx = 0, soloWord = null;
+function renderSolo(focusId){
+  const el = $("single");
+  if (!soloList.length){ el.innerHTML = `<div class="empty" style="margin-top:20px">No cards match. Clear the search or turn on more levels.</div>`; return; }
+  const x = soloList[soloIdx]; soloWord = x.deck + x.zh;
+  if ($("sort").value==="daily") store.set("cn_daily_"+deck, {d:todayKey(), w:soloWord});
+  const tab = DECKS[x.deck].tab + " · " + x.lvl, id = esc(soloWord);
+  el.innerHTML = `<div class="solo">
+    <div class="flip" id="soloFlip"><div class="flip-inner" id="soloInner" tabindex="0" role="button" aria-label="Flip card">
+      <div class="face d${x.deck} ${x.deck==="f"?"dfface":""}" data-tab="${tab}" style="--tabc:var(--${x.deck})">
+        <div class="solo-front">
+          <h3 class="zh">${esc(x.zh)}</h3>
+          <span class="py ${pyOn()?"":"hide"}">${esc(x.py)}</span>
+          <button class="iconbtn speak" data-t="${esc(speakText(x))}" aria-label="Say it" title="Say it">${SPEAK_SVG}</button>
+          <p class="note">Say it out loud, then tap to check</p>
+        </div>
+      </div>
+      <div class="face back d${x.deck}" data-tab="${tab}" style="--tabc:var(--${x.deck})">
+        <div class="head"><h3 class="zh">${esc(x.zh)}</h3><span class="py">${esc(x.py)}</span>
+          <button class="iconbtn speak" data-t="${esc(speakText(x))}" aria-label="Say it">${SPEAK_SVG}</button></div>
+        <p class="en">${esc(x.en)}</p>
+        ${exHTML(x)}
+        ${x.rel ? `<p class="rel">${x.deck==="c" ? "Words with it: " : "Also: "}<b>${esc(x.rel)}</b></p>` : ""}
+      </div>
+    </div></div>
+    <div class="solo-nav">
+      <button class="navbtn" id="soloPrev" ${soloIdx===0?"disabled":""}>Previous</button>
+      <p class="count">${soloIdx+1} of ${soloList.length}</p>
+      <button class="iconbtn star" id="soloStar" data-id="${id}" aria-pressed="${stars.has(soloWord)}" aria-label="Star">★</button>
+      <button class="navbtn" id="soloNext" ${soloIdx===soloList.length-1?"disabled":""}>Next</button>
+    </div>
+    <p class="keys">Keyboard: ← and → to move, space to flip, P to hear it</p>
+  </div>`;
+  if (focusId && $(focusId) && !$(focusId).disabled) $(focusId).focus();
+}
+function soloMove(d, focusId){ const n = soloIdx + d; if (n<0 || n>=soloList.length) return; soloIdx = n; renderSolo(focusId); }
+const soloFlip = () => { const f = $("soloFlip"); if (f) f.classList.toggle("on"); };
+$("single").onclick = e => {
+  const sp = e.target.closest(".speak"); if (sp) return say(sp.dataset.t);
+  if (e.target.closest("#soloPrev")) return soloMove(-1,"soloPrev");
+  if (e.target.closest("#soloNext")) return soloMove(1,"soloNext");
+  const st = e.target.closest("#soloStar");
+  if (st){ const id = st.dataset.id; stars.has(id) ? stars.delete(id) : stars.add(id); saveStars(); st.setAttribute("aria-pressed", stars.has(id)); return; }
+  if (e.target.closest("#soloInner")) soloFlip();
+};
+document.addEventListener("keydown", e => {
+  if ($("browse").hidden || $("single").hidden || !soloList.length) return;
+  if (e.target.closest("input, select, textarea")) return;
+  if (e.key==="ArrowRight"){ e.preventDefault(); soloMove(1); }
+  else if (e.key==="ArrowLeft"){ e.preventDefault(); soloMove(-1); }
+  else if ((e.key===" "||e.key==="Enter") && !e.target.closest("button")){ e.preventDefault(); soloFlip(); }
+  else if (e.key.toLowerCase()==="p") say(speakText(soloList[soloIdx]));
+});
+
+/* ---------- test ---------- */
+const MODES = {
+  listen:{t:"Listen and choose", d:"Hear it, then pick the meaning."},
+  read:{t:"Read and choose", d:"See the characters, pick the meaning."},
+  produce:{t:"English to Chinese", d:"See English, pick the Chinese."},
+  pinyin:{t:"Pick the pinyin", d:"See the characters, pick the reading."},
+  tone:{t:"Tone check", d:"Hear it, name the tone of the first syllable."},
+  cloze:{t:"Fill the blank", d:"Complete a sentence with the right word."},
+  flash:{t:"Flashcards", d:"Flip each card and grade yourself."}
+};
+let setup = store.get("cn_setup", {mode:"listen", decks:["c","w","f"], lv:[1,2,3,4], n:10, pool:"all"});
+let quiz = null;
+
+function renderSetup(){
+  quiz = null;
+  const best = store.get("cn_best",{});
+  $("testpanel").innerHTML = `
+    <h2>Test yourself</h2>
+    <p class="note">Pick a quiz type, which decks and levels to draw from, and how many questions.</p>
+    <div class="modes" id="modes">${Object.entries(MODES).map(([k,m]) =>
+      `<button class="mode" data-m="${k}" aria-pressed="${setup.mode===k}"><strong>${m.t}</strong><span>${m.d}</span></button>`).join("")}</div>
+    <div class="row"><label>Decks</label><div class="chips" id="tdk">${Object.entries(DECKS).map(([k,d]) =>
+      `<button class="chip" data-d="${k}" style="background:var(--${k})" aria-pressed="${setup.decks.includes(k)}">${d.name}</button>`).join("")}</div></div>
+    <div class="row"><label>Levels</label><div class="chips" id="tlv">${Object.entries(LEVELS).map(([k,v]) =>
+      `<button class="chip lvl lv${k}" data-l="${k}" aria-pressed="${setup.lv.includes(+k)}">${v.name}</button>`).join("")}
+      <button class="tiny" id="tlvAll" style="border-color:#B9B2A0;color:var(--ink)">All</button></div></div>
+    <p class="note">${LEVEL_BANDS}</p>
+    <div class="row">
+      <label for="tn">Questions</label>
+      <select id="tn">${[10,20,30,50].map(n=>`<option ${n===setup.n?"selected":""}>${n}</option>`).join("")}</select>
+      <label for="tpool">Cards</label>
+      <select id="tpool">
+        <option value="all" ${setup.pool==="all"?"selected":""}>All cards</option>
+        <option value="daily" ${setup.pool==="daily"?"selected":""}>Today's mix (${todayLabel()})</option>
+        <option value="star" ${setup.pool==="star"?"selected":""}>Starred cards (${stars.size})</option>
+      </select>
+    </div>
+    <p class="note" id="tmsg"></p>
+    <div class="row"><button class="primary" id="go">Start quiz</button>
+      ${Object.keys(best).length ? `<span class="note">Best: ${Object.entries(best).map(([k,v])=>`${MODES[k]?MODES[k].t:k} ${v}%`).join(", ")}</span>` : ""}</div>`;
+  $("modes").onclick = e => { const b = e.target.closest(".mode"); if (!b) return; setup.mode = b.dataset.m;
+    document.querySelectorAll(".mode").forEach(x => x.setAttribute("aria-pressed", x===b)); };
+  $("tdk").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; const d = b.dataset.d;
+    setup.decks = setup.decks.includes(d) ? setup.decks.filter(x=>x!==d) : [...setup.decks, d]; b.setAttribute("aria-pressed", setup.decks.includes(d)); };
+  $("tlv").onclick = e => {
+    if (e.target.closest("#tlvAll")){ setup.lv = [1,2,3,4,5,6,7,8,9,10];
+      document.querySelectorAll("#tlv .chip").forEach(c => c.setAttribute("aria-pressed","true")); return; }
+    const b = e.target.closest(".chip"); if (!b) return; const l = +b.dataset.l;
+    setup.lv = setup.lv.includes(l) ? setup.lv.filter(x=>x!==l) : [...setup.lv, l]; b.setAttribute("aria-pressed", setup.lv.includes(l)); };
+  $("go").onclick = startQuiz;
+}
+
+function startQuiz(){
+  setup.n = +$("tn").value; setup.pool = $("tpool").value; store.set("cn_setup", setup);
+  let pool = CARDS.filter(x => setup.decks.includes(x.deck) && setup.lv.includes(x.lvl));
+  if (setup.pool==="star") pool = pool.filter(x => stars.has(x.deck+x.zh));
+  if (setup.mode==="tone") pool = pool.filter(x => firstToneOf(x.py) > 0 && x.deck!=="f");
+  if (setup.mode==="cloze") pool = pool.filter(x => x.deck!=="f" && x.exz && x.exz.includes(x.zh));
+  if (setup.mode==="listen" || setup.mode==="produce") pool = pool.filter(x => x.deck!=="f");
+  if (pool.length < 4){ $("tmsg").textContent = "Not enough cards for this quiz. Turn on more decks or levels, or star more cards first."; return; }
+  let base;
+  if (setup.pool==="daily"){ const pos = dailyOrder(); base = pool.slice().sort((a,b)=>pos.get(a.deck+a.zh)-pos.get(b.deck+b.zh)); }
+  else base = shuffle(pool);
+  const items = shuffle(base.slice(0, Math.min(setup.n, pool.length)));
+  quiz = {mode:setup.mode, items, i:0, right:0, missed:[], answered:false,
+          pool:CARDS.filter(x => setup.decks.includes(x.deck) && setup.lv.includes(x.lvl))};
+  renderQ();
+}
+function distractors(x, k=3){
+  const same = shuffle(quiz.pool.filter(y => y.zh!==x.zh && y.deck===x.deck));
+  const any = shuffle(quiz.pool.filter(y => y.zh!==x.zh));
+  const out = [];
+  for (const y of [...same, ...any]){ if (out.length>=k) break; if (!out.some(o=>o.zh===y.zh)) out.push(y); }
+  return out;
+}
+
+function renderQ(){
+  const q = quiz, x = q.items[q.i]; q.answered = false;
+  const head = `<div class="qmeta"><span>${MODES[q.mode].t}</span><span>Question ${q.i+1} of ${q.items.length} · Score ${q.right}</span></div>
+    <div class="progress"><div style="width:${q.i/q.items.length*100}%"></div></div>`;
+  let body = "";
+  const optRow = (arr, label) => `<div class="opts">${arr.map(o => `<button class="opt" data-k="${esc(o.deck+o.zh)}">${label(o)}</button>`).join("")}</div>`;
+  if (q.mode==="listen"){
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt"><button class="primary" id="sp">${SPEAK_SVG} Play again</button>
+      <p class="note" style="margin-top:10px">Listen, then choose what it means.</p></div>
+      ${optRow(opts, o => esc(o.en))}`;
+  } else if (q.mode==="read"){
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt"><span class="big">${esc(x.zh)}</span></div>${optRow(opts, o => esc(o.en))}`;
+  } else if (q.mode==="produce"){
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt">${esc(x.en)}</div>${optRow(opts, o => `<span class="z">${esc(o.zh)}</span>`)}`;
+  } else if (q.mode==="pinyin"){
+    const opts = shuffle([x, ...distractors(x)]);
+    body = `<div class="prompt"><span class="${x.deck==="f"?"mid":"big"}">${esc(x.zh)}</span></div>${optRow(opts, o => esc(o.py))}`;
+  } else if (q.mode==="tone"){
+    const t = firstToneOf(x.py);
+    body = `<div class="prompt"><span class="big">${esc(x.zh)}</span>
+      <button class="primary" id="sp">${SPEAK_SVG} Play again</button>
+      <p class="note" style="margin-top:10px">Which tone is the first syllable?</p></div>
+      <div class="opts">${[1,2,3,4].map(n => `<button class="opt" data-t="${n}">${TONE_NAME[n]}</button>`).join("")}</div>`;
+    q.tone = t;
+  } else if (q.mode==="cloze"){
+    const opts = shuffle([x, ...distractors(x)]);
+    const s = esc(x.exz).split(esc(x.zh)).join('<span class="blank"></span>');
+    body = `<div class="prompt"><span class="mid">${s}</span>${x.exe ? `<span class="note">${esc(x.exe)}</span>` : ""}</div>
+      ${optRow(opts, o => `<span class="z">${esc(o.zh)}</span>`)}`;
+  } else {
+    body = `<div class="solo" style="margin-top:0"><div class="flip" id="soloFlip"><div class="flip-inner" id="soloInner" tabindex="0" role="button" aria-label="Flip card">
+        <div class="face d${x.deck}" data-tab="${DECKS[x.deck].tab}" style="--tabc:var(--${x.deck})"><div class="solo-front"><h3 class="zh">${esc(x.zh)}</h3>
+          <p class="note">Say it, then tap to check</p></div></div>
+        <div class="face back d${x.deck}" data-tab="${DECKS[x.deck].tab}" style="--tabc:var(--${x.deck})">
+          <div class="head"><h3 class="zh">${esc(x.zh)}</h3><span class="py">${esc(x.py)}</span></div>
+          <p class="en">${esc(x.en)}</p>${exHTML(x)}</div>
+      </div></div></div>
+      <div class="row" style="justify-content:center"><button class="iconbtn" id="sp" aria-label="Say it">${SPEAK_SVG}</button>
+        <button class="ghost" id="fbad" hidden>Still learning</button><button class="primary" id="fgood" hidden>I knew it</button></div>`;
+  }
+  $("testpanel").innerHTML = head + body + `<div id="fb"></div><div class="row"><button class="ghost" id="quit">End quiz</button></div>`;
+  $("quit").onclick = finish;
+  const sp = $("sp"); if (sp) sp.onclick = () => say(speakText(x));
+  if (q.mode==="listen" || q.mode==="tone") setTimeout(() => say(speakText(x)), 300);
+  if (q.mode==="flash"){
+    const inner = $("soloInner");
+    const flip = () => { $("soloFlip").classList.toggle("on"); $("fbad").hidden = $("fgood").hidden = false; };
+    inner.onclick = flip; inner.onkeydown = e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); flip(); } };
+    $("fgood").onclick = () => { q.right++; next(); };
+    $("fbad").onclick = () => { q.missed.push(x); next(); };
+  } else {
+    document.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      if (q.answered) return;
+      const ok = q.mode==="tone" ? +b.dataset.t === q.tone : b.dataset.k === x.deck + x.zh;
+      document.querySelectorAll(".opt").forEach(o => { o.disabled = true;
+        const isRight = q.mode==="tone" ? +o.dataset.t === q.tone : o.dataset.k === x.deck + x.zh;
+        if (isRight) o.classList.add("right"); });
+      if (!ok) b.classList.add("wrong");
+      grade(ok, x);
+    });
+  }
+}
+function grade(ok, x){
+  const q = quiz; q.answered = true;
+  if (ok) q.right++; else q.missed.push(x);
+  $("fb").innerHTML = `<div class="feedback"><b style="color:${ok?"var(--ok)":"var(--bad)"}">${ok?"对了！Correct.":"再试试 Not quite."}</b>
+    <span class="z" style="font-size:1.3rem">${esc(x.zh)}</span> <i>${esc(x.py)}</i> — ${esc(x.en)}
+    ${x.exz ? `<br><span class="z">${esc(x.exz)}</span>${x.exe ? ` <i>${esc(x.exe)}</i>` : ""}` : ""}
+    ${x.rel ? `<br><span class="note">${x.deck==="c"?"Words with it: ":"Also: "}<span class="z">${esc(x.rel)}</span></span>` : ""}
+    <div class="row" style="margin-bottom:0"><button class="ghost" id="hear">${SPEAK_SVG} Hear it</button>
+      <button class="primary" id="nx">${q.i+1<q.items.length?"Next question":"See results"}</button></div></div>`;
+  $("hear").onclick = () => say(speakText(x));
+  $("nx").onclick = next; $("nx").focus();
+}
+function next(){ quiz.i++; quiz.i < quiz.items.length ? renderQ() : finish(); }
+function finish(){
+  const q = quiz, done = q.mode==="flash" ? q.right + q.missed.length : (q.answered ? q.i+1 : q.i);
+  const n = Math.max(done,0), pct = n ? Math.round(q.right/n*100) : 0;
+  if (n >= 5){ const best = store.get("cn_best",{}); if (!best[q.mode] || pct > best[q.mode]){ best[q.mode] = pct; store.set("cn_best", best); } }
+  $("testpanel").innerHTML = `<h2>成绩 Results</h2><div class="score">${q.right} / ${n}</div>
+    <p class="note">${n ? pct+"% correct" : "No questions answered."}</p>
+    ${q.missed.length ? `<h3 style="font-family:var(--serif)">Review these</h3>
+      <ul class="missed">${q.missed.map(x=>`<li><span class="z">${esc(x.zh)}</span> <i>${esc(x.py)}</i> — ${esc(x.en)}</li>`).join("")}</ul>
+      <button class="ghost" id="starMissed">Star these cards</button>` : n ? `<p>全对！Every answer was right.</p>` : ""}
+    <div class="row"><button class="primary" id="again">New quiz</button>
+      ${q.missed.length ? `<button class="ghost" id="retry">Retry missed cards</button>` : ""}</div>`;
+  $("again").onclick = renderSetup;
+  const sm = $("starMissed"); if (sm) sm.onclick = () => { q.missed.forEach(x => stars.add(x.deck+x.zh)); saveStars(); sm.textContent = "Starred"; sm.disabled = true; };
+  const rt = $("retry"); if (rt) rt.onclick = () => { const items = shuffle(q.missed); quiz = {...q, items, i:0, right:0, missed:[], answered:false}; renderQ(); };
+}
+
+renderGrid();
+</script>
+</body>
+</html>
